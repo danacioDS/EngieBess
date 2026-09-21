@@ -58,4 +58,10 @@
 \input{sections/part2-physical-asset}
 \input{sections/part4-services}
 
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[utf8]{inputenc}
+  \usepackage[T1]{fontenc}
+\fi
+
 \end{document}
