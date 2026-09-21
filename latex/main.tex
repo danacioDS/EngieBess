@@ -1,0 +1,61 @@
+\documentclass[11pt, a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}
+\usepackage{bm}
+
+\usepackage{siunitx}
+\sisetup{detect-all, group-separator={,}, output-decimal-marker={.}}
+
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta, positioning, shapes.geometric, calc}
+
+\usepackage{listings}
+\usepackage{xcolor}
+
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=blue, citecolor=blue, urlcolor=blue}
+\usepackage{cleveref}
+
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{BESS Engineering Model}
+\fancyhead[R]{\leftmark}
+\fancyfoot[C]{\thepage}
+\usepackage{setspace}
+\onehalfspacing
+
+\title{
+  \textbf{BESS Engineering Model} \\[0.5em]
+  \large Technical Specification for Operational and Financial Simulation
+}
+\author{ENGIE RFP-264144-1}
+\date{Version 1.0 --- \today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+\newpage
+
+\input{sections/part0-introduction}
+\input{sections/part1-fundamentals}
+\input{sections/part2-physical-asset}
+\input{sections/part4-services}
+
+\end{document}

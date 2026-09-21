@@ -1,0 +1,34 @@
+# LaTeX build artifacts
+latex/build/
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+*.nav
+*.snm
+*.vrb
+*.run.xml
+*.bcf
+
+# Generated LaTeX sections
+latex/sections/*.tex
+
+# Pandoc
+*.pandoc.*
+
+# VS Code
+.vscode/*.local
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS
+.DS_Store
+Thumbs.db

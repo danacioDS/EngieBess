@@ -1,0 +1,50 @@
+name: Build LaTeX PDF
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'latex/**'
+      - 'scripts/**'
+      - '.github/workflows/build-pdf.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-science \
+            texlive-pictures \
+            texlive-fonts-recommended \
+            latexmk
+
+      - name: Install Pandoc
+        run: sudo apt-get install -y pandoc
+
+      - name: Convert Markdown to LaTeX
+        run: ./scripts/md2tex.sh
+
+      - name: Compile PDF
+        run: |
+          mkdir -p latex/build
+          cd latex
+          latexmk -pdf -interaction=nonstopmode -outdir=build main.tex
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: BESS-Engineering-Model-PDF
+          path: latex/build/main.pdf
+          if-no-files-found: error
