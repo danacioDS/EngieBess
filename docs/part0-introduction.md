@@ -42,7 +42,7 @@ For the layer separation to work, five rules apply:
 
 2. **Every service in Part 4 uses the same template.** Objective, inputs, constraints, what it reserves from the asset (power and energy), outputs/KPIs, and risks. This allows comparing modes and detecting overlaps.
 
-3. **Every part declares its interface** in half a page: what it consumes and what it produces. For example, Part 3 delivers only $SOH_t\) (capacity, power, efficiency) and \(c_{deg}$, and Part 5 consumes them as parameters. This makes it possible to change the degradation model without touching dispatch.
+3. **Every part declares its interface** in half a page: what it consumes and what it produces. For example, Part 3 delivers only \(SOH_t\) (capacity, power, efficiency) and \(c_{deg}\), and Part 5 consumes them as parameters. This makes it possible to change the degradation model without touching dispatch.
 
 4. **Every part carries its own changelog.** Equations are numbered by part (e.g., 2.6) to avoid ambiguous cross-references.
 
@@ -58,7 +58,7 @@ The order is not arbitrary: it follows dependencies.
 2. **Part 2 — Physical asset model.** Corrects the energy balance, the site balance, and derating.
 3. **Part 4 — Services (operating modes).** The four modes still missing, with a uniform template.
 4. **Part 5 — Dispatch, stacking, and outputs.** Consumes everything above.
-5. **Part 3 — Degradation and useful life.** Can proceed in parallel because its interface with the other parts is narrow: it only delivers $SOH\) and \(c_{deg}$.
+5. **Part 3 — Degradation and useful life.** Can proceed in parallel because its interface with the other parts is narrow: it only delivers \(SOH\) and \(c_{deg}\).
 
 If Part 4 becomes too extensive, it can be split into:
 
