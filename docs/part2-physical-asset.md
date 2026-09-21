@@ -132,11 +132,11 @@ E_{nom}^{cell} = \frac{E_{PCC}^{usable}}{\eta_{PCS} \cdot \eta_d \cdot (SOC_{max
 The cell DC power limits are:
 
 \[
-0 \le P_{DC,t}^{ch} \le P_{batt,max}^{DC,ch} \cdot SOH_k^{pow} \cdot g_{SOC}(SOC_t) \cdot g_T(T_t)
+0 \le P_{DC,t}^{ch} \le P_{batt,max}^{DC,ch} \cdot SOH_k^{pow} \cdot g_{SOC}$SOC_t$ \cdot g_T$T_t$
 \]
 
 \[
-0 \le P_{DC,t}^{dis} \le P_{batt,max}^{DC,dis} \cdot SOH_k^{pow} \cdot f_{SOC}(SOC_t) \cdot f_T(T_t)
+0 \le P_{DC,t}^{dis} \le P_{batt,max}^{DC,dis} \cdot SOH_k^{pow} \cdot f_{SOC}$SOC_t$ \cdot f_T$T_t$
 \]
 
 **Where:**
@@ -151,10 +151,10 @@ The derating functions capture the reduction of available power as a function of
 
 | Function | Range | Meaning |
 |---|---|---|
-| \(f_{SOC}(SOC_t)\) | \([0, 1]\) | Discharge derating at low SOC |
-| \(f_T(T_t)\) | \([0, 1]\) | Discharge derating at low/high temperature |
-| \(g_{SOC}(SOC_t)\) | \([0, 1]\) | Charge derating at high SOC |
-| \(g_T(T_t)\) | \([0, 1]\) | Charge derating at low/high temperature |
+| \(f_{SOC}$SOC_t$\) | \([0, 1]\) | Discharge derating at low SOC |
+| \(f_T$T_t$\) | \([0, 1]\) | Discharge derating at low/high temperature |
+| \(g_{SOC}$SOC_t$\) | \([0, 1]\) | Charge derating at high SOC |
+| \(g_T$T_t$\) | \([0, 1]\) | Charge derating at low/high temperature |
 
 **Typical shapes:**
 
@@ -236,11 +236,11 @@ The AC active power limits are:
 **Where the derating is applied only to the battery-derived term, inside the \(\min(\cdot)\):**
 
 \[
-P_{max,t}^{AC,ch} = \min\left(P_{max}^{AC},\; \frac{P_{batt,max}^{DC,ch} \cdot SOH_k^{pow} \cdot g_{SOC}(SOC_t) \cdot g_T(T_t)}{\eta_{PCS}}\right)
+P_{max,t}^{AC,ch} = \min\left(P_{max}^{AC},\; \frac{P_{batt,max}^{DC,ch} \cdot SOH_k^{pow} \cdot g_{SOC}$SOC_t$ \cdot g_T$T_t$}{\eta_{PCS}}\right)
 \]
 
 \[
-P_{max,t}^{AC,dis} = \min\left(P_{max}^{AC},\; P_{batt,max}^{DC,dis} \cdot SOH_k^{pow} \cdot f_{SOC}(SOC_t) \cdot f_T(T_t) \cdot \eta_{PCS}\right)
+P_{max,t}^{AC,dis} = \min\left(P_{max}^{AC},\; P_{batt,max}^{DC,dis} \cdot SOH_k^{pow} \cdot f_{SOC}$SOC_t$ \cdot f_T$T_t$ \cdot \eta_{PCS}\right)
 \]
 
 **Explanation:** The PCS hardware rating \(P_{max}^{AC}\) is a physical limit that does not depend on battery SOC or temperature. The derating functions apply only to the battery DC capability, which is converted to the AC side and then composed with the PCS rating via \(\min(\cdot)\).
@@ -305,7 +305,7 @@ P_{loss,t}^{PCS,inc} = P_{standby} + k_{quad} \cdot \left(\left(S_t^{loss}\right
 
 **Path into the energy balance:** The incremental loss appears explicitly in the energy balance (section 2.2.1) as \(-P_{loss,t}^{PCS,inc} / \eta_{PCS} \cdot \Delta t\).
 
-**Alternative (full loss curve):** If the manufacturer provides a full efficiency curve \(\eta_{PCS}(S_t)\), the incremental model is replaced by the curve. The choice is declared per scenario.
+**Alternative (full loss curve):** If the manufacturer provides a full efficiency curve \(\eta_{PCS}$S_t$\), the incremental model is replaced by the curve. The choice is declared per scenario.
 
 ### 2.3.5 PCS loss convexity and MILP treatment
 
