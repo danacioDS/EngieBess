@@ -1,4 +1,3 @@
-Perfecto. Aquí tienes el documento completo en un bloque, listo para guardar o copiar.
 
 ---
 
@@ -6,7 +5,23 @@ Perfecto. Aquí tienes el documento completo en un bloque, listo para guardar o 
 
 ## From Product Intent to Validated and Executable Systems
 
-**Version 4.0 — Engineering Method**
+**Version 4.3 — Engineering Method**
+
+---
+
+## Resumen de cambios respecto a 4.2
+
+| # | Cambio | Secciones afectadas |
+|---|---|---|
+| 1 | Se elimina la contradicción §25 vs Rule 25: el Product Specification termina en Part V (Validation & Acceptance); el Execution Baseline se estructura como documento independiente | §25, §25.1, §25.2, §25.3, §26–§31, Rule 25 |
+| 2 | Se aclara que Prototype es **transversal al nivel de la pregunta**, no un paso posterior a LLD | §2, §3, §16, §47 |
+| 3 | Se formaliza la cadena **Requirement → Concept → Model → Question → Hypothesis → Evidence → Decision → Specification** | §5, §12, §25, §36, §47 |
+| 4 | Se precisa el concepto de **Baseline** con tres niveles (Engineering / Product / Execution) y se aclara que no es inmutable | §25.1, §25.3, §44 |
+
+Además se refuerzan:
+- Rules 25 y 30 (nuevas)
+- Glosario ampliado
+- Modelo final integrado
 
 ---
 
@@ -30,7 +45,7 @@ The method is based on seven principles:
 
 The fundamental transformation is:
 
-**Intent → Concept → Engineering Model → Architecture → Design → Prototype → Evidence → Decision → Specification → Execution → Implementation → Validation → Acceptance**
+**Intent → Requirement → Concept → Model → Question → Hypothesis → Evidence → Decision → Baseline → Architecture → Execution → Implementation → Validation → Acceptance**
 
 This is **not a waterfall process**.
 
@@ -50,29 +65,29 @@ This document defines a systematic method for transforming a product concept, RF
 
 The method is intended for systems where:
 
-* requirements may initially be incomplete or evolving;
-* multiple engineering domains interact;
-* mathematical or computational models are required;
-* technical implementation choices are uncertain;
-* prototypes are required to validate assumptions;
-* implementation effort depends on unresolved technical decisions;
-* acceptance requires objective evidence;
-* changes must be controlled without losing traceability.
+- requirements may initially be incomplete or evolving;
+- multiple engineering domains interact;
+- mathematical or computational models are required;
+- technical implementation choices are uncertain;
+- prototypes are required to validate assumptions;
+- implementation effort depends on unresolved technical decisions;
+- acceptance requires objective evidence;
+- changes must be controlled without losing traceability.
 
 The method is intentionally defined independently of any particular project artifact.
 
 A project applies this method to produce its own:
 
-* engineering models;
-* architecture;
-* prototypes;
-* specifications;
-* work breakdown structures;
-* organizational structures;
-* cost baselines;
-* execution specifications;
-* implementations;
-* validation evidence.
+- engineering models;
+- architecture;
+- prototypes;
+- specifications;
+- work breakdown structures;
+- organizational structures;
+- cost baselines;
+- execution specifications;
+- implementations;
+- validation evidence.
 
 For the ENGIE BESS context, the method provides the process by which the BESS engineering and software solution can be progressively developed and validated.
 
@@ -91,25 +106,30 @@ The fundamental transformation is:
 ```text
 Product Intent
       ↓
+Product Requirements
+      ↓
 Conceptual Engineering
+   ├── Engineering Concept
+   ├── Engineering Model
+   └── Engineering Questions
       ↓
-HLD
+HLD / LLD
       ↓
-LLD
+Prototype(s) / Analysis
       ↓
-Prototype
-      ↓
-Validation / Evidence
+Evidence
       ↓
 Engineering Decision
       ↓
-Product Specification
-      ↓
-WBS / Competencies / OBS / CBS
+Baseline
+   ├── Product Specification
+   └── Execution Baseline
       ↓
 Tasks
       ↓
 Execution Specification
+      ↓
+Prompt
       ↓
 Implementation
       ↓
@@ -140,6 +160,45 @@ Requirement Problem?
 
 The correction must be applied at the level where the underlying meaning is incorrect.
 
+**Note on Prototype placement.**
+
+Prototypes are **transversal to the level of the engineering question**. They are not a fixed step in the chain; they are evidence-generating mechanisms that may operate wherever an engineering question arises.
+
+```text
+                 CONCEPTUAL ENGINEERING
+                         │
+              ┌──────────┴──────────┐
+              │                     │
+              ▼                     ▼
+       Engineering Model     Engineering
+                            Questions
+              │                     │
+              └──────────┬──────────┘
+                         ▼
+                  Prototype / Analysis
+                         │
+                      Evidence
+                         │
+                         ▼
+                 Engineering Decision
+                         │
+                         ▼
+                    HLD / LLD
+                         │
+                         ▼
+              Technical Prototype
+                         │
+                      Evidence
+                         │
+                         ▼
+                  Architecture /
+                  Design Decision
+```
+
+A prototype may therefore be used to answer a **conceptual** question (e.g., "is LP sufficient to represent basic dispatch?") before HLD/LLD are complete, or to answer an **implementation** question (e.g., "does the solver scale to the required horizon?") after LLD.
+
+**Rule.** The transition from design to Product Specification must pass through Prototype, Evidence, and Engineering Decision. A Product Specification must never be issued directly from LLD.
+
 ---
 
 # 3. The Engineering Lifecycle
@@ -152,53 +211,67 @@ The principal lifecycle is:
                     PRODUCT INTENT
                           │
                           ▼
+                 PRODUCT REQUIREMENTS
+                          │
+                          ▼
                  CONCEPTUAL ENGINEERING
                           │
+              ┌───────────┼───────────┐
+              ▼           ▼           ▼
+        ENGINEERING  ENGINEERING  ENGINEERING
+          CONCEPT       MODEL      QUESTIONS
+              │           │           │
+              └───────────┼───────────┘
                           ▼
-                         HLD
+                  PROTOTYPE / ANALYSIS
                           │
                           ▼
-                         LLD
-                          │
-                          ▼
-                      PROTOTYPE
-                          │
-                          ▼
-                 VALIDATION / EVIDENCE
+                      EVIDENCE
                           │
                     ┌─────┴─────┐
                     │           │
                   PASS         FAIL
                     │           │
                     ▼           ▼
-                 DECISION    ROOT CAUSE
-                    │           │
-                    │           ▼
+              ENGINEERING    ROOT CAUSE
+               DECISION          │
+                    │            ▼
                     │      CORRECTIVE ACTION
-                    │           │
-                    └─────◄─────┘
+                    │            │
+                    └─────◄──────┘
                     │
                     ▼
-             PRODUCT SPECIFICATION
+                 BASELINE
                     │
-                    ▼
-              WBS / OBS / CBS
-                    │
-                    ▼
-                  TASKS
-                    │
-                    ▼
-          EXECUTION SPECIFICATION
-                    │
-                    ▼
-              IMPLEMENTATION
-                    │
-                    ▼
-             TEST / VALIDATION
-                    │
-                    ▼
-                ACCEPTANCE
+        ┌───────────┴───────────┐
+        ▼                       ▼
+PRODUCT SPECIFICATION   EXECUTION BASELINE
+        │                       │
+        │              ┌────────┼────────┐
+        │              ▼        ▼        ▼
+        │             WBS      OBS      CBS
+        │              │
+        │              ▼
+        │            TASKS
+        │              │
+        │              ▼
+        │    EXECUTION SPECIFICATION
+        │              │
+        └──────────────┤
+                       ▼
+                     PROMPT
+                       │
+                       ▼
+                 IMPLEMENTATION
+                       │
+                       ▼
+                TEST / VALIDATION
+                       │
+                       ▼
+                   ACCEPTANCE
 ```
+
+Note that this figure shows a **default progression**. In practice, prototype/evidence/decision cycles may occur at multiple levels (conceptual, architectural, technical) before a baseline is declared.
 
 Four mechanisms operate across every stage:
 
@@ -218,9 +291,31 @@ Requirement, model, and implementation uncertainty must be identified and reduce
 
 Changes and failures must propagate through the appropriate abstraction level without uncontrolled redesign.
 
-These mechanisms are not sequential phases.
+### 3.5 Engineering Decision Cycle
 
-They are **continuous controls over the lifecycle**.
+Every significant engineering decision follows this cycle:
+
+```text
+Requirement
+     ↓
+Engineering Question
+     ↓
+Hypothesis
+     ↓
+Experiment / Prototype / Analysis
+     ↓
+Evidence
+     ↓
+Engineering Decision
+     ↓
+Baseline
+```
+
+**Engineering Decision** is formally defined as:
+
+> **The controlled selection, approval, or rejection of an engineering hypothesis, formulation, architecture element, or technical approach, based on defined requirements, constraints, evidence, and residual uncertainty.**
+
+These mechanisms are not sequential phases. They are **continuous controls over the lifecycle**.
 
 ---
 
@@ -258,10 +353,10 @@ Stakeholders evaluating BESS projects and their operational and economic perform
 
 At this level:
 
-* implementation technologies remain open;
-* architectural details remain open;
-* optimization techniques remain open;
-* unresolved requirements are explicitly recorded.
+- implementation technologies remain open;
+- architectural details remain open;
+- optimization techniques remain open;
+- unresolved requirements are explicitly recorded.
 
 Product Intent establishes the direction of the system without prematurely determining its implementation.
 
@@ -289,6 +384,80 @@ These domains are not necessarily independent modules.
 
 They represent **engineering responsibilities and semantic domains** whose interactions must be understood before software architecture is finalized.
 
+**Critical distinction:**
+
+- BESS Engineering ≠ Python
+- Market Engineering ≠ Databricks
+- Financial Engineering ≠ SQL
+
+The engineering domains define **what the system must represent**. The technology stack defines **how that representation is realized**. Mixing them inverts the method.
+
+## 5.1 Engineering Concept vs Engineering Model
+
+Conceptual Engineering produces two distinct but related artifacts:
+
+- **Engineering Concept** — the qualitative representation of the system: what entities exist, what states they have, what relationships and constraints apply, what questions must be answered.
+- **Engineering Model** — the quantitative representation: equations, variables, parameters, boundaries, and assumptions that operationalize the concept.
+
+Example (BESS):
+
+| Artifact | Content |
+|---|---|
+| Product Requirement | Model BESS operational performance. |
+| Engineering Requirement | The model shall represent energy state evolution subject to physical power, energy, and efficiency constraints. |
+| Engineering Concept | Represent the battery as a constrained energy-storage state system with SOC, power limits, and efficiency. |
+| Engineering Model | \(SOC_{t+\Delta t} = SOC_t + \frac{\eta_c P_c \Delta t}{E_{max}} - \frac{P_d \Delta t}{\eta_d E_{max}}\) |
+| Engineering Question | Is this state formulation sufficient for the intended operating envelope? |
+| Engineering Decision | Use this formulation within the defined operating envelope. |
+
+Concept and model are not interchangeable. Concept without model remains ambiguous; model without concept lacks semantic grounding.
+
+## 5.2 Formal chain from Requirement to Specification
+
+The methodology establishes the following formal chain:
+
+```text
+Stakeholder Requirement
+        ↓
+Product Requirement
+        ↓
+Engineering Requirement
+        ↓
+Engineering Concept
+        ↓
+Engineering Model
+        ↓
+Engineering Question
+        ↓
+Hypothesis
+        ↓
+Prototype / Analysis
+        ↓
+Evidence
+        ↓
+Engineering Decision
+        ↓
+Specification
+```
+
+Each step introduces a **different type of statement**:
+
+| Step | Nature |
+|---|---|
+| Stakeholder Requirement | Needs, expectations, constraints |
+| Product Requirement | What the product must do |
+| Engineering Requirement | What the model must represent |
+| Engineering Concept | Qualitative representation |
+| Engineering Model | Quantitative formulation |
+| Engineering Question | Precise, answerable uncertainty |
+| Hypothesis | Proposed answer |
+| Prototype / Analysis | Evidence-generating mechanism |
+| Evidence | Objective result |
+| Engineering Decision | Controlled selection |
+| Specification | Validated, stable statement |
+
+This chain is the backbone of traceability.
+
 ---
 
 # 6. BESS Engineering
@@ -297,22 +466,22 @@ BESS Engineering defines the physical capabilities, states, limitations, and beh
 
 It may include:
 
-* battery cells, modules, racks, and strings;
-* DC system;
-* PCS/inverter;
-* AC system;
-* grid interface;
-* site load;
-* energy capacity;
-* power capacity;
-* SOC;
-* SOH;
-* charging and discharging efficiency;
-* ramp limitations;
-* thermal behavior;
-* degradation;
-* operating limits;
-* availability and derating.
+- battery cells, modules, racks, and strings;
+- DC system;
+- PCS/inverter;
+- AC system;
+- grid interface;
+- site load;
+- energy capacity;
+- power capacity;
+- SOC;
+- SOH;
+- charging and discharging efficiency;
+- ramp limitations;
+- thermal behavior;
+- degradation;
+- operating limits;
+- availability and derating.
 
 The fundamental question is:
 
@@ -328,20 +497,20 @@ Market Engineering defines the environment in which the BESS can create or prese
 
 It may include:
 
-* energy markets;
-* day-ahead prices;
-* real-time prices;
-* ancillary services;
-* frequency regulation;
-* capacity markets;
-* demand response;
-* tariffs;
-* demand charges;
-* eligibility requirements;
-* participation rules;
-* settlement rules;
-* market constraints;
-* market timing and sequencing.
+- energy markets;
+- day-ahead prices;
+- real-time prices;
+- ancillary services;
+- frequency regulation;
+- capacity markets;
+- demand response;
+- tariffs;
+- demand charges;
+- eligibility requirements;
+- participation rules;
+- settlement rules;
+- market constraints;
+- market timing and sequencing.
 
 The fundamental question is:
 
@@ -359,16 +528,16 @@ Data/Input Engineering defines the information required by the engineering syste
 
 For each input, the model should establish:
 
-* semantic meaning;
-* source;
-* unit;
-* temporal resolution;
-* timestamp convention;
-* historical or forecast status;
-* quality requirements;
-* validation rules;
-* missing-data behavior;
-* uncertainty characteristics.
+- semantic meaning;
+- source;
+- unit;
+- temporal resolution;
+- timestamp convention;
+- historical or forecast status;
+- quality requirements;
+- validation rules;
+- missing-data behavior;
+- uncertainty characteristics.
 
 This is not yet an ETL or data-platform architecture.
 
@@ -386,12 +555,12 @@ Forecasting is explicitly separated from general Data Engineering because foreca
 
 Potential forecasts include:
 
-* load;
-* market prices;
-* PV production;
-* ancillary-service prices;
-* market availability;
-* other operational variables.
+- load;
+- market prices;
+- PV production;
+- ancillary-service prices;
+- market availability;
+- other operational variables.
 
 A basic representation is:
 
@@ -401,18 +570,18 @@ $$
 
 where:
 
-* \(X_t\) is the realized value;
-* \(\hat{X}_t\) is the forecast;
-* \(\epsilon_t\) is the forecast error.
+- \(X_t\) is the realized value;
+- \(\hat{X}_t\) is the forecast;
+- \(\epsilon_t\) is the forecast error.
 
 The engineering model must determine whether forecast uncertainty requires:
 
-* deterministic forecasts;
-* sensitivity analysis;
-* scenario-based forecasts;
-* stochastic optimization;
-* robust optimization;
-* probabilistic modeling.
+- deterministic forecasts;
+- sensitivity analysis;
+- scenario-based forecasts;
+- stochastic optimization;
+- robust optimization;
+- probabilistic modeling.
 
 The forecasting algorithm itself should not be frozen until project requirements and evidence justify the choice.
 
@@ -445,15 +614,15 @@ Dispatch is therefore a **convergence point**, not merely a downstream module.
 
 The dispatch problem may involve:
 
-* energy arbitrage;
-* peak shaving;
-* demand response;
-* frequency regulation;
-* voltage/reactive power services;
-* reserve allocation;
-* operational constraints;
-* degradation;
-* market opportunities.
+- energy arbitrage;
+- peak shaving;
+- demand response;
+- frequency regulation;
+- voltage/reactive power services;
+- reserve allocation;
+- operational constraints;
+- degradation;
+- market opportunities.
 
 The operational model must define the decision problem before an optimization technique is selected.
 
@@ -465,25 +634,25 @@ Financial Engineering translates validated operational behavior into economic co
 
 Operational outputs may include:
 
-* charging energy;
-* discharging energy;
-* peak reduction;
-* demand-response performance;
-* ancillary-service participation;
-* market settlements;
-* degradation;
-* replacement requirements.
+- charging energy;
+- discharging energy;
+- peak reduction;
+- demand-response performance;
+- ancillary-service participation;
+- market settlements;
+- degradation;
+- replacement requirements.
 
 Financial outputs may include:
 
-* revenue by stream;
-* savings;
-* O&M;
-* degradation cost;
-* replacement cost;
-* NPV;
-* IRR;
-* payback.
+- revenue by stream;
+- savings;
+- O&M;
+- degradation cost;
+- replacement cost;
+- NPV;
+- IRR;
+- payback.
 
 The fundamental boundary is:
 
@@ -501,62 +670,48 @@ The method distinguishes three principal categories of uncertainty.
 
 Uncertainty regarding what the stakeholder actually requires.
 
-It is reduced through:
+Reduced through:
 
 **Requirements Validation → Conceptual Engineering → Stakeholder Review**
 
 Examples include:
 
-* ambiguous requirements;
-* missing acceptance criteria;
-* conflicting stakeholder expectations;
-* unclear scope.
-
----
+- ambiguous requirements;
+- missing acceptance criteria;
+- conflicting stakeholder expectations;
+- unclear scope.
 
 ## 12.2 Model Uncertainty
 
 Uncertainty regarding whether the engineering representation adequately represents the real system.
 
-It is reduced through:
+Reduced through:
 
 **Engineering Analysis → Prototype → Benchmark → Backtesting → Validation**
 
 Examples include:
 
-* uncertain degradation behavior;
-* uncertain service constraints;
-* uncertain market representation;
-* uncertain mathematical formulation.
-
----
+- uncertain degradation behavior;
+- uncertain service constraints;
+- uncertain market representation;
+- uncertain mathematical formulation.
 
 ## 12.3 Implementation Uncertainty
 
 Uncertainty regarding whether the selected architecture and implementation can adequately realize the engineered system.
 
-It is reduced through:
+Reduced through:
 
 **HLD → LLD → Technical Prototype → Performance Testing**
 
 Examples include:
 
-* computational scalability;
-* solver performance;
-* data-processing limitations;
-* architectural bottlenecks.
+- computational scalability;
+- solver performance;
+- data-processing limitations;
+- architectural bottlenecks.
 
-These categories must not be conflated.
-
-For example:
-
-> A solver timing problem does not automatically invalidate the physical model.
-
-Similarly:
-
-> A stakeholder changing a requirement does not automatically invalidate the software architecture.
-
-The failure must first be classified.
+**Note.** Requirement, model, and implementation uncertainty are distinct. A failure must first be classified before corrective action. A solver timing problem does not invalidate the physical model; a stakeholder change does not invalidate the software architecture.
 
 ---
 
@@ -596,12 +751,12 @@ Validation and benchmarking operate across the architecture.
 
 HLD defines:
 
-* major components;
-* responsibilities;
-* interfaces;
-* dependencies;
-* major data flows;
-* architectural boundaries.
+- major components;
+- responsibilities;
+- interfaces;
+- dependencies;
+- major data flows;
+- architectural boundaries.
 
 HLD should avoid unnecessary implementation detail.
 
@@ -613,22 +768,22 @@ LLD transforms architectural components into implementable mechanisms.
 
 For an optimization engine, LLD may include:
 
-* state management;
-* SOC state;
-* SOH state;
-* available-energy calculation;
-* available-power calculation;
-* constraint construction;
-* market opportunity construction;
-* service allocation;
-* reserve/headroom calculation;
-* objective function;
-* degradation cost;
-* optimization formulation;
-* solver interface;
-* rolling-horizon controller;
-* infeasibility handling;
-* result validation.
+- state management;
+- SOC state;
+- SOH state;
+- available-energy calculation;
+- available-power calculation;
+- constraint construction;
+- market opportunity construction;
+- service allocation;
+- reserve/headroom calculation;
+- objective function;
+- degradation cost;
+- optimization formulation;
+- solver interface;
+- rolling-horizon controller;
+- infeasibility handling;
+- result validation.
 
 LLD is the level at which implementation uncertainty becomes explicit.
 
@@ -642,15 +797,15 @@ The methodology does not assume a final optimization technique in advance.
 
 Candidate techniques may include:
 
-* heuristic methods;
-* LP;
-* MILP;
-* MISOCP;
-* nonlinear optimization;
-* MPC;
-* stochastic optimization;
-* robust optimization;
-* hybrid methods.
+- heuristic methods;
+- LP;
+- MILP;
+- MISOCP;
+- nonlinear optimization;
+- MPC;
+- stochastic optimization;
+- robust optimization;
+- hybrid methods.
 
 The correct question is not:
 
@@ -664,7 +819,21 @@ Technique selection therefore follows engineering evidence.
 
 ---
 
-# 16. Prototype 0 — Minimum Viable Formulation
+# 16. Prototypes — Evidence-Generating Mechanisms
+
+Prototypes are **transversal to the level of the engineering question**. They are deliberately limited implementations, formulations, or analyses used to answer a specific engineering question.
+
+## 16.1 Prototype classes
+
+| Class | Purpose | Typical level |
+|---|---|---|
+| Engineering Prototype | Validate a concept, model, or formulation | Conceptual Engineering |
+| Technical Prototype | Validate an architecture or mechanism | HLD / LLD |
+| Performance Prototype | Validate scalability, runtime, resources | LLD / Implementation |
+
+A prototype may be used at **any level** where an engineering question arises. The class of the prototype should match the class of the question.
+
+## 16.2 Prototype 0 — Minimum Viable Formulation
 
 The first prototype should minimize unnecessary complexity.
 
@@ -674,15 +843,15 @@ For many BESS dispatch problems, a suitable initial formulation may be:
 
 with:
 
-* short horizon;
-* continuous charge/discharge variables;
-* SOC constraints;
-* energy limits;
-* power limits;
-* basic efficiency;
-* simplified revenue representation;
-* deterministic inputs;
-* no unnecessary binary variables.
+- short horizon;
+- continuous charge/discharge variables;
+- SOC constraints;
+- energy limits;
+- power limits;
+- basic efficiency;
+- simplified revenue representation;
+- deterministic inputs;
+- no unnecessary binary variables.
 
 Prototype 0 is not intended to be production software.
 
@@ -740,16 +909,14 @@ A candidate technique must satisfy mandatory requirements.
 
 Examples include:
 
-* physical feasibility;
-* numerical reliability;
-* maximum acceptable runtime;
-* required solution availability;
-* required temporal resolution;
-* required scalability.
+- physical feasibility;
+- numerical reliability;
+- maximum acceptable runtime;
+- required solution availability;
+- required temporal resolution;
+- required scalability.
 
 A technique failing a mandatory constraint is rejected regardless of its performance elsewhere.
-
----
 
 ## 18.2 Weighted Criteria
 
@@ -777,8 +944,8 @@ $$
 
 where:
 
-* \(w_i\) = weight of criterion \(i\);
-* \(s_{ij}\) = score of technique \(j\) against criterion \(i\).
+- \(w_i\) = weight of criterion \(i\);
+- \(s_{ij}\) = score of technique \(j\) against criterion \(i\).
 
 Subject to:
 
@@ -817,16 +984,16 @@ Validation is a continuous engineering function.
 
 It may include:
 
-* physical validation;
-* mathematical validation;
-* market validation;
-* benchmark testing;
-* historical backtesting;
-* performance testing;
-* regression testing;
-* integration testing;
-* UAT;
-* acceptance testing.
+- physical validation;
+- mathematical validation;
+- market validation;
+- benchmark testing;
+- historical backtesting;
+- performance testing;
+- regression testing;
+- integration testing;
+- UAT;
+- acceptance testing.
 
 Validation answers the question:
 
@@ -864,14 +1031,14 @@ Backtesting should evaluate more than historical revenue maximization.
 
 It should also examine:
 
-* physical feasibility;
-* constraint compliance;
-* operational behavior;
-* service performance;
-* sensitivity to forecast error;
-* stability;
-* degradation implications;
-* computational behavior.
+- physical feasibility;
+- constraint compliance;
+- operational behavior;
+- service performance;
+- sensitivity to forecast error;
+- stability;
+- degradation implications;
+- computational behavior.
 
 ---
 
@@ -883,87 +1050,77 @@ The project progresses through explicit decision gates.
 
 Required evidence:
 
-* product intent defined;
-* system boundary defined;
-* stakeholders identified;
-* major objectives identified;
-* major unresolved requirements recorded.
-
----
+- product intent defined;
+- system boundary defined;
+- stakeholders identified;
+- major objectives identified;
+- major unresolved requirements recorded.
 
 ## Gate 2 — Engineering Baseline
 
 Required evidence:
 
-* engineering domains defined;
-* interfaces identified;
-* major constraints identified;
-* inputs identified;
-* outputs identified;
-* principal assumptions documented.
-
----
+- engineering domains defined;
+- interfaces identified;
+- major constraints identified;
+- inputs identified;
+- outputs identified;
+- principal assumptions documented.
 
 ## Gate 3 — Architecture Baseline
 
 Required evidence:
 
-* HLD coherent;
-* interfaces defined;
-* dependencies understood;
-* architectural boundaries established;
-* major implementation risks identified.
-
----
+- HLD coherent;
+- interfaces defined;
+- dependencies understood;
+- architectural boundaries established;
+- major implementation risks identified.
 
 ## Gate 4 — Prototype Validation
 
 Required evidence:
 
-* core physical behavior validated;
-* core operational behavior validated;
-* critical assumptions tested;
-* prototype results reproducible;
-* known limitations documented.
+- core physical behavior validated;
+- core operational behavior validated;
+- critical assumptions tested;
+- prototype results reproducible;
+- known limitations documented.
 
----
+Gate 4 may be fed by prototypes at any level: conceptual, architectural, or performance.
 
 ## Gate 5 — Technique Selection
 
 Required evidence:
 
-* relevant candidate techniques considered;
-* sufficient prototype evidence generated;
-* hard constraints evaluated;
-* weighted criteria evaluated where applicable;
-* selected technique documented;
-* alternatives and rationale recorded.
-
----
+- relevant candidate techniques considered;
+- sufficient prototype evidence generated;
+- hard constraints evaluated;
+- weighted criteria evaluated where applicable;
+- selected technique documented;
+- alternatives and rationale recorded.
 
 ## Gate 6 — Product Baseline
 
 Required evidence:
 
-* requirements sufficiently stable;
-* acceptance criteria defined;
-* validation methods defined;
-* interfaces documented;
-* major residual risks identified.
-
----
+- requirements sufficiently stable;
+- acceptance criteria defined;
+- validation methods defined;
+- interfaces documented;
+- major residual risks identified.
 
 ## Gate 7 — Execution Baseline
 
 Required evidence:
 
-* WBS defined;
-* required competencies identified;
-* responsibilities established;
-* OBS established;
-* CBS estimated;
-* remaining uncertainty documented;
-* execution dependencies identified.
+- WBS defined;
+- required competencies identified;
+- responsibilities established;
+- OBS established;
+- CBS estimated;
+- remaining uncertainty documented;
+- execution dependencies identified.
 
 A gate does not imply that the system is permanently frozen.
 
@@ -1024,11 +1181,11 @@ Every uncertain engineering activity should have an explicit iteration budget.
 
 The budget may define:
 
-* maximum number of prototype iterations;
-* maximum investigation time;
-* maximum computational experimentation;
-* maximum engineering effort;
-* decision deadline.
+- maximum number of prototype iterations;
+- maximum investigation time;
+- maximum computational experimentation;
+- maximum engineering effort;
+- decision deadline.
 
 For example:
 
@@ -1081,12 +1238,12 @@ SOC determines available energy and operational feasibility.
 
 ### Inputs
 
-* initial SOC;
-* charging power;
-* discharging power;
-* timestep;
-* charging efficiency;
-* discharging efficiency.
+- initial SOC;
+- charging power;
+- discharging power;
+- timestep;
+- charging efficiency;
+- discharging efficiency.
 
 ### Behavior
 
@@ -1106,11 +1263,151 @@ Engineering benchmark and automated test cases.
 
 The Product Specification should represent a validated engineering decision, not an untested assumption.
 
+## 25.1 Baseline model
+
+The methodology distinguishes three baselines, each with its own scope:
+
+```text
+ENGINEERING BASELINE
+        │
+        ├── Product Baseline
+        │       └── Product Specification
+        │
+        └── Execution Baseline
+                ├── WBS
+                ├── Competency Decomposition
+                ├── OBS
+                ├── CBS
+                ├── Schedule
+                ├── Tasks
+                └── Execution Specifications
+```
+
+Definitions:
+
+- **Engineering Baseline** — the overall stable, evidence-supported state of the engineering work.
+- **Product Baseline** — the stable state of the product specification.
+- **Execution Baseline** — the stable state of the work, organizational, and cost structure.
+
+**Baseline ≠ immutable.** A baseline is a controlled reference. It changes only through change control.
+
+## 25.2 Product Specification structure (integrated)
+
+```text
+PRODUCT SPECIFICATION
+ENGIE BESS OPERATIONAL & FINANCIAL MODELING PLATFORM
+
+PART I — PRODUCT DEFINITION                       [definición]
+    1. Product Purpose
+    2. Scope
+    3. Users / Stakeholders
+    4. System Boundary
+    5. Product Capabilities
+    6. Success Criteria
+
+PART II — ENGINEERING SPECIFICATION               [requisitos]
+    7. BESS Engineering
+    8. Market Engineering
+    9. Data / Input Engineering
+   10. Forecasting Engineering
+   11. Operational Engineering
+   12. Optimization Engineering
+   13. Financial Engineering
+   14. Validation & Benchmark Engineering
+
+PART III — SYSTEM ARCHITECTURE                    [derivado]
+   15. HLD
+   16. LLD
+   17. Interfaces
+   18. Data flows
+   19. Computational architecture
+
+PART IV — TECHNOLOGY SPECIFICATION
+   20. Technology Constraints                     [impuesto]
+   21. Technology Decisions                       [elegido con evidencia]
+   22. Technology Validation
+
+PART V — VALIDATION & ACCEPTANCE                  [requisitos]
+   23. Acceptance Criteria
+   24. Test Strategy
+   25. Engineering Validation
+   26. Backtesting
+   27. UAT
+   28. Traceability
+```
+
+**Note.** The Product Specification ends at Part V. WBS, OBS, CBS, schedule, tasks, and execution specifications belong to the **Execution Baseline**, defined below as a separate document.
+
+## 25.3 Execution Baseline structure
+
+```text
+EXECUTION BASELINE
+ENGIE BESS OPERATIONAL & FINANCIAL MODELING PLATFORM
+
+PART I — PRODUCT CAPABILITY BREAKDOWN             [derivado]
+    1. Capability map
+    2. Capability-to-requirement traceability
+
+PART II — WBS                                     [derivado]
+    3. Work breakdown structure
+
+PART III — COMPETENCY DECOMPOSITION               [derivado]
+    4. Required competencies by WBS element
+
+PART IV — OBS                                     [derivado]
+    5. Organizational breakdown structure
+
+PART V — CBS                                      [derivado]
+    6. Cost breakdown structure
+
+PART VI — DEPENDENCIES                            [derivado]
+    7. Task and resource dependencies
+
+PART VII — SCHEDULE                               [derivado]
+    8. Timeline and milestones
+
+PART VIII — TASKS                                 [derivado]
+    9. Task specifications
+
+PART IX — EXECUTION SPECIFICATIONS                [derivado]
+   10. Execution specifications
+```
+
+**Nature of the Execution Baseline:**
+
+- It is **derived** from the Product Specification.
+- It may change for management reasons without changing the product.
+- It is **traceable** to the Product Specification, not the other way around.
+
+## 25.4 Relationship between Product Specification and Execution Baseline
+
+```text
+PRODUCT SPECIFICATION
+        │
+        ▼
+Engineering Definition  [Part II]
+        │
+        ▼
+EXECUTION BASELINE
+        │
+        ├── WBS            "What work?"
+        ├── Competencies   "What expertise?"
+        ├── OBS            "Who is responsible?"
+        ├── CBS            "What does it cost?"
+        └── Schedule
+```
+
+The WBS is **derived from the engineered product**, not from an arbitrary organizational structure.
+
+The OBS is **derived from the competencies required by the WBS**, not from predefined titles.
+
+The CBS is **derived from work and resources**, progressively refined by technical evidence.
+
 ---
 
 # 26. WBS — Work Breakdown Structure
 
-The WBS decomposes the product into the work required to create and validate it.
+The WBS decomposes the product into the work required to create and validate it. It belongs to the **Execution Baseline**.
 
 For example:
 
@@ -1167,21 +1464,21 @@ Example:
 
 ### Required Competencies
 
-* BESS operational modeling;
-* mathematical optimization;
-* energy-market modeling;
-* Python;
-* numerical methods;
-* testing and validation.
+- BESS operational modeling;
+- mathematical optimization;
+- energy-market modeling;
+- Python;
+- numerical methods;
+- testing and validation.
 
 ### Responsibilities
 
-* formulate dispatch problem;
-* define objective function;
-* define constraints;
-* prototype candidate techniques;
-* validate dispatch behavior;
-* document optimization decisions.
+- formulate dispatch problem;
+- define objective function;
+- define constraints;
+- prototype candidate techniques;
+- validate dispatch behavior;
+- document optimization decisions.
 
 ### Resource Type
 
@@ -1193,7 +1490,7 @@ This prevents organizational structure from driving technical decomposition.
 
 # 28. OBS — Organizational Breakdown Structure
 
-OBS maps required responsibilities to actual resources.
+OBS maps required responsibilities to actual resources. It belongs to the **Execution Baseline**.
 
 For example:
 
@@ -1209,9 +1506,9 @@ Dispatch Optimization
 
 These responsibilities may belong to:
 
-* one individual;
-* multiple specialists;
-* one multidisciplinary team.
+- one individual;
+- multiple specialists;
+- one multidisciplinary team.
 
 The OBS should therefore emerge from engineering responsibilities rather than predefined organizational titles.
 
@@ -1219,7 +1516,7 @@ The OBS should therefore emerge from engineering responsibilities rather than pr
 
 # 29. CBS — Cost Breakdown Structure
 
-CBS translates work and resource requirements into cost.
+CBS translates work and resource requirements into cost. It belongs to the **Execution Baseline**.
 
 Conceptually:
 
@@ -1237,17 +1534,17 @@ $$
 
 For example, before prototyping a dispatch engine:
 
-* formulation complexity may be uncertain;
-* solver selection may be uncertain;
-* scalability may be uncertain;
-* integration effort may be uncertain.
+- formulation complexity may be uncertain;
+- solver selection may be uncertain;
+- scalability may be uncertain;
+- integration effort may be uncertain.
 
 After prototype evidence:
 
-* formulation complexity becomes better understood;
-* technique selection becomes evidence-based;
-* scalability uncertainty decreases;
-* effort estimates become more reliable.
+- formulation complexity becomes better understood;
+- technique selection becomes evidence-based;
+- scalability uncertainty decreases;
+- effort estimates become more reliable.
 
 ---
 
@@ -1285,18 +1582,18 @@ Each WBS element is decomposed into executable tasks.
 
 A task should define:
 
-* objective;
-* scope;
-* inputs;
-* prerequisites;
-* engineering references;
-* expected output;
-* acceptance criterion;
-* validation method;
-* dependencies;
-* required competency;
-* estimated effort;
-* applicable constraints.
+- objective;
+- scope;
+- inputs;
+- prerequisites;
+- engineering references;
+- expected output;
+- acceptance criterion;
+- validation method;
+- dependencies;
+- required competency;
+- estimated effort;
+- applicable constraints.
 
 A task should **not require the executor to rediscover the engineering model**.
 
@@ -1364,24 +1661,24 @@ The prompt should communicate the already-defined execution specification to the
 
 A prompt may specify:
 
-* required context;
-* referenced artifacts;
-* exact task;
-* constraints;
-* expected output;
-* acceptance criteria;
-* validation requirements;
-* prohibited scope expansion.
+- required context;
+- referenced artifacts;
+- exact task;
+- constraints;
+- expected output;
+- acceptance criteria;
+- validation requirements;
+- prohibited scope expansion.
 
 The agent should not be expected to determine fundamental architecture unless that task is explicitly assigned as an engineering activity.
 
 If an execution agent repeatedly needs to invent:
 
-* requirements;
-* interfaces;
-* data structures;
-* architecture;
-* engineering assumptions;
+- requirements;
+- interfaces;
+- data structures;
+- architecture;
+- engineering assumptions;
 
 this is evidence that the upstream definition is incomplete.
 
@@ -1397,24 +1694,26 @@ Implementation instantiates the validated design.
 
 Possible implementation technologies include:
 
-* Python;
-* PySpark;
-* SQL;
-* optimization models;
-* Databricks;
-* APIs;
-* dashboards;
-* reporting systems.
+- Python;
+- PySpark;
+- SQL;
+- optimization models;
+- Databricks;
+- APIs;
+- dashboards;
+- reporting systems.
 
 Implementation should not silently redefine:
 
-* physical assumptions;
-* engineering constraints;
-* interfaces;
-* requirements;
-* optimization objectives.
+- physical assumptions;
+- engineering constraints;
+- interfaces;
+- requirements;
+- optimization objectives.
 
 If implementation reveals a fundamental design problem, the issue must be returned to the appropriate engineering abstraction level.
+
+**The technology stack is a constraint or a decision, not an engineering domain.** It belongs in Part IV of the Product Specification, not in Part II.
 
 ---
 
@@ -1461,21 +1760,35 @@ A single integrated traceability chain should connect intent to implementation a
 ```text
 RFP / Stakeholder Intent
           ↓
+Stakeholder Requirement
+          ↓
 Product Requirement
           ↓
 Engineering Requirement
           ↓
-Conceptual Model
+Engineering Concept
           ↓
-HLD
+Engineering Model
           ↓
-LLD
+Engineering Question
           ↓
-Product Specification
+Hypothesis
+          ↓
+Prototype / Analysis
+          ↓
+Evidence
+          ↓
+Engineering Decision
+          ↓
+Baseline
+   ├── Product Specification
+   └── Execution Baseline
           ↓
 WBS / Task
           ↓
 Execution Specification
+          ↓
+Prompt
           ↓
 Implementation
           ↓
@@ -1538,22 +1851,24 @@ A change should be classified according to its affected abstraction level.
 
 Examples include:
 
-* requirement change;
-* scope change;
-* engineering-model change;
-* architecture change;
-* implementation change.
+- requirement change;
+- scope change;
+- engineering-model change;
+- architecture change;
+- implementation change.
 
 The change assessment should consider:
 
-* technical impact;
-* validation impact;
-* schedule impact;
-* cost impact;
-* dependencies;
-* residual risk.
+- technical impact;
+- validation impact;
+- schedule impact;
+- cost impact;
+- dependencies;
+- residual risk.
 
 No significant requirement or engineering change should be incorporated without determining its downstream impact.
+
+**Note.** A change in the Execution Baseline (WBS, OBS, CBS, schedule) does not necessarily imply a change in the Product Specification.
 
 ---
 
@@ -1577,15 +1892,15 @@ Re-validation
 
 Potential affected levels include:
 
-* Product Intent;
-* Requirement;
-* Conceptual Engineering;
-* HLD;
-* LLD;
-* Product Specification;
-* Task;
-* Execution Specification;
-* Implementation.
+- Product Intent;
+- Requirement;
+- Conceptual Engineering;
+- HLD;
+- LLD;
+- Product Specification;
+- Task;
+- Execution Specification;
+- Implementation.
 
 The governing principle is:
 
@@ -1627,17 +1942,24 @@ A previously stable decision may be revised when requirements or evidence change
 
 Major technical decisions should have a minimal decision record containing:
 
-* decision;
-* alternatives considered;
-* evaluation criteria;
-* evidence;
-* assumptions;
-* constraints;
-* rationale;
-* selected option;
-* residual risks;
-* validation status;
-* date/version.
+- decision;
+- alternatives considered;
+- evaluation criteria;
+- evidence;
+- assumptions;
+- constraints;
+- rationale;
+- selected option;
+- residual risks;
+- validation status;
+- date/version.
+
+Additionally, a decision record should state:
+
+- the **engineering question** it answers;
+- the **hypothesis** that was tested;
+- the **prototype or analysis** used;
+- the **level** at which the decision applies (concept, model, architecture, mechanism, implementation).
 
 This prevents the project from losing the reasoning behind architectural and technical choices.
 
@@ -1653,15 +1975,15 @@ They should not automatically determine the architecture or technical solution.
 
 For example, in a BESS project, existing repositories may provide evidence regarding:
 
-* physical modeling;
-* degradation;
-* dispatch;
-* revenue stacking;
-* forecasting;
-* market sequencing;
-* optimization techniques;
-* testing;
-* backtesting.
+- physical modeling;
+- degradation;
+- dispatch;
+- revenue stacking;
+- forecasting;
+- market sequencing;
+- optimization techniques;
+- testing;
+- backtesting.
 
 The correct process is:
 
@@ -1713,12 +2035,12 @@ Can assumptions, decisions, and implementation choices be connected to identifia
 
 Additional criteria may include:
 
-* reproducibility;
-* documentation quality;
-* test coverage;
-* model transparency;
-* applicability to the target system;
-* known limitations.
+- reproducibility;
+- documentation quality;
+- test coverage;
+- model transparency;
+- applicability to the target system;
+- known limitations.
 
 External references should be used to reduce **model or implementation uncertainty**, not to bypass engineering decisions.
 
@@ -1739,10 +2061,10 @@ A review is sufficient when:
 
 The review should also have an explicit investigation budget, such as:
 
-* maximum number of references;
-* maximum investigation time;
-* maximum experimentation effort;
-* predefined decision deadline.
+- maximum number of references;
+- maximum investigation time;
+- maximum experimentation effort;
+- predefined decision deadline.
 
 The objective is not to find every existing implementation.
 
@@ -1760,6 +2082,30 @@ The initial definition of what the product must accomplish, why it exists, and f
 
 The process of determining what must be represented and how the system behaves conceptually before implementation architecture is fixed.
 
+### Engineering Concept
+
+The qualitative representation of the system: entities, states, relationships, and constraints, prior to their quantitative formulation.
+
+### Engineering Model
+
+The quantitative representation of the system: variables, parameters, equations, boundaries, and assumptions that operationalize the engineering concept.
+
+### Engineering Question
+
+A precise, answerable question derived from a requirement or from conceptual engineering, whose resolution reduces uncertainty.
+
+### Engineering Decision
+
+The controlled selection, approval, or rejection of an engineering hypothesis, formulation, architecture element, or technical approach, based on defined requirements, constraints, evidence, and residual uncertainty.
+
+### Baseline
+
+A stable, evidence-supported state of an engineering artifact that serves as a controlled reference for subsequent work. A baseline changes only through change control. Three baselines are distinguished:
+
+- **Engineering Baseline** — the overall stable state of the engineering work.
+- **Product Baseline** — the stable state of the Product Specification.
+- **Execution Baseline** — the stable state of the work, organizational, and cost structure.
+
 ### HLD — High-Level Design
 
 The architectural representation of major system components, responsibilities, interfaces, and dependencies.
@@ -1770,7 +2116,7 @@ The detailed design of implementable mechanisms within architectural components.
 
 ### Prototype
 
-A deliberately limited implementation or formulation used to answer a specific engineering question.
+A deliberately limited implementation or formulation used to answer a specific engineering question. May operate at conceptual, architectural, or implementational level.
 
 ### Validation
 
@@ -1784,21 +2130,49 @@ A defined reference case used to compare model or implementation behavior.
 
 Evaluation of a model against historical conditions.
 
+### Product Specification
+
+The integrated specification of the product. Includes:
+
+- Part I — Product Definition
+- Part II — Engineering Specification
+- Part III — System Architecture
+- Part IV — Technology Specification
+- Part V — Validation & Acceptance
+
+### Execution Baseline
+
+The organizational, work, and cost baseline derived from the Product Specification. Includes:
+
+- Part I — Product Capability Breakdown
+- Part II — WBS
+- Part III — Competency Decomposition
+- Part IV — OBS
+- Part V — CBS
+- Part VI — Dependencies
+- Part VII — Schedule
+- Part VIII — Tasks
+- Part IX — Execution Specifications
+
 ### WBS — Work Breakdown Structure
 
-Decomposition of the work required to create the system.
+Decomposition of the work required to create the system. Derived from the Product Specification.
 
 ### OBS — Organizational Breakdown Structure
 
-Mapping of responsibilities and work to organizational resources.
+Mapping of responsibilities and work to organizational resources. Derived from the competencies required by the WBS.
 
 ### CBS — Cost Breakdown Structure
 
-Decomposition and estimation of project cost.
+Decomposition and estimation of project cost. Derived from work and resources, progressively refined by technical evidence.
 
 ### Execution Specification
 
 A precise definition of how a task is to be executed and validated.
+
+### Prompt
+
+An execution interface that communicates an Execution Specification to an execution agent. Not an engineering specification.
 
 ### Semantic Stability
 
@@ -1819,6 +2193,8 @@ ENGIE RFP
    ↓
 Product Intent
    ↓
+Product Requirements
+   ↓
 Conceptual Engineering
    ├── BESS Engineering
    ├── Market Engineering
@@ -1828,31 +2204,44 @@ Conceptual Engineering
    ├── Financial Engineering
    └── Validation / Benchmark Engineering
    ↓
+Engineering Concept
+   ↓
+Engineering Model
+   ↓
+Engineering Questions
+   ↓
 HLD
    ↓
 LLD
    ↓
 External Evidence / Repository Review
    ↓
-Prototype
+Prototype / Analysis
    ↓
 Benchmark / Backtest
    ↓
-Technique Selection
+Evidence
    ↓
-Product Specification
+Engineering Decision
    ↓
-WBS
-   ↓
-Competency Decomposition
-   ↓
-OBS
-   ↓
-Progressive CBS
-   ↓
-Tasks
-   ↓
-Execution Specification
+Baseline
+   ├── Product Specification
+   │      ├── Part I   Product Definition
+   │      ├── Part II  Engineering Specification
+   │      ├── Part III System Architecture
+   │      ├── Part IV  Technology Specification
+   │      └── Part V   Validation & Acceptance
+   │
+   └── Execution Baseline
+          ├── Part I    Product Capability Breakdown
+          ├── Part II   WBS
+          ├── Part III  Competency Decomposition
+          ├── Part IV   OBS
+          ├── Part V    CBS
+          ├── Part VI   Dependencies
+          ├── Part VII  Schedule
+          ├── Part VIII Tasks
+          └── Part IX   Execution Specifications
    ↓
 Prompts
    ↓
@@ -1870,6 +2259,8 @@ Likewise, external repositories are treated as **evidence sources**, not archite
 The engineering model determines what the system must represent.
 
 Evidence helps determine how that representation should be implemented.
+
+The technology stack (Python, PySpark, SQL, Databricks, etc.) is treated as a **constraint or decision**, not as an engineering domain, and is placed in Part IV of the Product Specification.
 
 ---
 
@@ -1967,6 +2358,34 @@ Evidence helps determine how that representation should be implemented.
 
 **A decision is stable only to the extent that its assumptions and evidence remain valid.**
 
+### Rule 24
+
+**A Product Specification must never be issued directly from LLD; it must pass through Prototype, Evidence, and Engineering Decision.**
+
+### Rule 25
+
+**The Product Specification ends at Validation & Acceptance. WBS, OBS, CBS, schedule, tasks, and execution specifications belong to the Execution Baseline, a separate document derived from the Product Specification.**
+
+### Rule 26
+
+**Engineering domains (BESS, Market, Financial, etc.) are not technologies. The technology stack belongs to the Technology Specification part, not to the Engineering Specification part.**
+
+### Rule 27
+
+**Prototypes are transversal to the level of the engineering question. They may operate at any level: conceptual, architectural, or implementational.**
+
+### Rule 28
+
+**Engineering Concept and Engineering Model are distinct artifacts. Concept without model is ambiguous; model without concept lacks semantic grounding.**
+
+### Rule 29
+
+**Every engineering decision must record the question it answers, the hypothesis tested, the evidence used, and the level at which it applies.**
+
+### Rule 30
+
+**A baseline is a controlled reference, not an immutable artifact. It changes only through change control.**
+
 ---
 
 # 47. Final Integrated Model
@@ -1977,46 +2396,55 @@ The complete method can be summarized as:
                          PRODUCT INTENT
                                │
                                ▼
+                    PRODUCT REQUIREMENTS
+                               │
+                               ▼
                     CONCEPTUAL ENGINEERING
                                │
+                ┌──────────────┼──────────────┐
+                │              │              │
+                ▼              ▼              ▼
+           ENGINEERING     ENGINEERING    ENGINEERING
+             CONCEPT         MODEL          QUESTIONS
+                │              │              │
+                └──────────────┼──────────────┘
                                ▼
-                              HLD
+                     PROTOTYPE / ANALYSIS
                                │
-                               ▼
-                              LLD
-                               │
-                               ▼
-                           PROTOTYPE
-                               │
-                               ▼
-                    VALIDATION / EVIDENCE
+                            EVIDENCE
                                │
                                ▼
                      ENGINEERING DECISION
                                │
                                ▼
-                   PRODUCT SPECIFICATION
+                            BASELINE
                                │
-                               ▼
-                       WBS / OBS / CBS
-                               │
-                               ▼
-                            TASKS
-                               │
-                               ▼
-                  EXECUTION SPECIFICATION
-                               │
-                               ▼
-                           PROMPT
-                               │
-                               ▼
-                       IMPLEMENTATION
-                               │
-                               ▼
-                    TEST / VALIDATION
-                               │
-                               ▼
-                          ACCEPTANCE
+                ┌──────────────┴──────────────┐
+                ▼                             ▼
+       PRODUCT SPECIFICATION          EXECUTION BASELINE
+                │                             │
+                │                    ┌────────┼────────┐
+                │                    ▼        ▼        ▼
+                │                   WBS      OBS      CBS
+                │                    │
+                │                    ▼
+                │                  TASKS
+                │                    │
+                │                    ▼
+                │          EXECUTION SPECIFICATION
+                │                    │
+                └────────────────────┤
+                                     ▼
+                                   PROMPT
+                                     │
+                                     ▼
+                              IMPLEMENTATION
+                                     │
+                                     ▼
+                              TEST / VALIDATE
+                                     │
+                                     ▼
+                                ACCEPTANCE
 
 
         ┌─────────────────────────────────────────────┐
@@ -2033,9 +2461,7 @@ The complete method can be summarized as:
         └─────────────────────────────────────────────┘
 ```
 
-The model is not strictly linear.
-
-Evidence may trigger controlled movement to an earlier abstraction level:
+The model is not strictly linear. Evidence may trigger controlled movement to an earlier abstraction level:
 
 ```text
                          ┌─────────────────┐
@@ -2082,11 +2508,11 @@ The methodology can ultimately be reduced to one statement:
 
 For the ENGIE BESS project:
 
-> **First define what the BESS system means from an engineering perspective. Then define how physical behavior, markets, data, forecasting, operations, and finance interact. Then design the architecture. Use external evidence and targeted prototypes to reduce uncertainty. Select computational techniques based on evidence rather than assumption. Only then progressively establish the product specification, work structure, organizational responsibilities, cost baseline, execution specifications, and implementation.**
+> **First define what the BESS system means from an engineering perspective. Then define how physical behavior, markets, data, forecasting, operations, and finance interact. Then design the architecture. Use external evidence and targeted prototypes to reduce uncertainty. Select computational techniques based on evidence rather than assumption. Only then progressively establish the product specification, execution baseline, and implementation.**
 
 The essential transformation is therefore:
 
-**Meaning → Model → Architecture → Prototype → Evidence → Decision → Specification → Execution → Validation**
+**Intent → Requirement → Concept → Model → Question → Hypothesis → Evidence → Decision → Baseline → Architecture → Execution → Implementation → Validation → Acceptance**
 
 Not:
 
@@ -2097,4 +2523,15 @@ And not:
 **Prompt → Code → Hope**
 
 The purpose of the methodology is to preserve the meaning of the product while progressively transforming it from an initial idea into a **validated, traceable, executable, and maintainable system**.
+
+---
+
+Este es el documento completo en versión 4.3. Con esto quedan resueltas las 4 correcciones que señalaste:
+
+1. Contradicción §25 / Rule 25 eliminada → Product Specification termina en Part V; Execution Baseline es documento separado con su propia estructura.
+2. Prototype formalmente transversal al nivel de la pregunta → §2, §3, §16, §47.
+3. Cadena Requirement → Concept → Model → Question → Hypothesis → Evidence → Decision → Specification formalizada → §5.2, §36, §47.
+4. Baseline precisado en tres niveles y declarado no inmutable → §25.1, §44, Rule 30.
+
+¿Quieres que a continuación empecemos a construir **§7 BESS Engineering** sobre esta base 4.3, con la estructura de 20 subsecciones que propusiste (Domain Purpose, System Boundary, Physical Entities, States, Parameters, Inputs, Outputs, Physical Relationships, Operating Constraints, Performance Characteristics, Degradation, Availability/Derating, Operating Modes, Engineering Questions, Engineering Models, Assumptions, Uncertainties, Validation Requirements, Evidence Requirements, Engineering Decisions)?
 
