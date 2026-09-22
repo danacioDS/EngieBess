@@ -2,7 +2,7 @@
 
 ## BESS Engineering Model
 
-**Version 1.0 — Revision 6 (FC4)**
+**Version 1.0 — Revision 7 (FC5)**
 
 ---
 
@@ -20,17 +20,21 @@ It consumes from Part 1: symbols, state definitions, sign conventions, temporal 
 
 **Scope rule:** Part 2 contains component modeling. It does not define services, dispatch logic, or degradation. Those belong to Parts 3, 4, and 5.
 
-**Revision 6 (FC4) scope:** This revision applies the three fixes the Revision 5 grade identified:
+**Revision 7 (FC5) scope:** This revision is the **registration-closure and cross-check revision**. It applies the two items that became available after Part 1 FC11 and Part 5 FC5, and it declares the cross-check with Part 3 that unblocks Part 3's exit criterion 9. No technical content changes to the physical model.
 
-- **Trigger redesign.** Revision 5's trigger referenced `Th` at a solver-determined index (`Th_{t_last,t}`), which is **not a linear operation** and is not implementable in a MILP. Revision 6 redesigns the trigger to track `Th_last,t` — the throughput **value** at the last cycle completion — as an ordinary decision variable updated by the same big-M pattern already proven correct in Revision 5. `t_last,t` is retained only as a post-solve diagnostic, derived from the solution; it does **not** appear in any live constraint. The multi-cycle gap is now genuinely closed, including the single-cycle case that Revision 5's "backward compatibility" claim overstated.
-- **Citation fix completed.** The residual "FC9/FC10" reference in §2.1 is corrected to "FC9." The changelog's claim of full citation closure is now accurate.
-- **Terminology collision resolved.** Revision 5's §2.9 proposed a new unregistered category under the name "transient," which Part 1's §1.4 header already uses for a registered-but-inline category. Revision 6 **renames** the new category to **"within-horizon auxiliary quantities"** (distinct name, distinct rule) and, more importantly, **actually registers** `Th_last,t` in Part 1 via the existing transient convention (it *is* an inline, non-state, non-decision quantity in the sense Part 1 already accommodates). `t_last,t` and `m_cycle,t` are diagnostics, not symbols at all; they are not registered and are not "transient" — they are simply solver outputs.
+Specifically:
+
+- **`Th_last,t` registration closure acknowledged (§2.9, §2.10 criterion 10).** Part 1 FC11 registered `Th_last,t` in §1.4.6 under the transient-quantities convention. Part 2's registration request (issued in Revision 6 §2.9) is now closed. §2.9 is updated to record the closure; §2.10 criterion 10 changes from PENDING to MET.
+- **§2.8 "Pending" list updated.** "Part 1 registration of `Th_last,t`" is removed from the pending list; the remaining pending items are the numerical/manufacturer-data verifications (criteria 13–15) and the cross-checks (criteria 11–12).
+- **Cross-check with Part 3 declared (§2.11 new).** Part 3 FC3 §3.14 criterion 9 waits on Part 2 to declare that SOH consumption and throughput evolution are consistent. Part 2 FC5 declares the cross-check explicitly. This unblocks Part 3's criterion 9.
+- **Cross-check with Part 5 declared (§2.11).** Part 5 FC4 §5.13 criterion 12 and Part 5 FC5 already count `Th_last,t` in the problem-size inventory. Part 2 FC5 confirms the inventory is correct and that `Th_last,t` is a within-horizon transient, not a persistent state.
+- **No physical or component modeling added or changed.** The energy balance, the PCS model, the loss model, the derating rules, the binding-limit rule, the rest-period formulation, the thermal model, and the grid/site model are unchanged from Revision 6.
 
 **Item 5 status:** Closed in Revision 4, unchanged.
 
-**Item 6 status:** Closed in Revision 4, refined in Revision 6 (the within-horizon value-tracking, not index-tracking, formulation).
+**Item 6 status:** Closed in Revision 4, refined in Revision 6 (the within-horizon value-tracking, not index-tracking, formulation), unchanged in Revision 7.
 
-**Part 1 action requested (Revision 6):** Register `Th_last,t` in Part 1 §1.4.6 (per-step degradation variables) as a within-horizon derived quantity with the transient marker. Add a one-line note in Part 1 §1.4 header clarifying that the existing "transient" convention applies to within-horizon quantities that are not solver diagnostics. No new convention is proposed; Revision 6 fits inside the existing one.
+**Part 1 action status:** **Closed.** `Th_last,t` is registered in Part 1 FC11 §1.4.6.
 
 **Interface summary (Part 2):**
 
@@ -42,7 +46,7 @@ It consumes from Part 1: symbols, state definitions, sign conventions, temporal 
 | Dispatch $P_{AC}^{ch}, P_{AC}^{dis}, Q_t$ (Part 5) | $P_{PCC,t}$, $P_{import,t}$, $P_{export,t}$ |
 | Scenario inputs $P_{load,t}, T_{amb,t}$ | $P_{DC,t}$, $P_{DC,t}^{ch}$, $P_{DC,t}^{dis}$ |
 | Reservations $R_{reg,t}^{up}, R_{reg,t}^{down}, Q_{res,t}$ (Part 4) | $S_t$, $S_t^{loss}$, $P_{loss,t}^{PCS,inc}$ |
-| Absolute regulation statistics $\sigma_{reg,t}^{abs}$ (Part 4) | $\Delta Th_{cycle}$ |
+| Absolute regulation statistics $\sigma_{reg,t}^{abs}$ (Part 4) | $\Delta Th_{cycle}$, $Th_{last,t}$ (within-horizon) |
 
 ---
 
@@ -382,7 +386,7 @@ where $RampRate$ is in kW/min and $\Delta t$ is in hours (Part 1, section 1.5.1)
 
 ### 2.3.8 Minimum rest period (multi-cycle, value-tracked formulation)
 
-**Status:** The rest-period constraint is now **fully linearized** and **implementable as a MILP** (Revision 6). The trigger tracks the throughput **value** at the last completion (`Th_last,t`), not the **index** of that completion (`t_last,t`). Indexing a variable array by a decision variable is not a linear operation and was the defect in Revision 5's formulation. The value-tracked formulation is linear and closed under the same big-M pattern already proven for the counter update.
+**Status:** The rest-period constraint is **fully linearized** and **implementable as a MILP** (Revision 6). The trigger tracks the throughput **value** at the last completion (`Th_last,t`), not the **index** of that completion (`t_last,t`). Indexing a variable array by a decision variable is not a linear operation and was the defect in Revision 5's formulation. The value-tracked formulation is linear and closed under the same big-M pattern already proven for the counter update.
 
 **Cycle completion threshold:**
 
@@ -490,11 +494,13 @@ When $p_t = 1$ (rest active), the power is forced to zero. When $p_t = 0$ (rest 
 
 **Auxiliary binaries.** $c_{cycle,t}$, $r_t$, $p_t$ are auxiliary MILP binaries used exclusively for linearization. They are covered by Part 1 §1.4.0's auxiliary-binary convention and are **not registered** as decision variables. Downstream parts query the underlying physical state $n_{rest,t}$ (and $Th_t$) instead. See Part 1 §1.4.0 for the named whitelist.
 
-**Within-horizon tracked quantity.** `Th_last,t` is a within-horizon derived quantity, an ordinary decision variable inside the optimizer, and it **is registered** in Part 1 via the existing transient convention (see §2.9). It is not a state, not a decision variable in the persistent sense, and not an auxiliary binary — it is an inline quantity that participates in the trigger linearization.
+**Within-horizon tracked quantity.** `Th_last,t` is a within-horizon derived quantity, an ordinary decision variable inside the optimizer, and it **is registered** in Part 1 §1.4.6 (FC11) via the existing transient convention. It is not a state, not a decision variable in the persistent sense, and not an auxiliary binary — it is an inline quantity that participates in the trigger linearization.
+
+**Registration status (Revision 7 — FC5).** `Th_last,t` is **registered in Part 1 FC11 §1.4.6** under the transient-quantities convention. Part 2's registration request (Revision 6 §2.9) is **closed**. The audit script recognizes `Th_last,t` as a registered transient quantity. The `t_last,t` and `m_cycle,t` diagnostics remain unregistered solver outputs.
 
 **Post-solve diagnostics.** `t_last,t` and `m_cycle,t` are computed **after** the solve, from the returned `c_cycle,t` sequence and the returned `Th_t` sequence. They are not decision variables and do not appear in any constraint. They are reported as engineering outputs (the number of cycles completed per horizon, and the step index of the most recent completion) but are not registered symbols and are not "transient" in Part 1's sense — they are simply solver outputs, like any other reported KPI.
 
-**Backward compatibility, restated honestly.** Revision 5's claim that "under horizons with zero or one cycle completion, Revision 5 reduces exactly to Revision 4" was **not accurate**, because once `c_cycle,t` fires once, Revision 5's trigger referenced `Th` at a solver-determined index, which was unimplementable even in the single-cycle case. Revision 6's formulation *is* backward-compatible in the correct sense: when the horizon contains zero cycle completions, `Th_last,t` stays at its initial parameter value throughout and the trigger reduces to the frozen-parameter form of Revision 4; when the horizon contains exactly one completion, `Th_last,t` updates once and then holds, which is exactly the correct single-cycle behavior; and when the horizon contains multiple completions, `Th_last,t` updates at each, which is the multi-cycle behavior Revision 5 was aiming for. All three cases are now linear and implementable.
+**Backward compatibility, restated honestly.** Revision 5's claim that "under horizons with zero or one cycle completion, Revision 5 reduces exactly to Revision 4" was **not accurate**, because once `c_cycle,t` fires once, Revision 5's trigger referenced `Th` at a solver-determined index, which was unimplementable even in the single-cycle case. Revision 6's formulation *is* backward-compatible in the correct sense: when the horizon contains zero cycle completions, `Th_last,t` stays at its initial parameter value throughout and the trigger reduces to the frozen-parameter form of Revision 4; when the horizon contains exactly one completion, `Th_last,t` updates once and then holds, which is exactly the correct single-cycle behavior; and when the horizon contains multiple completions, `Th_last,t` updates at each, which is the multi-cycle behavior Revision 5 was aiming for. All three cases are now linear and implementable. Revision 7 does not change this formulation.
 
 **Complexity.** The value-tracked formulation adds:
 - One continuous decision variable per step: `Th_last,t` (T_opt variables).
@@ -693,35 +699,48 @@ Part 2 produces the following quantities for use by Parts 3, 4, and 5:
 | Loss-model apparent power | $S_t^{loss}$ | Part 3 (loss propagation) |
 | PCS incremental loss | $P_{loss,t}^{PCS,inc}$ | Part 3 (loss propagation) |
 | Cycle threshold | $\Delta Th_{cycle}$ | Part 3 (throughput reference) |
+| Within-horizon throughput tracker | $Th_{last,t}$ (within-horizon, transient) | Part 2 internal; counted in Part 5 problem size |
 | Cycles completed per horizon | $m_{cycle,t}$ (diagnostic) | Part 5 (diagnostics) |
+
+**Note (Revision 7):** $Th_{last,t}$ is registered in Part 1 FC11 §1.4.6. It is produced and consumed entirely within Part 2's rest-period mechanism; it is not a Part 3 state and not a Part 4 or Part 5 input. Part 5 counts it in the problem-size inventory (§5.3.6) because it appears in the optimizer's variable set.
 
 ---
 
 ## 2.8 Part 2 changelog
 
-### Version 1.0 — Revision 6 (FC4)
+### Version 1.0 — Revision 7 (FC5)
 
-**Changes from Revision 5 (verified):**
+**Changes from Revision 6 (verified):**
 
-1. **Trigger redesigned to track the throughput value, not the index (§2.3.8).** Revision 5's trigger referenced `Th` at a solver-determined index (`Th_{t_last,t}`), which is not a linear operation and is not implementable in a MILP. Revision 6 replaces the index-tracking quantity `t_last,t` with a value-tracking quantity `Th_last,t` — the throughput **value** at the last completion — updated by the same big-M pattern already proven correct in Revision 5. The trigger `Th_t - Th_last,t ≥ ΔTh_cycle` is now linear. The multi-cycle gap is genuinely closed, including the single-cycle case that Revision 5's "backward compatibility" claim overstated.
+1. **`Th_last,t` registration closure acknowledged (§2.3.8, §2.9, §2.10 criterion 10).** Part 1 FC11 registered `Th_last,t` in §1.4.6 under the transient-quantities convention. Part 2's registration request (issued in Revision 6 §2.9) is now **closed**. §2.9 records the closure; §2.10 criterion 10 changes from PENDING to MET. No technical change to the rest-period formulation.
 
-2. **`t_last,t` demoted to a post-solve diagnostic (§2.3.8, §2.6.3).** `t_last,t` no longer appears in any constraint. It is computed after the solve from the returned `c_cycle,t` sequence and reported as an engineering output. This removes the unimplementable reference entirely.
+2. **§2.8 "Pending" list updated.** "Part 1 registration of `Th_last,t`" is removed from the pending list. The remaining pending items are the numerical/manufacturer-data verifications (criteria 13–15) and the cross-checks (criteria 11–12).
 
-3. **Backward-compatibility claim corrected and made accurate (§2.3.8).** Revision 5 claimed that the formulation "reduces exactly to Revision 4" for zero- or one-cycle horizons. That was not accurate: once `c_cycle,t` fires, Revision 5's trigger referenced `Th` at a solver-determined index, which was unimplementable even in the single-cycle case. Revision 6 states the correct backward-compatibility property: zero completions → frozen parameter; one completion → single update then hold; multiple completions → per-completion updates. All three cases are now linear.
+3. **Cross-check with Part 3 declared (§2.11 new).** Part 3 FC3 §3.14 criterion 9 waits on Part 2 to declare that SOH consumption and throughput evolution are consistent. Part 2 FC5 declares the cross-check explicitly. This unblocks Part 3's criterion 9.
 
-4. **Citation fix completed (§2.1).** The residual "FC9/FC10" reference in §2.1 is corrected to "FC9." The changelog's claim of full citation closure is now accurate.
+4. **Cross-check with Part 5 declared (§2.11).** Part 5 FC4 §5.13 criterion 12 and Part 5 FC5 already count `Th_last,t` in the problem-size inventory. Part 2 FC5 confirms the inventory is correct and that `Th_last,t` is a within-horizon transient, not a persistent state.
 
-5. **Terminology collision resolved (§2.1, §2.9).** Revision 5's §2.9 proposed an unregistered category under the name "transient," which collides with Part 1 §1.4 header's existing "transient quantities convention" (registered-but-inline). Revision 6 **renames** the new category to **"within-horizon auxiliary quantities"** and **registers** `Th_last,t` in Part 1 via the existing transient convention. `t_last,t` and `m_cycle,t` are declared as post-solve diagnostics, not symbols, and are not "transient" in any sense — they are solver outputs.
+5. **§2.10 exit criteria updated.** Criterion 10 (Part 1 registration of `Th_last,t`) changes from PENDING to MET. Criterion 11 (cross-check with Part 3) changes from PENDING to MET (declared in §2.11). Criterion 12 (cross-check with Part 5) changes from PENDING to MET (declared in §2.11). Criteria 13–15 (manufacturer-data verifications) remain PENDING as external scenario-data dependencies.
 
-6. **§2.6.3 added — post-solve diagnostics table.** Separates the diagnostics (`t_last,t`, `m_cycle,t`) from both the binding constraints (§2.6.1) and the consistency checks (§2.6.2). Makes it clear that the diagnostics do not participate in the feasible set.
+6. **No physical or component modeling added or changed.** The energy balance, the PCS model, the loss model, the derating rules, the binding-limit rule, the rest-period formulation, the thermal model, and the grid/site model are unchanged from Revision 6.
 
-7. **§2.9 rewritten.** The previous §2.9 proposed a new convention. Revision 6's §2.9 (below) instead requests that `Th_last,t` be registered in Part 1 §1.4.6 under the existing transient convention, and clarifies the diagnostic-vs-symbol distinction.
+7. **No registration changes.** All symbols remain as in Revision 6. `Th_last,t` was already counted; its registration is now confirmed.
 
-8. **Version label updated to Revision 6 (FC4).** FC4 is the promotion candidate.
+8. **Version label updated to Revision 7 (FC5).** FC5 is the promotion candidate.
+
+**Carried over from Revision 6 (verified):**
+
+- Trigger redesigned to track the throughput value, not the index (§2.3.8).
+- `t_last,t` demoted to a post-solve diagnostic (§2.3.8, §2.6.3).
+- Backward-compatibility claim corrected and made accurate (§2.3.8).
+- Citation fix completed (§2.1).
+- Terminology collision resolved (§2.1, §2.9).
+- §2.6.3 added — post-solve diagnostics table.
+- §2.9 rewritten.
 
 **Carried over from Revision 5 (verified):**
 
-- Citation fixes for Part 1 FC8/FC9 references (partially applied in Revision 5; fully applied in Revision 6).
+- Citation fixes for Part 1 FC8/FC9 references.
 - Multi-cycle-per-horizon gap identified (the diagnosis was correct; the fix in Revision 5 was not).
 
 **Carried over from Revision 4 (verified):**
@@ -757,16 +776,13 @@ Part 2 produces the following quantities for use by Parts 3, 4, and 5:
 - $\sigma_{reg,t}^{abs}$ in interface table.
 - Site balance conditional on configuration.
 
-**Pending:**
+**Pending (Revision 7):**
 
-- Numerical verification of typical parameter values against manufacturer data.
-- Verification of derating function shapes against manufacturer curves.
-- Verification of PCS loss curve against manufacturer data.
-- Cross-check with Part 3 on SOH consumption and throughput evolution.
-- Cross-check with Part 5 on dispatch variable usage and rest constraint implementation.
-- **Part 1 registration of `Th_last,t`** (see §2.9).
+- Numerical verification of typical parameter values against manufacturer data (criterion 13).
+- Verification of derating function shapes against manufacturer curves (criterion 14).
+- Verification of PCS loss curve against manufacturer data (criterion 15).
 
-**No longer pending (closed in Revisions 4, 5, and 6):**
+**No longer pending (closed in Revisions 4, 5, 6, and 7):**
 
 - ~~Part 1 sign-off on the change request~~ — closed by Part 1 FC8/FC9.
 - ~~Derating double-application (open-item 5)~~ — closed by Revision 4.
@@ -775,14 +791,19 @@ Part 2 produces the following quantities for use by Parts 3, 4, and 5:
 - ~~Multi-cycle-per-horizon gap — fix~~ — closed by Revision 6 (value-tracked formulation).
 - ~~Part 1 citation errors~~ — closed by Revision 6.
 - ~~Terminology collision with Part 1's "transient" convention~~ — closed by Revision 6 (renamed to "within-horizon auxiliary quantities").
+- ~~Part 1 registration of `Th_last,t`~~ — closed by Part 1 FC11; acknowledged in Revision 7.
+- ~~Cross-check with Part 3~~ — declared in Revision 7 (§2.11).
+- ~~Cross-check with Part 5~~ — declared in Revision 7 (§2.11).
 
 ---
 
-## 2.9 Part 1 registration request
+## 2.9 Part 1 registration request — CLOSED
 
-**Status:** Issued by Part 2. **Pending Part 1 sign-off.**
+**Status:** **Closed by Part 1 FC11.** This section is retained as a closure record.
 
-Revision 6 introduces one within-horizon quantity that is a decision variable inside the optimizer and should be registered in Part 1:
+### 2.9.1 The original request (Revision 6)
+
+Revision 6 introduced one within-horizon quantity that is a decision variable inside the optimizer and requested registration in Part 1:
 
 | Symbol | Description | Unit | Suggested Part 1 section |
 |---|---|---|---|
@@ -794,11 +815,23 @@ Revision 6 introduces one within-horizon quantity that is a decision variable in
 - **Not an auxiliary binary** — it is continuous.
 - **An inline quantity in the sense of Part 1 §1.4 header's existing transient convention** — it is introduced in formulas (the trigger and its update), it is not stored as state/decision/parameter in the persistent model, and it should be marked "transient" in its table row.
 
-The existing Part 1 transient convention already accommodates this. Revision 6 requests that `Th_last,t` be added to §1.4.6 with the transient marker, with Part 2 as the owning part.
+### 2.9.2 Part 1's action (FC11)
+
+Part 1 FC11 registered `Th_last,t` in **§1.4.6** (per-step degradation and thermal variables) under the **transient-quantities convention**, with Part 2 as the owning part. The registration reads:
+
+| Symbol | Description | Unit | Part |
+|---|---|---|---|
+| $Th_{last,t}$ | Throughput value at the most recent cycle completion, evaluated at step $t$ (within-horizon transient) **[FC11]** | kWh | 2 |
+
+Part 1 FC11 also clarified the transient-quantities convention to distinguish within-horizon quantities (which are registered with the transient marker) from solver diagnostics (which are post-solve computed, are not symbols, and are not registered).
+
+### 2.9.3 Closure
+
+**The registration request is closed.** `Th_last,t` is now a registered symbol in Part 1 §1.4.6. The audit script recognizes it. Part 2's exit criterion 10 is MET.
 
 **Diagnostics.** `t_last,t` and `m_cycle,t` are **not** registered. They are post-solve diagnostics (see §2.6.3), computed from the returned solution, and they do not appear in any constraint. They are reported as engineering outputs (cycles per horizon, step index of last completion) but are not symbols.
 
-**No new convention proposed.** Revision 6 fits inside Part 1's existing rules. The "within-horizon auxiliary quantities" name is used in Revision 6's prose to distinguish them from registered auxiliary binaries, but no new registration category is requested.
+**No new convention was proposed or is needed.** Revision 6 fit inside Part 1's existing rules; FC11 confirmed the fit by registering the symbol.
 
 ---
 
@@ -810,17 +843,110 @@ The existing Part 1 transient convention already accommodates this. Revision 6 r
 | 2 | **Derating binding rule stated.** Open-item 5 closed. | **MET** (Revision 4) |
 | 3 | **$t_{last}$ update timing stated unambiguously.** Open-item 6 closed. | **MET** (Revision 4) |
 | 4 | **Multi-cycle-per-horizon gap closed with a linear, implementable formulation.** Value-tracked trigger; index-tracking removed from constraints. | **MET** (Revision 6) |
-| 5 | **Citation accuracy.** All Part 1 cross-references resolve to actual documents and sections. | **MET** (Revision 6) |
+| 5 | **Citation accuracy.** All Part 1 cross-references resolve to actual documents and sections. | **MET** (Revision 6; updated to FC11 in Revision 7) |
 | 6 | **Terminology consistency with Part 1.** No collision with Part 1's existing "transient" convention. | **MET** (Revision 6) |
 | 7 | **Internal cross-references verified.** All section references resolve to existing sections. | **MET** |
 | 8 | **Changelog cumulative and honest.** | **MET** |
-| 9 | **No truncated sections.** Document complete from 2.1 to 2.10. | **MET** |
-| 10 | **Part 1 registration of $Th_{last,t}$.** | **PENDING** (external; Part 1 revision) |
-| 11 | **Cross-check with Part 3 on SOH consumption and throughput evolution.** | **PENDING** (external; Part 3 revision) |
-| 12 | **Cross-check with Part 5 on dispatch variable usage and rest constraint implementation.** | **PENDING** (external; Part 5 revision) |
+| 9 | **No truncated sections.** Document complete from 2.1 to 2.11. | **MET** |
+| 10 | **Part 1 registration of $Th_{last,t}$.** | **MET (Revision 7)** — Part 1 FC11 §1.4.6 |
+| 11 | **Cross-check with Part 3 on SOH consumption and throughput evolution.** | **MET (Revision 7)** — §2.11 |
+| 12 | **Cross-check with Part 5 on dispatch variable usage and rest constraint implementation.** | **MET (Revision 7)** — §2.11 |
 | 13 | **Numerical verification of typical parameter values** against manufacturer data. | **PENDING** (external; scenario data) |
 | 14 | **Verification of derating function shapes** against manufacturer curves. | **PENDING** (external; scenario data) |
 | 15 | **Verification of PCS loss curve** against manufacturer data. | **PENDING** (external; scenario data) |
 
 **Freeze definition:** Frozen (v1.0) means changes only via change request with version increment. FC documents are under review, not frozen.
 
+---
+
+## 2.11 Cross-checks with Parts 3 and 5
+
+This section declares the two cross-checks that Revision 7 closes: the Part 3 cross-check on SOH consumption and throughput evolution, and the Part 5 cross-check on dispatch variable usage and rest constraint implementation.
+
+### 2.11.1 Cross-check with Part 3 — SOH consumption
+
+**Part 3 produces:** $SOH_k$, $SOH_k^{pow}$, $SOH_k^{eff}$ (latched per epoch, Part 3 §3.4).
+
+**Part 2 consumes:**
+- $SOH_k$ in the energy limits (§2.2.2): $E_{min,t} = E_{nom} \cdot SOH_k \cdot SOC_{min}$, $E_{max,t} = E_{nom} \cdot SOH_k \cdot SOC_{max}$.
+- $SOH_k^{pow}$ in the AC power limits (§2.3.2): the battery DC capability is scaled by $SOH_k^{pow}$ inside the $\min(\cdot)$.
+- $SOH_k^{eff}$ in the efficiency chain (§2.2.3): $\eta_{c,t} = \eta_c \cdot SOH_k^{eff}$, $\eta_{d,t} = \eta_d \cdot SOH_k^{eff}$.
+
+**Consistency:** All three SOH forms are latched at the epoch boundary and are **fixed within the optimization horizon** (Part 1 §1.5.8). Part 2 consumes them as parameters, not as decision variables. This matches Part 3's definition (§3.4.1–§3.4.3) and Part 1's update-timing table (§1.5.7). **No inconsistency.**
+
+### 2.11.2 Cross-check with Part 3 — Throughput evolution
+
+**Part 3 produces:** $Th_t$ (cumulative throughput, Part 3 §3.5.1).
+
+**Part 2 consumes:**
+- $Th_t$ in the rest-period trigger (§2.3.8): the trigger compares $Th_t - Th_{last,t}$ against $\Delta Th_{cycle}$.
+
+**Part 2 does not modify $Th_t$.** It reads the current value and uses it in the trigger comparison. The physical update of $Th_t$ is Part 3's responsibility (§3.5.1).
+
+**Part 2 produces:** $Th_{last,t}$ (within-horizon throughput tracker). This is a **Part 2-internal artifact** — it is reset at each horizon to the physical value implied by the persistent `t_last` and `Th_t` states, and it does not propagate back to Part 3. Part 3 does not consume $Th_{last,t}$.
+
+**Coupling direction:** **Part 3 → Part 2** for `Th_t`. **Part 2 → Part 3** does not exist for throughput. This is a one-directional coupling, as stated in Part 3 §3.5.1 ("The coupling is one-directional: Part 3 → Part 2").
+
+**Consistency:** Part 3's throughput definition (physical throughput plus regulation mileage, §3.5.1) matches what Part 2's trigger consumes. Part 2's `Th_last,t` is a within-horizon tracker, not a modification of `Th_t`. **No inconsistency.**
+
+### 2.11.3 Cross-check with Part 5 — Dispatch variable usage
+
+**Part 5 produces:** $P_{AC,t}^{ch}$, $P_{AC,t}^{dis}$, $Q_t$ (dispatch decisions, Part 5 §5.3.1).
+
+**Part 2 consumes:**
+- $P_{AC,t}^{ch}$, $P_{AC,t}^{dis}$ in the AC↔DC conversion (§2.3.1): $P_{DC,t}^{ch} = P_{AC,t}^{ch} \cdot \eta_{PCS}$, $P_{DC,t}^{dis} = P_{AC,t}^{dis} / \eta_{PCS}$.
+- $Q_t$ in the apparent power constraints (§2.3.3): $P_{AC,t}^2 + Q_t^2 \le S_{max}^2$ (average), and the peak-based reservation constraint.
+- $P_{AC,t}^{ch} + P_{AC,t}^{dis}$ in the rest enforcement (§2.3.8): forced to zero when $p_t = 1$.
+
+**Consistency:** Part 2's binding-limit rule (§2.2.5, §2.3.2) states that the AC limits are the binding constraints. Part 5's decision variables $P_{AC,t}^{ch}$ and $P_{AC,t}^{dis}$ are bounded by those AC limits. The DC limits are post-solve checks. **No inconsistency.**
+
+### 2.11.4 Cross-check with Part 5 — Rest constraint implementation
+
+**Part 5 counts in its variable inventory (Part 5 §5.3.1, §5.3.6):**
+- $Th_{last,t}$: continuous decision variable, within-horizon transient, +1 per step.
+- $c_{cycle,t}$, $r_t$, $p_t$: auxiliary binaries, not registered, part of the MISOCP variable set.
+
+**Part 2 confirms:**
+- $Th_{last,t}$ is a **continuous** decision variable, not a binary. It is registered in Part 1 §1.4.6 under the transient-quantities convention, not the auxiliary-binary convention (§1.4.0). Part 5's classification is correct.
+- $c_{cycle,t}$, $r_t$, $p_t$ are **auxiliary binaries** used exclusively for linearization. They are covered by Part 1 §1.4.0's auxiliary-binary convention and are **not registered**. Part 5's classification is correct.
+- The value-tracked trigger adds **7 constraints per step** (2 for the trigger comparison, 4 for the $Th_{last,t}$ update disjunction, 1 for the $m_{cycle,t}$ accumulator), as stated in Part 5 §5.3.6. Part 2's own complexity accounting (§2.3.8, "Complexity") matches this. **No inconsistency.**
+
+**Consistency:** Part 5's problem-size inventory (§5.3.6) matches Part 2's own complexity accounting. **No inconsistency.**
+
+### 2.11.5 Summary of cross-checks
+
+| Cross-check | Part 2 consumes | Part 2 produces | Direction | Status |
+|---|---|---|---|---|
+| SOH consumption | $SOH_k$, $SOH_k^{pow}$, $SOH_k^{eff}$ (Part 3) | — | Part 3 → Part 2 | **Consistent** |
+| Throughput evolution | $Th_t$ (Part 3) | $Th_{last,t}$ (Part 2-internal) | Part 3 → Part 2 | **Consistent** |
+| Dispatch variable usage | $P_{AC,t}^{ch}$, $P_{AC,t}^{dis}$, $Q_t$ (Part 5) | — | Part 5 → Part 2 | **Consistent** |
+| Rest constraint implementation | — | `Th_last,t`, auxiliary binaries, complexity accounting | Part 2 → Part 5 | **Consistent** |
+
+**Conclusion:** Part 2's consumption of Part 3 and Part 5 quantities is consistent with those parts' definitions. Part 2's production of `Th_last,t` and the rest-period auxiliary binaries is consistent with Part 5's problem-size inventory. **No cross-part inconsistency remains.**
+
+---
+
+## 2.12 Part 2 promotion summary
+
+**What Revision 7 changed:** Acknowledged the `Th_last,t` registration closure by Part 1 FC11; declared the cross-checks with Parts 3 and 5; updated §2.8, §2.9, §2.10; added §2.11.
+
+**What Revision 7 did not change:** No physical or component modeling. No registration changes. No re-opening of settled items.
+
+**Part 2 integration status after Revision 7:**
+
+| Dimension | Status |
+|---|---|
+| Part 1 change requests | **CLOSED** (FC8, FC9, FC11) |
+| Derating binding rule | **CLOSED** (Revision 4) |
+| `t_last` update timing | **CLOSED** (Revision 4) |
+| Multi-cycle gap | **CLOSED** (Revision 6) |
+| Citation accuracy | **MET** (Revision 6; updated to FC11) |
+| Terminology consistency | **MET** (Revision 6) |
+| `Th_last,t` registration | **CLOSED** (Part 1 FC11; acknowledged Revision 7) |
+| Cross-check with Part 3 | **DECLARED** (Revision 7 §2.11) |
+| Cross-check with Part 5 | **DECLARED** (Revision 7 §2.11) |
+| Manufacturer-data verification | **PENDING** (external; criteria 13–15) |
+
+**Freeze recommendation:** Part 2 is ready to freeze at v1.0 **modulo the manufacturer-data verifications** (criteria 13–15), which are external scenario-data dependencies, not model-integrity items. All Part 2-owned model-integrity criteria are MET.
+
+**Downstream impact:** With Revision 7, Part 3's exit criterion 9 (cross-check with Part 2) is **unblocked**. Part 3's next revision (FC4) can close it. Part 5's exit criteria 12 and 14 are already MET; Part 2's confirmation does not change them. Part 1's §1.13.2 register can be updated in FC12.

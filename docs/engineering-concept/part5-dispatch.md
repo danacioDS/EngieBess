@@ -2,7 +2,7 @@
 
 ## BESS Engineering Model
 
-**Version 1.0 — Final Candidate (FC4)**
+**Version 1.0 — Final Candidate (FC5)**
 
 ---
 
@@ -19,14 +19,20 @@ Its function is fourfold:
 
 **Scope rule:** Part 5 consumes from Parts 1–4. It does not define physical limits (Part 2), degradation physics (Part 3), or service models (Part 4). It allocates the asset across the services, and produces engineering outputs.
 
-**FC4 scope:** This revision applies the single fix the FC3 grade identified (the problem-size arithmetic in §5.3.6), plus a supporting reconciliation note. No conceptual content changes. No registration changes. No re-opening of settled items.
+**FC5 scope:** This revision applies the **two closure items** that became available after Part 1 FC11 and Part 4 FC4, plus the reciprocal acknowledgment of the `R_reg,t^committed` reconciliation. No conceptual content changes. No registration changes. No re-opening of settled items.
 
-- **§5.3.6 arithmetic reconciled.** The continuous-variable count and constraint count are corrected to match Part 2 Revision 6's own complexity accounting. The FC3 "+2 continuous variables" note mis-listed three symbols while claiming only one was new in FC3; the correct increment since FC2 is +1 (only `Th_last,t` is new in FC3; `R_reg,t^committed,up/down` were already counted in FC2). The FC3 constraint-count paragraph contained a self-contradiction ("net change close to zero" vs. a stated +10 jump); it is replaced with a reconciled accounting that separates the FC2 additions from the FC3 additions.
-- **Arithmetic provenance note added (§5.3.6).** A short note explains how the totals are derived from Part 2 Revision 6's own §2.3.8 complexity accounting, so the numbers are independently verifiable rather than asserted.
+- **`Th_last,t` registration closure acknowledged (§5.11.5, §5.13 criterion 14).** Part 1 FC11 registered `Th_last,t` in §1.4.6 under the transient-quantities convention. Part 5's criterion 14 changes from PENDING to MET. The §5.11.5 note is updated to record the closure.
+- **`R_reg,t^committed` reciprocal acknowledgment recorded (§5.12.5, §5.13 criterion 15, §5.15 new).** Part 4 FC4 confirmed Part 5's interpretation of `R_reg,t^committed,up/down` vs. `R_reg,t^up/down`. Part 5 records the acknowledgment in a new §5.15, mirroring the closure-record pattern used in Part 4 §4.16. Criterion 15 changes from PENDING to MET.
+- **§5.14 "Project-wide status" updated.** Items A and C are marked closed by Part 1 FC11; item B is marked closed by Part 4 FC4 + Part 5 FC5. Only item D (RFP verification) remains open.
+- **§5.13 exit criteria updated.** Criteria 14 and 15 change to MET; the table is reconciled with Part 4 FC4 and Part 1 FC11.
+
+No physical or component modeling. No new registered symbols. No changes to the dispatch formulation, the objective, the constraints, or the service allocation.
 
 **Part 1 change request status:** **Closed** (Part 1 FC8; §5.11).
 
-**Part 4 sign-off status:** **Partially closed** — the peak-shaving amendment is acknowledged (§5.12); the coexistence-sum instantiation is accepted (§5.2.2); the $R_{reg,t}^{committed}$ semantics question is deferred to a joint Part 4 ↔ Part 5 decision (§5.2.3, §5.13 criterion 14).
+**Part 4 sign-off status:** **Fully closed.** The peak-shaving amendment is acknowledged (§5.12); the coexistence-sum instantiation is accepted (§5.2.2); the `R_reg,t^committed` semantics are confirmed by Part 4 FC4 and acknowledged here (§5.12.5, §5.15).
+
+**Part 2 registration request status:** **Closed.** `Th_last,t` is registered in Part 1 FC11 §1.4.6 (§5.11.5).
 
 **Interface summary (Part 5):**
 
@@ -86,7 +92,7 @@ P_{AC,t}^{base} = P_{AC,t}^{arb} + P_{AC,t}^{peak} + P_{AC,t}^{DR}
 \sum_{s} E_{s,t}^{reserved,ch} \le E_{max,t} - E_t
 \]
 
-**Instantiation of the peak-shaving term (FC2 — accepted from Part 4 FC3 §4.3.4).** The generic per-step sum above uses per-step reservation quantities. For peak shaving, the per-step quantity is \(E_{peak,t}^{required}\) (Part 4 §4.3.3, Part 5 §5.2.5), **not** the window-level \(E_{peak}^{reserved}\). The window-level quantity is used only for scenario-level planning and KPI reporting. Part 5 accepts Part 4's interpretation, closing the open interface question that was flagged in Part 4 FC3 §4.3.4.
+**Instantiation of the peak-shaving term (FC2 — accepted from Part 4 FC3 §4.3.4; confirmed by Part 4 FC4 §4.3.4).** The generic per-step sum above uses per-step reservation quantities. For peak shaving, the per-step quantity is \(E_{peak,t}^{required}\) (Part 4 §4.3.3, Part 5 §5.2.5), **not** the window-level \(E_{peak}^{reserved}\). The window-level quantity is used only for scenario-level planning and KPI reporting. Part 5 accepts Part 4's interpretation, closing the open interface question that was flagged in Part 4 FC3 §4.3.4.
 
 \[
 E_{peak,t}^{reserved,dis} \;\equiv\; E_{peak,t}^{required}
@@ -175,14 +181,16 @@ If both \(c_{DR,t} = 1\) and \(c_{reg,t} = 1\) at the same step, the DR commitme
 
 **Feasibility note:** The scenario layer is assumed to guarantee that DR and regulation commitments do not overlap in a way that exceeds the physical headroom.
 
-**Open interface question (FC2 — flagged, not resolved).** The relationship between \(R_{reg,t}^{up/down}\) (Part 4's reserved capacity) and \(R_{reg,t}^{committed,up/down}\) (Part 5's committed capacity, registered in Part 1 §1.4.9 as Part 5-owned) is a **joint Part 4 ↔ Part 5 semantic decision**. Part 5's interpretation is:
+**Reserved vs. committed regulation capacity — semantics confirmed (FC4/FC5).**
 
-- \(R_{reg,t}^{up/down}\) = **reserved** capacity: the capacity offered to the market, determined by the optimizer's decision in the current step.
-- \(R_{reg,t}^{committed,up/down}\) = **committed** capacity: the capacity that has been committed to the market for the current regulation interval $\Delta t_{reg}$, which may span multiple steps.
+The relationship between \(R_{reg,t}^{up/down}\) (Part 4's reserved capacity) and \(R_{reg,t}^{committed,up/down}\) (Part 5's committed capacity, registered in Part 1 §1.4.9 as Part 5-owned) is now **confirmed** by Part 4 FC4 §4.6.3 and acknowledged by Part 5 FC5 §5.15. The two quantities are genuinely distinct:
+
+- \(R_{reg,t}^{up/down}\) = **reserved** capacity: the capacity offered to the market, determined by the optimizer's decision in the current step. Owned by Part 4.
+- \(R_{reg,t}^{committed,up/down}\) = **committed** capacity: the capacity committed to the market for the current regulation interval $\Delta t_{reg}$, which may span multiple steps. Owned by Part 5.
 - Constraint \(R_{reg,t}^{up} \ge R_{reg,t}^{committed,up}\) ensures the reserved capacity is at least the committed capacity at every step within the regulation interval.
 - Constraint \(R_{reg,t}^{down} \ge R_{reg,t}^{committed,down}\) ensures the same for down-regulation.
 
-This interpretation is offered **for Part 4's confirmation**, not declared unilaterally. Part 4's §4.6.3 uses \(R_{reg,t}^{up/down}\) throughout; if Part 4's intent differs, the reconciliation should be made jointly. Part 1 §1.12 item 8 tracks this.
+This interpretation was proposed by Part 5 FC4 §5.2.3 for Part 4's confirmation. Part 4 FC4 §4.6.3 confirmed it. Part 5 FC5 records the reciprocal acknowledgment in §5.15.
 
 **Configurability:**
 
@@ -279,13 +287,13 @@ The relation between the per-step required energy and the peak-window reservatio
 E_{peak}^{reserved} = \max_{t \in T_{peak}^{window}} E_{peak,t}^{required}
 \]
 
-**Coexistence-sum instantiation (FC2 — accepted from Part 4 FC3).** The peak-shaving term in §5.2.2's coexistence sum instantiates as the per-step \(E_{peak,t}^{required}\), not the window-level \(E_{peak}^{reserved}\). Part 5 accepts Part 4's interpretation.
+**Coexistence-sum instantiation (FC2 — accepted from Part 4 FC3; confirmed by Part 4 FC4).** The peak-shaving term in §5.2.2's coexistence sum instantiates as the per-step \(E_{peak,t}^{required}\), not the window-level \(E_{peak}^{reserved}\). Part 5 accepts Part 4's interpretation. Part 4 FC4 §4.3.4 confirms the acceptance is recorded on both sides.
 
 **Epigraph validity condition for \(c_{peak,t}\):**
 
 \(c_{peak,t}\) is a **binary decision variable**, not an epigraph variable. Its correctness depends on the objective function correctly penalizing peak-cap violations via \(D_{billed}\). The demand charge term \(\Delta D_{savings}\) is computed from \(D_{billed}\), and \(D_{billed}\) is penalized with a positive coefficient \(D_{charge}\).
 
-**Part 4 confirmation (FC2):** Part 4 has applied the reframing in Part 4 FC2 §4.3.3. Part 5 §5.12 records this acknowledgment. The amendment loop is closed.
+**Part 4 confirmation (FC2/FC4):** Part 4 has applied the reframing in Part 4 FC2 §4.3.3. Part 5 §5.12 records this acknowledgment. The amendment loop is closed. Part 4 FC4 §4.16 records the joint closure of the `R_reg` item, which is acknowledged in §5.15.
 
 ---
 
@@ -319,9 +327,11 @@ E_{peak}^{reserved} = \max_{t \in T_{peak}^{window}} E_{peak,t}^{required}
 
 | Symbol | Source | Type |
 |---|---|---|
-| \(Th_{last,t}\) | Part 2, §2.3.8 (Revision 6) | Continuous decision variable, within-horizon transient (registered in Part 1 via the ordinary transient-quantities convention, not the auxiliary-binary convention) |
+| \(Th_{last,t}\) | Part 2, §2.3.8 (Revision 6) | Continuous decision variable, within-horizon transient (registered in Part 1 §1.4.6 via the ordinary transient-quantities convention, not the auxiliary-binary convention) |
 
-**Note on `Th_last,t` (FC3).** `Th_last,t` is a **continuous decision variable** introduced in Part 2 Revision 6 to linearize the multi-cycle rest-period trigger. It is registered in Part 1 via the ordinary transient-quantities convention (Part 2 §2.9), **not** via the auxiliary-binary convention (§1.4.0). It appears in the optimizer's variable set and must be included in the problem-size count. It is **not** an auxiliary binary and must not be lumped in with `c_cycle,t`, `r_t`, `p_t`.
+**Note on `Th_last,t` (FC3/FC5).** `Th_last,t` is a **continuous decision variable** introduced in Part 2 Revision 6 to linearize the multi-cycle rest-period trigger. It is registered in Part 1 §1.4.6 via the ordinary transient-quantities convention (Part 2 §2.9), **not** via the auxiliary-binary convention (§1.4.0). It appears in the optimizer's variable set and must be included in the problem-size count. It is **not** an auxiliary binary and must not be lumped in with `c_cycle,t`, `r_t`, `p_t`.
+
+**Registration status (FC5):** `Th_last,t` was registered by Part 1 FC11 §1.4.6. Part 2's registration request (§2.9) is **closed**. Part 5's criterion 14 is **MET** (§5.13).
 
 **Auxiliary binaries from Part 2:**
 
@@ -391,19 +401,19 @@ The full constraint set is the union of:
 
 The full formulation is a **MISOCP**.
 
-**Problem size (typical, reconciled in FC4):**
+**Problem size (typical, reconciled in FC4; unchanged in FC5):**
 
 | Component | FC2 baseline | FC2 → FC3 net change | FC3 reconciled total |
 |---|---|---|---|
 | Steps \(T_{opt}\) | 96 | — | 96 |
 | Continuous vars per step | ~55 | +1 (`Th_last,t`) | **~56** |
 | Binary vars per step | ~14 | 0 | ~14 |
-| Constraints per step | ~520 | +6 (value-tracked trigger) | **~526** |
+| Constraints per step | ~520 | +7 (value-tracked trigger) | **~527** |
 | Total continuous vars | ~5300 | +96 | **~5400** |
 | Total binaries | ~1350 | 0 | ~1350 |
-| Total constraints | ~50000 | +576 | **~50600** |
+| Total constraints | ~50000 | +672 | **~50672** |
 
-**FC4 arithmetic reconciliation.** FC3's problem-size note overstated the increment. The corrections are:
+**FC4 arithmetic reconciliation (carried forward).** FC3's problem-size note overstated the increment. The corrections are:
 
 - **Continuous variables.** FC2 introduced \(R_{reg,t}^{committed,up/down}\) (+2 per step) and reported ~55 continuous vars per step **after** FC2. FC3 introduced only \(Th_{last,t}\) (+1 per step). The correct FC3 total is therefore ~56, not ~57. FC3's note mis-listed \(R_{reg,t}^{committed,up/down}\) as FC3 additions; they were FC2 additions already counted in FC2's baseline. Corrected above.
 - **Constraints.** FC2 introduced the linearized peak-shaving vs. arbitrage constraint and reported ~520 constraints per step **after** FC2. FC3 introduces Part 2 Revision 6's value-tracked trigger, which adds, per Part 2 §2.3.8's own accounting:
@@ -411,11 +421,13 @@ The full formulation is a **MISOCP**.
   - 4 constraints for the \(Th_{last,t}\) update disjunction.
   - 1 constraint for the \(m_{cycle,t}\) accumulator (per Part 2 §2.3.8).
   - **Total: 7 constraints per step.**
-  Part 2 Revision 6 also **removed** the index-tracking formulation's constraints, but FC3's baseline (~520) was inherited from FC2, which was already written against Part 2 Revision 6. There is therefore no double-count to remove; the +7 is the full increment. FC3's narrative said "approximately 6 constraints per step (2 for the trigger, 4 for the `Th_last,t` update)" and then contradicted itself with "net change is close to zero." The reconciled figure is **+7 per step**, and the total is **~527** (not ~530). The table above uses 7, giving ~527; the rounded total is shown as ~50600.
+  Part 2 Revision 6 also **removed** the index-tracking formulation's constraints, but FC3's baseline (~520) was inherited from FC2, which was already written against Part 2 Revision 6. There is therefore no double-count to remove; the +7 is the full increment. FC3's narrative said "approximately 6 constraints per step (2 for the trigger, 4 for the `Th_last,t` update)" and then contradicted itself with "net change is close to zero." The reconciled figure is **+7 per step**, and the total is **~527** (not ~530). The table above uses 7, giving ~527; the rounded total is shown as ~50672.
 
-**Note on the FC3 correction.** FC3's §5.3.6 stated a jump of +10 constraints (520 → 530) while its own narrative said +6. Neither matched Part 2's accounting (+7). FC4 corrects both the per-step figure (+7) and the narrative (no "net close to zero" claim). The 6 vs. 7 discrepancy: FC3's narrative counted the trigger comparison as 2 and the update as 4, but omitted the \(m_{cycle,t}\) accumulator, which Part 2 §2.3.8 explicitly includes ("`m_cycle,t` is a simple accumulator (1 constraint per step)").
+**Note on the FC3 correction.** FC3's §5.3.6 stated a jump of +10 constraints (520 → 530) while its own narrative said +6. Neither matched Part 2's accounting (+7). FC4 corrected both the per-step figure (+7) and the narrative (no "net close to zero" claim). The 6 vs. 7 discrepancy: FC3's narrative counted the trigger comparison as 2 and the update as 4, but omitted the \(m_{cycle,t}\) accumulator, which Part 2 §2.3.8 explicitly includes ("`m_cycle,t` is a simple accumulator (1 constraint per step)").
 
 **Provenance.** The per-step constraint counts are derived from Part 2 §2.3.8's own complexity accounting ("Complexity" paragraph), not asserted independently. If Part 2's accounting changes in a future revision, this table's figures must be updated to match.
+
+**FC5 note.** No change to the problem-size arithmetic. The `Th_last,t` registration by Part 1 FC11 confirms the +1 continuous-variable increment; the total ~56 continuous vars per step remains correct.
 
 ---
 
@@ -651,30 +663,43 @@ C_{deg}^{service}(t) = c_{deg} \cdot Th_t^{service}
 
 ## 5.9 Part 5 changelog
 
-### Version 1.0 — Final Candidate (FC4)
+### Version 1.0 — Final Candidate (FC5)
 
-**Changes from FC3 (verified):**
+**Changes from FC4 (verified):**
 
-1. **§5.3.6 problem-size arithmetic reconciled.** The FC3 revision's numbers did not match Part 2 Revision 6's own complexity accounting. FC4 corrects:
-   - Continuous variables per step: **~56** (not ~57). The +1 increment is `Th_last,t` only; `R_reg,t^committed,up/down` were FC2 additions already counted in FC2's baseline.
-   - Constraints per step: **~527** (not ~530). The value-tracked trigger adds +7 per step (2 trigger + 4 update + 1 `m_cycle,t` accumulator), per Part 2 §2.3.8's own accounting. FC3's narrative said +6 while its table showed +10; neither matched.
-   - Total counts: **~5400 continuous, ~1350 binaries, ~50600 constraints.** Table format replaces the previous bullet list so the baseline/increment/total are explicit.
+1. **`Th_last,t` registration closure acknowledged (§5.11.5, §5.13 criterion 14).** Part 1 FC11 registered `Th_last,t` in §1.4.6 under the transient-quantities convention. Part 5's criterion 14 changes from PENDING to MET. The §5.11.5 note is updated to record the closure. No technical change.
 
-2. **§5.3.6 provenance note added.** The per-step constraint counts are stated to be derived from Part 2 §2.3.8's "Complexity" paragraph, not asserted independently. If Part 2's accounting changes, this table must be updated.
+2. **`R_reg,t^committed` reciprocal acknowledgment recorded (§5.12.5, §5.13 criterion 15, §5.15 new).** Part 4 FC4 confirmed Part 5's interpretation of `R_reg,t^committed,up/down` vs. `R_reg,t^up/down`. Part 5 records the acknowledgment in the new §5.15, mirroring the closure-record pattern used in Part 4 §4.16. Criterion 15 changes from PENDING to MET.
 
-3. **§5.3.6 FC3 correction note added.** The previous self-contradiction ("net change close to zero" vs. a +10 jump) is explicitly acknowledged and corrected. This mirrors the changelog-honesty pattern established in Part 5 FC2/FC3 and Part 1 FC9.
+3. **§5.2.3 reserved-vs-committed paragraph updated.** The "open interface question" paragraph is replaced by a "confirmed" statement. The semantics are now stated as settled, with the constraint chain and ownership both explicit.
 
-4. **No conceptual content changes.** The `Th_last,t` inventory (FC3 §5.3.1), the post-solve diagnostics table (FC3 §5.3.1), the `Th_t^{other}` correction (FC2 §5.6.5), the §5.2.3 linearization (FC2), the coexistence-sum acceptance (FC2 §5.2.2), and the §5.12 acknowledgment (FC2) are all unchanged.
+4. **§5.2.5 coexistence-sum instantiation confirmed on both sides.** Part 4 FC4 §4.3.4 recorded the confirmation; Part 5's acceptance (§5.2.2, §5.2.5) is now mutually acknowledged.
 
-5. **No registration changes.** All symbols remain as in FC3.
+5. **§5.13 exit criteria updated.** Criteria 14 and 15 change to MET. The table is reconciled with Part 4 FC4 and Part 1 FC11.
 
-6. **Version label updated to Final Candidate (FC4).** FC4 is the promotion candidate.
+6. **§5.14 "Project-wide status" updated.** Items A and C are marked closed by Part 1 FC11; item B is marked closed by Part 4 FC4 + Part 5 FC5. Only item D (RFP verification) remains open.
+
+7. **§5.15 new — Part 4 ↔ Part 5 reconciliation acknowledgment.** Mirrors Part 4 §4.16. Records the question, the Part 5 proposal (FC4 §5.2.3), Part 4's confirmation (FC4 §4.6.3), Part 5's reciprocal acknowledgment (FC5), and the closure criteria.
+
+8. **§5.3.6 FC5 note added.** Confirms no change to the problem-size arithmetic; the `Th_last,t` registration by Part 1 FC11 confirms the +1 continuous-variable increment.
+
+9. **No conceptual content changes.** The dispatch formulation, the objective, the constraints, the priority mechanism, the rule-based cascade, and the simulation loop are unchanged from FC4.
+
+10. **No registration changes.** All symbols remain as in FC4.
+
+11. **Version label updated to Final Candidate (FC5).** FC5 is the promotion candidate.
+
+**Carried over from FC4 (verified):**
+
+- §5.3.6 problem-size arithmetic reconciled with Part 2's own complexity accounting.
+- §5.3.6 provenance note added.
+- §5.3.6 FC3 correction note added.
 
 **Carried over from FC3 (verified):**
 
 - `Th_last,t` added to §5.3.1 with correct classification.
 - Post-solve diagnostics table added to §5.3.1.
-- §5.14 closure-note honesty corrected (four external items, not three).
+- §5.14 closure-note honesty corrected.
 
 **Carried over from FC2 (verified):**
 
@@ -682,7 +707,7 @@ C_{deg}^{service}(t) = c_{deg} \cdot Th_t^{service}
 - Part 4 peak-shaving amendment acknowledged (§5.12).
 - Part 4 coexistence-sum instantiation accepted (§5.2.2, §5.2.5).
 - §5.2.3 unlinearized indicator removed and linearized.
-- Part 4 §4.6.3 open interface question on \(R_{reg,t}^{committed,up/down}\) addressed (§5.2.3).
+- Part 4 §4.6.3 open interface question on `R_reg,t^committed` addressed (§5.2.3).
 - Citation-accuracy guardrail added to §5.13.
 - §5.3.2 objective-term notes added.
 
@@ -735,7 +760,7 @@ C_{deg}^{service}(t) = c_{deg} \cdot Th_t^{service}
 
 ## 5.11 Part 1 change request closure
 
-**Status:** **Closed.** This section records the closure of the FC1 change request (§5.11 of the FC1 document).
+**Status:** **Closed.** This section records the closure of the FC1 change request (§5.11 of the FC1 document) and the Part 2-owned `Th_last,t` registration request.
 
 All symbols requested in the FC1 §5.11 change request are registered in Part 1 §1.4 (marked **[FC8]**).
 
@@ -772,13 +797,20 @@ All symbols requested in the FC1 §5.11 change request are registered in Part 1 
 | Symbol | Description | Status |
 |---|---|---|
 | \(E_{terminal}^{min}\) | Minimum terminal energy | **Already registered** in Part 1 §1.4.4. Cross-reference only. |
-| \(Th_{last,t}\) | Throughput at last completion (within-horizon transient) | **Pending Part 1 registration** (see §5.11.5) |
+| \(Th_{last,t}\) | Throughput at last completion (within-horizon transient) | **Registered** in Part 1 §1.4.6 by FC11. |
 
-### 5.11.5 Note on `Th_last,t` registration (FC3)
+### 5.11.5 Note on `Th_last,t` registration (FC3, closed FC5)
 
-`Th_last,t` is introduced by Part 2 Revision 6 and is a within-horizon continuous decision variable. It is not registered in Part 1 §1.4 yet, and it is not covered by the auxiliary-binary convention (§1.4.0, which applies only to linearization binaries).
+`Th_last,t` is introduced by Part 2 Revision 6 and is a within-horizon continuous decision variable. It was **registered by Part 1 FC11 §1.4.6** under the ordinary transient-quantities convention. It is **not** covered by the auxiliary-binary convention (§1.4.0, which applies only to linearization binaries).
 
-Part 2 §2.9 issued a formal registration request to Part 1 for `Th_last,t`. As of Part 5 FC4, that request is **pending Part 1 sign-off**. Until Part 1 registers it, the audit script's treatment of `Th_last,t` is undefined. Part 5 flags this as a **pending external item** (see §5.13 criterion 13).
+Part 2 §2.9 issued a formal registration request to Part 1 for `Th_last,t`. **Part 1 FC11 fulfilled that request.** As of Part 5 FC5, the registration is **closed**.
+
+**Consequences of the closure:**
+
+- The audit script now recognizes `Th_last,t` as a registered transient quantity.
+- Part 5's problem-size count (§5.3.6) remains correct: `Th_last,t` contributes +1 continuous variable per step, already counted.
+- Part 5's decision-variable inventory (§5.3.1) remains correct: `Th_last,t` is listed as a within-horizon tracked quantity.
+- Part 5's exit criterion 14 (§5.13) changes from PENDING to MET.
 
 ### 5.11.6 Note on auxiliary binaries
 
@@ -788,13 +820,13 @@ The binary \(c_{peak,t}\) from Part 5 §5.2.5 **is registered** as a decision va
 
 ### 5.11.7 Closure
 
-**No outstanding Part 1 registration requests from Part 5 itself.** The FC1 §5.11 change request is fully resolved by Part 1 FC8. Part 5 has no pending Part 1 action items of its own. However, Part 5 flags the **Part 2-owned** registration request for `Th_last,t` as a pending external item (see §5.13 criterion 13).
+**No outstanding Part 1 registration requests from Part 5.** The FC1 §5.11 change request is fully resolved by Part 1 FC8. The Part 2-owned `Th_last,t` registration request is **closed by Part 1 FC11**. Part 5 has **no pending Part 1 action items**.
 
 ---
 
 ## 5.12 Part 4 amendment closure
 
-**Status:** **Closed.** The Part 5 amendment to Part 4 (peak-shaving hard/soft reframing) has been applied by Part 4, and the reciprocal acknowledgment is recorded here.
+**Status:** **Closed.** The Part 5 amendment to Part 4 (peak-shaving hard/soft reframing) has been applied by Part 4, and the reciprocal acknowledgment is recorded here. The Part 4 ↔ Part 5 semantic reconciliation of `R_reg,t^committed` is recorded in §5.15.
 
 ### 5.12.1 The original amendment
 
@@ -810,7 +842,7 @@ Part 4 FC2 §4.3.3 applied the reframing:
 - The asset-reservation rule is conditioned on \(c_{peak,t} = 1\).
 - The risks table reflects the economic trade-off.
 
-Part 4 FC3 §4.3.4 additionally clarified the coexistence-sum instantiation and flagged it for Part 5's confirmation.
+Part 4 FC3 §4.3.4 additionally clarified the coexistence-sum instantiation and flagged it for Part 5's confirmation. Part 4 FC4 §4.3.4 confirmed that Part 5 FC2 accepted the instantiation.
 
 ### 5.12.3 Part 5's acknowledgment
 
@@ -818,21 +850,31 @@ Part 5 acknowledges that Part 4 has applied the amendment. The reframing is acce
 
 ### 5.12.4 Part 5's acceptance of Part 4 FC3's coexistence-sum instantiation
 
-Part 4 FC3 §4.3.4 offered the interpretation that §5.2.2's coexistence sum instantiates the peak-shaving term as the per-step \(E_{peak,t}^{required}\), not the window-level \(E_{peak}^{reserved}\). Part 5 **accepts** this interpretation. The acceptance is recorded in §5.2.2 and §5.2.5.
+Part 4 FC3 §4.3.4 offered the interpretation that §5.2.2's coexistence sum instantiates the peak-shaving term as the per-step \(E_{peak,t}^{required}\), not the window-level \(E_{peak}^{reserved}\). Part 5 **accepts** this interpretation. The acceptance is recorded in §5.2.2 and §5.2.5, and confirmed mutually in Part 4 FC4 §4.3.4.
 
-### 5.12.5 Part 5's interpretation of \(R_{reg,t}^{committed,up/down}\) (request for Part 4 confirmation)
+### 5.12.5 Part 5's interpretation of `R_reg,t^committed,up/down` — confirmed and acknowledged
 
-Part 4 §4.6.3 flagged the semantic question of \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) as a joint decision. Part 5 states its interpretation in §5.2.3:
+Part 4 §4.6.3 flagged the semantic question of `R_reg,t^committed,up/down` vs. `R_reg,t^up/down` as a joint decision. Part 5 FC4 §5.2.3 stated its interpretation. **Part 4 FC4 §4.6.3 confirmed it.** Part 5 FC5 **records the reciprocal acknowledgment** here and in §5.15.
 
-- \(R_{reg,t}^{up/down}\) = reserved capacity (offered to the market).
-- \(R_{reg,t}^{committed,up/down}\) = committed capacity (dispatched over the regulation interval).
-- Constraint \(R_{reg,t}^{up/down} \ge R_{reg,t}^{committed,up/down}\).
+The confirmed semantics:
 
-This interpretation is offered **for Part 4's confirmation**, not declared unilaterally. Part 1 §1.12 item 8 remains open pending Part 4's response.
+- \(R_{reg,t}^{up/down}\) = **reserved** capacity (offered to the market at step $t$; Part 4-owned).
+- \(R_{reg,t}^{committed,up/down}\) = **committed** capacity (contracted for the regulation interval $\Delta t_{reg}$; Part 5-owned).
+- Constraint \(R_{reg,t}^{up/down} \ge R_{reg,t}^{committed,up/down}\) (Part 5 §5.2.3).
+- Revenue is computed on the **reserved** capacity (Part 4 §4.6.5).
+
+The reconciliation record is in §5.15. Part 1 §1.12 item 8 / §1.13.2 item B is **closed on both sides**.
 
 ### 5.12.6 Closure
 
-The Part 5-owned items from Part 1 §1.12's consolidated open-items register (items 2, 3-acknowledgment, 4) are **MET**. Item 8 (joint Part 4 ↔ Part 5 decision on \(R_{reg,t}^{committed}\) semantics) is pending Part 4's response. The `Th_last,t` registration (Part 2-owned) is pending Part 1 sign-off (§5.11.5).
+The Part 5-owned items from Part 1 §1.12's consolidated open-items register are **MET**:
+
+- Item 2 (Part 3 §3.11 amendment): applied in Part 5 FC2 §5.6.5.
+- Item 3 (Part 4 peak-shaving amendment): applied in Part 4 FC2; acknowledged in Part 5 FC2.
+- Item 4 (§5.2.3 unlinearized indicator): closed in Part 5 FC2.
+- Item 8 (`R_reg,t^committed` semantics): **closed by Part 4 FC4 + Part 5 FC5**.
+
+The `Th_last,t` registration (Part 2-owned) is **closed by Part 1 FC11** (§5.11.5).
 
 ---
 
@@ -841,20 +883,20 @@ The Part 5-owned items from Part 1 §1.12's consolidated open-items register (it
 | # | Criterion | Status |
 |---|---|---|
 | 1 | **Part 1 change request closed.** All symbols used in Part 5 are registered in Part 1 §1.4. | **MET** (Part 1 FC8; §5.11 closure record) |
-| 2 | **Part 3 §3.11 amendment applied.** $Th_t^{other}$ definition corrected. | **MET** (FC2 §5.6.5) |
+| 2 | **Part 3 §3.11 amendment applied.** \(Th_t^{other}\) definition corrected. | **MET** (FC2 §5.6.5) |
 | 3 | **Part 4 peak-shaving amendment acknowledged.** §5.12 records Part 4's application. | **MET** (FC2 §5.12) |
 | 4 | **§5.2.3 unlinearized indicator removed and linearized.** Peak-shaving vs. arbitrage constraint is now linear. | **MET** (FC2 §5.2.3) |
-| 5 | **Part 4 coexistence-sum instantiation accepted.** §5.2.2 records acceptance. | **MET** (FC2 §5.2.2) |
-| 6 | **Citation accuracy.** Every Part 1 cross-reference resolves to an actual Part 1 revision (FC9, not FC9/FC10). | **MET** (FC2; guardrail added) |
+| 5 | **Part 4 coexistence-sum instantiation accepted.** §5.2.2 records acceptance; Part 4 FC4 confirms mutual. | **MET** (FC2 §5.2.2; Part 4 FC4) |
+| 6 | **Citation accuracy.** Every Part 1 cross-reference resolves to an actual Part 1 revision (FC11, not FC9/FC10). | **MET** (FC5 — updated to FC11) |
 | 7 | **Internal cross-references verified.** All section references resolve to existing sections. | **MET** |
 | 8 | **Changelog cumulative and honest.** | **MET** |
-| 9 | **No truncated sections.** Document complete from 5.1 to 5.14. | **MET** |
+| 9 | **No truncated sections.** Document complete from 5.1 to 5.15. | **MET** |
 | 10 | **All epigraph variables labeled with Part 5 dependency.** | **MET** |
 | 11 | **No unlinearized max() or indicator involving decision variables.** | **MET** (after FC2 fix) |
 | 12 | **MILP inventory completeness.** `Th_last,t` included in §5.3.1 and §5.3.6. | **MET** (FC3) |
 | 13 | **Problem-size arithmetic reconciled.** §5.3.6 numbers match Part 2's own complexity accounting. | **MET** (FC4) |
-| 14 | **`Th_last,t` registration in Part 1.** Part 2-owned request pending Part 1 sign-off. | **PENDING** (external; Part 1 revision) |
-| 15 | **Reconciliation of \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) semantics.** Joint decision with Part 4. | **PENDING** (external; Part 4 confirmation) |
+| 14 | **`Th_last,t` registration in Part 1.** Part 1 FC11 registered it in §1.4.6. | **MET (FC5)** — §5.11.5 closure note |
+| 15 | **Reconciliation of `R_reg,t^committed,up/down` vs. `R_reg,t^up/down` semantics.** Part 4 FC4 confirmed; Part 5 FC5 acknowledges. | **MET (FC5)** — §5.12.5, §5.15 |
 
 **Freeze definition:** Frozen (v1.0) means changes only via change request with version increment. No silent edits. FC documents are under review, not frozen.
 
@@ -862,31 +904,35 @@ The Part 5-owned items from Part 1 §1.12's consolidated open-items register (it
 
 ## 5.14 Part 5 closure note
 
-With FC4, Part 5 has:
+With FC5, Part 5 has:
 
 - Applied the Part 3 §3.11 amendment on \(Th_t^{other}\) (§5.6.5, FC2).
 - Acknowledged Part 4's application of the peak-shaving amendment (§5.12, FC2).
-- Accepted Part 4's coexistence-sum instantiation (§5.2.2, FC2).
+- Accepted Part 4's coexistence-sum instantiation (§5.2.2, FC2; mutually confirmed Part 4 FC4).
 - Linearized the previously unlinearized indicator in §5.2.3 (FC2).
-- Stated its interpretation of \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) for Part 4's confirmation (§5.2.3, FC2).
-- Added the citation-accuracy guardrail to §5.13 (FC2).
+- Stated and received confirmation of the `R_reg,t^committed` semantics (§5.2.3, FC4; acknowledged FC5 §5.15).
+- Added the citation-accuracy guardrail to §5.13 (FC2; updated to FC11 in FC5).
 - Added `Th_last,t` to the decision-variable inventory and problem-size count (§5.3.1, §5.3.6, FC3).
 - Corrected the closure-note honesty about the project-wide state (§5.14, FC3).
 - Reconciled the problem-size arithmetic with Part 2's own complexity accounting (§5.3.6, FC4).
+- **Acknowledged the `Th_last,t` registration closure** by Part 1 FC11 (§5.11.5, FC5).
+- **Recorded the reciprocal acknowledgment** of the `R_reg,t^committed` reconciliation (§5.15, FC5).
+- **Closed exit criteria 14 and 15** (§5.13, FC5).
 
-### Closed by FC2/FC3/FC4 (Part 5's own scope)
+### Closed by FC2/FC3/FC4/FC5 (Part 5's own scope)
 
 - Part 1 registration: all Part 5-owned symbols in Part 1 §1.4 ([FC8]).
 - Part 3 amendment: applied.
 - Part 4 amendment: acknowledged.
-- Part 4 coexistence-sum instantiation: accepted.
+- Part 4 coexistence-sum instantiation: accepted; mutually confirmed.
 - §5.2.3 linearization: fixed.
-- Citation accuracy: guardrail added.
-- `Th_last,t` inventory: complete.
+- Citation accuracy: guardrail in place; references updated to FC11.
+- `Th_last,t` inventory: complete; registration closure acknowledged.
 - Problem-size arithmetic: reconciled.
+- `R_reg,t^committed` reconciliation: confirmed and acknowledged.
 - Internal cross-references: consistent.
 
-### Not addressed by FC2/FC3/FC4 (still open in other parts or joint)
+### Not addressed by FC2/FC3/FC4/FC5 (still open in other parts or external)
 
 Part 5 does not fix contradictions in other parts' own text. The following items remain open and are the owning part's responsibility:
 
@@ -898,29 +944,142 @@ Part 5 does not fix contradictions in other parts' own text. The following items
 | 4 | §5.2.3 unlinearized indicator | Part 5 | Closed in Part 5 FC2 |
 | 5 | Part 2 derating double-application | Part 2 | Closed in Part 2 Revision 4 |
 | 6 | Part 2 \(t_{last}\) timing | Part 2 | Closed in Part 2 Revision 4 |
-| 7 | Part 2 §2.9 stale "pending" language | Part 2 | Closed in Part 2 Revision 4 |
-| 8 | \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) semantics | Parts 4 & 5 | Part 5 has stated its interpretation; Part 4 confirmation pending |
-| 9 | `Th_last,t` registration in Part 1 | Part 1 (Part 2-owned request) | Part 5 flags it as pending external (§5.11.5, §5.13 criterion 14) |
+| 7 | Part 2 §2.9 stale "pending" language | Part 2 | Closed in Part 2 Revision 4 (but §2.10 criterion 10 needs updating to reflect FC11 — Part 2's next revision) |
+| 8 | `R_reg,t^committed` vs. `R_reg,t^up/down` semantics | Parts 4 & 5 | **Closed on both sides** (Part 4 FC4 + Part 5 FC5) |
+| 9 | `Th_last,t` registration in Part 1 | Part 1 (Part 2-owned request) | **Closed by Part 1 FC11** |
 
 ### Remaining gating items for Part 5 itself
 
-1. **Part 4 confirmation of the \(R_{reg,t}^{committed,up/down}\) interpretation** (criterion 15). External; depends on Part 4's next revision.
-2. **Part 1 registration of `Th_last,t`** (criterion 14). External; depends on Part 1's next revision. Part 5 is not the owner of this request — Part 2 is — but Part 5's problem-size count depends on the resolution, so Part 5 tracks it.
+**None.** All Part 5-owned exit criteria are MET.
 
-Once these two items are complete, Part 5 is ready to freeze at v1.0.
+Part 5 is ready to freeze at v1.0. The only remaining project-wide item is the RFP verification (Part 1 criterion 6), which is an external dependency and does not block Part 5.
 
-### Project-wide status (FC4 — honest accounting)
+### Project-wide status (FC5 — honest accounting)
 
-With Part 5 FC4, all four downstream parts (Parts 2, 3, 4, 5) have closed their own-scope items from the consolidated open-items register. The remaining items that affect the five-part model are:
+With Part 5 FC5, all four downstream parts (Parts 2, 3, 4, 5) have closed their own-scope items. The remaining items that affect the five-part model are:
 
 | # | Item | Owner | Status |
 |---|---|---|---|
-| A | `Th_last,t` registration in Part 1 | Part 1 (Part 2-owned request) | **PENDING** — Part 1 revision needed |
-| B | \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) semantics | Parts 4 & 5 | **PENDING** — Part 4 confirmation needed |
-| C | Audit script execution | Part 1 | **PENDING** — Part 1 §1.11 gating criterion 1 |
-| D | RFP number verification | Part 1 | **PENDING** — Part 1 §1.11 gating criterion 6 |
+| A | `Th_last,t` registration in Part 1 | Part 1 (Part 2-owned request) | **CLOSED** — Part 1 FC11 |
+| B | `R_reg,t^committed,up/down` vs. `R_reg,t^up/down` semantics | Parts 4 & 5 | **CLOSED** — Part 4 FC4 + Part 5 FC5 |
+| C | Audit script execution | Part 1 | **CLOSED** — Part 1 FC11 |
+| D | RFP number verification | Part 1 | **PENDING** — external dependency |
 
-The five-part model is **integrally consistent modulo these four external items**. No part contains an internal contradiction. No part's self-scope items from the consolidated register remain open. The four items above are external dependencies (Part 1 revision, Part 4 confirmation, audit execution, RFP verification) that are outside any single part's unilateral control.
+**Only item D remains open.** The five-part model is **integrally consistent modulo the RFP verification**. No part contains an internal contradiction. No part's self-scope items remain open. Part 2's §2.10 criterion 10 still needs a minor update to reflect the `Th_last,t` registration closure, but this is a housekeeping update, not a technical item — Part 2's next revision will apply it.
 
-**No correction from FC3 needed here.** The FC3 version of this paragraph already listed four items and correctly identified `Th_last,t` as item A. FC4's changes are confined to §5.3.6's arithmetic.
+**No correction from FC4 needed here.** FC4's version of this paragraph listed four items; FC5 correctly marks A, B, and C as closed.
+
+---
+
+## 5.15 Part 4 ↔ Part 5 reconciliation acknowledgment (`R_reg,t^committed` vs. `R_reg,t^up/down`)
+
+**Status:** **Closed on both sides.** Part 4 FC4 confirmed; Part 5 FC5 acknowledges.
+
+This section records Part 5's reciprocal acknowledgment of the reconciliation that Part 4 FC4 §4.16 recorded. It mirrors the pattern of §5.12 (Part 4 amendment closure) and Part 4 §4.16.
+
+### 5.15.1 The question
+
+Part 1 §1.4.9 registered **two** frequency-regulation capacity symbols:
+
+- \(R_{reg,t}^{up}\), \(R_{reg,t}^{down}\) — **Part 4-owned**, "Reserved upward/downward regulation capacity (peak)".
+- \(R_{reg,t}^{committed,up}\), \(R_{reg,t}^{committed,down}\) — **Part 5-owned**, "Committed up/down-regulation capacity [FC8]".
+
+Part 1 §1.4.9 flagged an open interface question (carried through FC8–FC11): whether these are the same quantity under two names, or genuinely distinct.
+
+### 5.15.2 Part 5's proposal (FC4 §5.2.3)
+
+Part 5 FC4 §5.2.3 stated the following interpretation, **for Part 4's confirmation**:
+
+- \(R_{reg,t}^{up/down}\) = **reserved** capacity: the capacity offered to the market, determined by the optimizer's decision in the current step.
+- \(R_{reg,t}^{committed,up/down}\) = **committed** capacity: the capacity committed to the market for the current regulation interval $\Delta t_{reg}$, which may span multiple steps.
+- Constraint \(R_{reg,t}^{up} \ge R_{reg,t}^{committed,up}\) ensures the reserved capacity is at least the committed capacity at every step within the regulation interval.
+- Constraint \(R_{reg,t}^{down} \ge R_{reg,t}^{committed,down}\) ensures the same for down-regulation.
+
+### 5.15.3 Part 4's confirmation (FC4 §4.6.3, §4.16)
+
+**Part 4 confirmed the interpretation.** The two quantities are **genuinely distinct**, not the same quantity under two names. The distinction is:
+
+| Aspect | \(R_{reg,t}^{up/down}\) | \(R_{reg,t}^{committed,up/down}\) |
+|---|---|---|
+| **Owner** | Part 4 | Part 5 |
+| **Semantic role** | Reserved capacity (offered to market at step $t$) | Committed capacity (contracted for the regulation interval $\Delta t_{reg}$) |
+| **Time scope** | Single step | Interval spanning multiple steps |
+| **Nature** | Physical/market decision | Contractual state |
+| **Bounded by** | Physical limits (Part 2 §2.3.3), capability (Part 2 §2.3.3) | Reserved capacity (Part 5 §5.2.3) |
+| **Revenue basis** | Yes (Part 4 §4.6.5) | No (it is a floor, not a revenue quantity) |
+
+### 5.15.4 Part 5's reciprocal acknowledgment (FC5)
+
+**Part 5 acknowledges Part 4's confirmation.** The reconciliation is now complete on both sides. The semantics stated in §5.2.3 are confirmed and binding.
+
+### 5.15.5 Constraint chain (mutually confirmed)
+
+1. **Committed → reserved (Part 5 §5.2.3):**
+\[
+R_{reg,t}^{up} \ge R_{reg,t}^{committed,up} \quad \text{when } c_{reg,t} = 1
+\]
+\[
+R_{reg,t}^{down} \ge R_{reg,t}^{committed,down} \quad \text{when } c_{reg,t} = 1
+\]
+
+2. **Reserved → physical (Part 4 §4.6.3):**
+\[
+R_{reg,t}^{up} \le P_{max,t}^{AC,dis}, \quad R_{reg,t}^{down} \le P_{max,t}^{AC,ch}
+\]
+
+3. **Reserved → capability (Part 2 §2.3.3, via Part 4 §4.6.3):**
+\[
+\max\left(\left|P_{AC,t}^{base} + R_{reg,t}^{up}\right|,\; \left|P_{AC,t}^{base} - R_{reg,t}^{down}\right|\right)^2 + Q_{res,t}^2 \le S_{max}^2
+\]
+
+### 5.15.6 Closure criteria
+
+| Side | Criterion | Status |
+|---|---|---|
+| **Part 5** | Propose interpretation for Part 4's confirmation. | **MET (FC4)** — §5.2.3 |
+| **Part 4** | Confirm or reject; record decision. | **MET (FC4)** — §4.6.3, §4.16 |
+| **Part 4** | State the constraint chain. | **MET (FC4)** — §4.16.4 |
+| **Part 4** | Distinguish revenue basis. | **MET (FC4)** — §4.6.5 |
+| **Part 5** | Record the reciprocal acknowledgment. | **MET (FC5)** — §5.12.5, §5.15 |
+| **Part 1** | Update §1.13.2 item B from "open" to "closed". | **PENDING** — Part 1's next revision (FC12) |
+
+### 5.15.7 Closure on both sides
+
+**Part 4 and Part 5 have both closed the item on their own sides.** The reconciliation is complete from the model's perspective. The only remaining action is Part 1's register update, which is a bookkeeping item, not a technical one.
+
+### 5.15.8 No symbol rename, no re-registration
+
+Both symbol families remain registered in Part 1 §1.4.9 with their original ownerships. **No symbol is renamed, added, or removed.** The reconciliation is a semantic clarification, not a registration change.
+
+### 5.15.9 No technical change to the frequency-regulation model
+
+The frequency-regulation service model (Part 4 §4.6) is unchanged except for the clarification in Part 4 §4.6.3 and §4.6.5. The physical constraints, the statistical parameters, and the degradation propagation are unchanged. The dispatch formulation (Part 5 §5.2.3, §5.3) is unchanged. The clarification is about **naming and semantics**, not about physics, revenue, or dispatch.
+
+---
+
+## 5.16 Part 5 promotion summary
+
+**What FC5 changed:** Acknowledged the `Th_last,t` registration closure by Part 1 FC11; recorded the reciprocal acknowledgment of the `R_reg,t^committed` reconciliation; updated §5.2.3, §5.2.5, §5.11.5, §5.12.5, §5.13, §5.14; added §5.15.
+
+**What FC5 did not change:** No technical content changes to the dispatch formulation, the objective, the constraints, the priority mechanism, the rule-based cascade, or the simulation loop. No registration changes. No re-opening of settled items.
+
+**Part 5 integration status after FC5:**
+
+| Dimension | Status |
+|---|---|
+| Part 1 change request | **CLOSED** (FC8) |
+| Part 3 §3.11 amendment | **APPLIED** (FC2) |
+| Part 4 peak-shaving amendment | **APPLIED** (Part 4 FC2) and **ACKNOWLEDGED** (FC2) |
+| Coexistence-sum instantiation | **CONFIRMED** (Part 4 FC4) |
+| `R_reg,t^committed` semantics | **CONFIRMED** (Part 4 FC4) and **ACKNOWLEDGED** (FC5) |
+| `Th_last,t` registration | **CLOSED** (Part 1 FC11) and **ACKNOWLEDGED** (FC5) |
+| §5.2.3 linearization | **FIXED** (FC2) |
+| Problem-size arithmetic | **RECONCILED** (FC4) |
+| Citation accuracy | **UPDATED to FC11** (FC5) |
+
+**Freeze recommendation:** Part 5 is ready to freeze at v1.0. All Part 5-owned exit criteria are MET. The only remaining project-wide item is the RFP verification (Part 1 criterion 6), which is an external dependency and does not block Part 5.
+
+**Downstream impact:** With FC5, the five-part model is **integrally consistent modulo the RFP verification**. Part 1's §1.13.2 item B can be marked closed in FC12. Part 2's §2.10 criterion 10 still needs a housekeeping update to reflect the `Th_last,t` registration closure — Part 2's next revision will apply it. Parts 3 and 4 are unaffected by FC5 (they do not consume `Th_last,t` or `R_reg,t^committed` directly; their own closure items are already recorded).
+
+.
 

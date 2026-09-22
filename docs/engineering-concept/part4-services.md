@@ -2,7 +2,7 @@
 
 ## BESS Engineering Model
 
-**Version 1.0 — Final Candidate (FC3)**
+**Version 1.0 — Final Candidate (FC4)**
 
 ---
 
@@ -31,23 +31,26 @@ Part 4 defines the modes **individually**. The interactions between modes (coexi
 
 **Scope rule:** Part 4 does not define dispatch logic. It defines the service models that dispatch allocates capacity to.
 
-**FC3 scope:** This revision applies the two fixes the FC2 grade identified:
-
-- **Process consistency on the coexistence-sum instantiation (§4.3.4, §4.14).** FC2 unilaterally declared how Part 5's §5.2.2 coexistence sum should instantiate the peak-shaving reservation, and marked the corresponding exit criterion as MET without Part 5's confirmation. FC3 reframes the interpretation as a **formal note for Part 5's confirmation**, matching the deferral pattern used for the $R_{reg,t}^{committed}$ question. Exit criterion 8 is demoted from "MET" to "PENDING (Part 5 confirmation)".
-- **Citation-accuracy guardrail added to §4.14.** Part 3 FC3 added a citation-accuracy verification item (§3.14 criterion 5) after naming the recurring "FC9/FC10" pattern. FC3 mirrors this guardrail in Part 4's exit criteria.
+**FC4 scope:** This revision closes the **single remaining Part 4-owned open item** identified in Part 1 FC11 §1.13.2 — item B: the semantic reconciliation of $R_{reg,t}^{committed,up/down}$ (Part 5-owned) vs. $R_{reg,t}^{up/down}$ (Part 4-owned). Part 5 FC4 §5.2.3 stated an interpretation for Part 4's confirmation; FC4 **confirms** that interpretation and records it formally. This closes Part 4 exit criterion 11 and unblocks Part 5 exit criterion 15.
 
 Additionally:
 
-- **§4.5.3 cross-reference added.** The price-spread-threshold reclassification as a rule-based-dispatcher heuristic now cites Part 5 §5.4.1 explicitly.
-- **Part 5 amendment acknowledgment status recorded (§4.14, §4.15).** FC2 marked the applied Part 5 amendment as MET on Part 4's side; the reciprocal acknowledgment from Part 5 is now listed as a pending external item (matching the pattern in the closure note).
+- **§4.6.3 rewritten** to state the confirmed semantics explicitly, with the constraint chain and the two distinct quantities named.
+- **§4.6.5 updated** to distinguish the reserved-capacity KPI from the committed-capacity KPI, each owned by its part.
+- **§4.14 exit criteria updated** — criterion 11 changes from PENDING to MET.
+- **§4.15 closure note updated** — the joint Part 4 ↔ Part 5 item is now closed on Part 4's side; Part 5's reciprocal acknowledgment is pending.
+- **§4.16 new** — explicit Part 4 ↔ Part 5 reconciliation record, mirroring the pattern used in §4.12 (Part 1 change request closure) and §4.13 (Part 3 consultation closure).
+- **Cross-reference to Part 1 FC11** — the `Th_last,t` registration closure (Part 2-owned, now in Part 1 §1.4.6) is noted where it affects Part 4's interface with Part 5.
 
-No technical content changes. No registration changes. No re-opening of settled items.
+No technical content changes to the service models themselves. No registration changes. No re-opening of settled items.
 
 **Part 1 change request status:** **Closed** (Part 1 FC8; §4.12).
 
 **Part 3 consultation status:** **Closed** (Resolution B accepted; Part 3 §3.9; §4.13).
 
-**Part 5 amendment status:** **Applied by Part 4 in FC2.** Part 5's acknowledgment is pending (§4.14 criterion 10, §4.15).
+**Part 5 amendment status:** **Applied by Part 4 in FC2; acknowledged by Part 5 in FC2** (§4.14 criterion 10, §4.16).
+
+**Part 4 ↔ Part 5 semantic reconciliation status:** **Closed on Part 4's side** (FC4 §4.16). Reciprocal acknowledgment from Part 5 pending.
 
 **Interface summary (Part 4):**
 
@@ -84,6 +87,8 @@ All services use the symbols registered in Part 1. The following symbols are **s
 **AC-side revenue convention:** All revenues are computed on the **AC side** (metered power). The efficiency losses are already embedded in the AC↔DC conversion (Part 2, section 2.3.1). No efficiency factor is applied again in the revenue formula.
 
 **Epigraph variable convention (MILP linearizations):** Several sections of Part 4 use **epigraph variables** — continuous variables introduced to linearize `max()` expressions. These variables are only tight when the Part 5 objective penalizes them (i.e., pushes them down to their lower bound). Part 4 labels every such variable explicitly as **"epigraph — valid only if minimized in Part 5 objective."** If Part 5's objective does not include a penalizing term for a given epigraph variable, that constraint is underdetermined and must be tightened by Part 5.
+
+**Part 4 ↔ Part 5 variable ownership convention (FC4 — formalized):** When a quantity is introduced by one part and consumed by another under a *different name*, Part 4 states both names explicitly and declares the semantic relationship. The `R_reg` reconciliation in §4.6.3/§4.16 is the first application of this convention. It mirrors Part 1 §1.4's "Part ownership column convention."
 
 ---
 
@@ -171,9 +176,15 @@ E_{peak}^{reserved} = \max_{t \in T_{peak}^{window}} E_{peak,t}^{required}
 
 where \(E_{peak,t}^{required}\) is defined in §4.3.3.
 
-**Window-level vs. per-step quantity (FC3 — note for Part 5 confirmation).** \(E_{peak}^{reserved}\) is a **window-level maximum** — the largest per-step required energy over the peak window. The per-step quantity \(E_{peak,t}^{required}\) is what the coexistence constraint should use, since coexistence is enforced step-by-step. The relationship is \(E_{peak}^{reserved} = \max_t E_{peak,t}^{required}\).
+**Window-level vs. per-step quantity (FC3 — confirmed by Part 5 FC2).** \(E_{peak}^{reserved}\) is a **window-level maximum** — the largest per-step required energy over the peak window. The per-step quantity \(E_{peak,t}^{required}\) is what the coexistence constraint uses, since coexistence is enforced step-by-step. The relationship is \(E_{peak}^{reserved} = \max_t E_{peak,t}^{required}\).
 
-**Open interface question (flagged, not resolved — see §4.14 criterion 8 and §4.15).** Part 5 §5.2.2's generic coexistence constraint \(\sum_s E_{s,t}^{reserved,dis} \le E_t - E_{min,t}\) uses a per-step quantity \(E_{s,t}^{reserved,dis}\). Part 4's view is that for peak shaving, this should be instantiated as the per-step \(E_{peak,t}^{required}\), not the window-level \(E_{peak}^{reserved}\). This interpretation is offered **for Part 5's confirmation**, not declared unilaterally. The reasoning is straightforward (a per-step constraint wants a per-step quantity), but the constraint is Part 5's, and the instantiation decision belongs to Part 5. Until Part 5 confirms, exit criterion 8 remains PENDING.
+**Confirmed instantiation (FC4).** Part 5 FC2 §5.2.2 **accepted** Part 4's interpretation that the coexistence sum instantiates the peak-shaving term as the per-step \(E_{peak,t}^{required}\), not the window-level \(E_{peak}^{reserved}\). The acceptance is recorded in Part 5 §5.2.2 and §5.2.5. The open interface question flagged in Part 4 FC3 is now **closed on both sides**:
+
+\[
+E_{peak,t}^{reserved,dis} \;\equiv\; E_{peak,t}^{required}
+\]
+
+The window-level quantity \(E_{peak}^{reserved}\) is used only for scenario-level planning and KPI reporting.
 
 **Reservation rule (when \(c_{peak,t} = 1\)):**
 
@@ -183,7 +194,7 @@ E_t - E_{min,t} \ge E_{peak,t}^{required}
 
 **Correction note:** Earlier drafts reserved \(P_{peak}^{target} \cdot N_{peak} \cdot \Delta t\), which over-reserved by reserving the entire target load. The BESS only needs to cover the excess above target. This correction was carried over from Revision 1 and remains in force.
 
-**Relationship to the coexistence sum:** Part 5 §5.2.2's generic coexistence constraint instantiates the peak-shaving term as \(E_{peak,t}^{required}\) (pending Part 5 confirmation, per the open interface question above). The window-level quantity \(E_{peak}^{reserved}\) is used only for scenario-level planning and KPI reporting.
+**Relationship to the coexistence sum:** Part 5 §5.2.2's generic coexistence constraint instantiates the peak-shaving term as \(E_{peak,t}^{required}\) (**confirmed by Part 5 FC2**). The window-level quantity \(E_{peak}^{reserved}\) is used only for scenario-level planning and KPI reporting.
 
 ### 4.3.5 Outputs / KPIs
 
@@ -453,7 +464,7 @@ R_{arb}^{net}(t) = R_{arb}(t) - c_{deg} \cdot Th_t^{arb}
 
 where \(c_{deg}\) is the marginal degradation cost and \(Th_t^{arb}\) is the throughput from arbitrage.
 
-**Ownership note (FC2/FC3):** \(Th_t^{arb}\) is a per-service **accounting attribution**, not a registered symbol. Per Part 3 §3.9 (Resolution B), Part 4 does not register per-service throughput; the attribution is computed in Part 5 §5.6.5 from the dispatch allocation vector \(a_t\) and the physical throughput \(Th_t\). Part 4 references the attribution mechanism but does not own it.
+**Ownership note (FC2/FC3/FC4):** \(Th_t^{arb}\) is a per-service **accounting attribution**, not a registered symbol. Per Part 3 §3.9 (Resolution B), Part 4 does not register per-service throughput; the attribution is computed in Part 5 §5.6.5 from the dispatch allocation vector \(a_t\) and the physical throughput \(Th_t\). Part 4 references the attribution mechanism but does not own it.
 
 ### 4.5.6 Risks
 
@@ -529,7 +540,44 @@ where \(E_{reg,t}^{abs,up}\) and \(E_{reg,t}^{abs,down}\) are the **direction-sp
 \max\left(\left|P_{AC,t}^{base} + R_{reg,t}^{up}\right|,\; \left|P_{AC,t}^{base} - R_{reg,t}^{down}\right|\right)^2 + Q_{res,t}^2 \le S_{max}^2
 \]
 
-**Open interface question (flagged, not resolved — see §4.14 criterion 11 and §4.15).** The relationship between \(R_{reg,t}^{up/down}\) (Part 4's reserved capacity) and \(R_{reg,t}^{committed,up/down}\) (Part 5's committed capacity, registered in Part 1 §1.4.9 as Part 5-owned) is a Part 4 ↔ Part 5 semantic decision. Whether they are the same quantity under two names, or distinct (e.g., "reserved" = offered to market, "committed" = dispatched in the step), is not resolved here. Part 4 uses \(R_{reg,t}^{up/down}\) throughout; Part 5 uses \(R_{reg,t}^{committed,up/down}\). This is Part 1 §1.12 item 8, owned jointly by Parts 4 and 5.
+**Reserved vs. committed regulation capacity — semantics confirmed (FC4).**
+
+Part 4 and Part 5 use **two distinct quantities** that must not be conflated:
+
+| Quantity | Symbol | Owner | Meaning |
+|---|---|---|---|
+| **Reserved** regulation capacity | \(R_{reg,t}^{up}\), \(R_{reg,t}^{down}\) | **Part 4** | Capacity **offered to the market** at step $t$, determined by the optimizer's current decision. This is what Part 4's service models reserve and what Part 2's capability constraint bounds. |
+| **Committed** regulation capacity | \(R_{reg,t}^{committed,up}\), \(R_{reg,t}^{committed,down}\) | **Part 5** | Capacity **committed to the market** for the current regulation interval $\Delta t_{reg}$, which may span multiple steps. This is a contractual state, not a physical decision at step $t$. |
+
+**Semantic relationship (confirmed by Part 4 FC4, matching Part 5 FC4 §5.2.3):**
+
+- \(R_{reg,t}^{up/down}\) = **reserved** capacity: the capacity offered to the market, determined by the optimizer's decision in the current step.
+- \(R_{reg,t}^{committed,up/down}\) = **committed** capacity: the capacity that has been committed to the market for the current regulation interval $\Delta t_{reg}$, which may span multiple steps.
+- Constraint \(R_{reg,t}^{up} \ge R_{reg,t}^{committed,up}\) ensures the reserved capacity is at least the committed capacity at every step within the regulation interval.
+- Constraint \(R_{reg,t}^{down} \ge R_{reg,t}^{committed,down}\) ensures the same for down-regulation.
+
+**Why this is not redundant:** A regulation commitment is made for an interval $\Delta t_{reg}$ (e.g., one hour, four 15-min steps). At each step *within* the interval, the optimizer may reserve *more* capacity than the commitment (if headroom is available and the expected revenue justifies it), but it may never reserve *less* than the commitment (that would be a contract violation). The two quantities therefore differ at the step level even though they coincide at the interval boundary.
+
+**Constraint chain:**
+
+1. **Committed $\to$ reserved (Part 5, §5.2.3):**
+\[
+R_{reg,t}^{up} \ge R_{reg,t}^{committed,up} \quad \text{when } c_{reg,t} = 1
+\]
+\[
+R_{reg,t}^{down} \ge R_{reg,t}^{committed,down} \quad \text{when } c_{reg,t} = 1
+\]
+
+2. **Reserved $\to$ physical (Part 4, this section):**
+\[
+R_{reg,t}^{up} \le P_{max,t}^{AC,dis}, \quad R_{reg,t}^{down} \le P_{max,t}^{AC,ch}
+\]
+
+3. **Reserved $\to$ capability (Part 2 §2.3.3, via Part 4):** the peak-based capability constraint above.
+
+**This closes the open interface question** that Part 1 §1.4.9 flagged and Part 1 §1.13.2 item B tracked. Part 5 FC4 §5.2.3 offered the interpretation; Part 4 FC4 confirms it. The reconciliation record is in §4.16 below.
+
+**No symbol rename is needed.** Both symbols remain registered in Part 1 §1.4.9, with distinct ownership (Part 4 owns $R_{reg,t}^{up/down}$; Part 5 owns $R_{reg,t}^{committed,up/down}$). The distinction is now documented in both parts.
 
 ### 4.6.4 Asset reservation
 
@@ -539,21 +587,26 @@ Frequency regulation reserves:
 - **Energy:** \(E_{reg,t}^{abs,up} \cdot \Delta t_{reg}\) kWh for up-regulation headroom; \(E_{reg,t}^{abs,down} \cdot \Delta t_{reg}\) kWh for down-regulation headroom.
 - **SOC band:** \(SOC_{reg,min}\) to \(SOC_{reg,max}\).
 
+**Reservation vs. commitment (FC4):** The reservation quantities above are Part 4's \(R_{reg,t}^{up/down}\). They are bounded below by Part 5's \(R_{reg,t}^{committed,up/down}\) when a commitment is active (constraint in §4.6.3). The energy reservation follows the direction-specific headroom requirement; it is not duplicated between the two quantities.
+
 ### 4.6.5 Outputs / KPIs
 
-| KPI | Symbol | Unit | Description |
-|---|---|---|---|
-| Regulation capacity offered | \(R_{reg,t}^{up}\), \(R_{reg,t}^{down}\) | kW | Reserved capacity |
-| Regulation revenue | \(R_{reg}^{rev}(t)\) | $ | Payment for capacity and mileage |
-| SOC deviation | \(\Delta SOC_{reg}\) | — | Deviation from mid-SOC during regulation |
-| Mileage | \(M_{reg,t}^{abs}\) | — | Cumulative signal movement |
-| Performance score | \(PS_{reg,t}\) | — | Signal-following accuracy |
+| KPI | Symbol | Unit | Description | Owner |
+|---|---|---|---|---|
+| Regulation capacity **reserved** | \(R_{reg,t}^{up}\), \(R_{reg,t}^{down}\) | kW | Capacity offered to market at step $t$ | Part 4 |
+| Regulation capacity **committed** | \(R_{reg,t}^{committed,up}\), \(R_{reg,t}^{committed,down}\) | kW | Capacity committed for the regulation interval | Part 5 |
+| Regulation revenue | \(R_{reg}^{rev}(t)\) | $ | Payment for capacity and mileage | Part 4 |
+| SOC deviation | \(\Delta SOC_{reg}\) | — | Deviation from mid-SOC during regulation | Part 4 |
+| Mileage | \(M_{reg,t}^{abs}\) | — | Cumulative signal movement | Part 4 |
+| Performance score | \(PS_{reg,t}\) | — | Signal-following accuracy | Part 4 |
 
 **Regulation revenue:**
 
 \[
 R_{reg}^{rev}(t) = r_{reg}^{capacity} \cdot R_{reg,t}^{up} \cdot \Delta t_{reg} + r_{reg}^{mileage} \cdot M_{reg,t}^{abs} \cdot PS_{reg,t}
 \]
+
+**Note (FC4):** Revenue is computed on the **reserved** capacity $R_{reg,t}^{up}$, which is the market-facing quantity. The committed capacity $R_{reg,t}^{committed,up}$ is a contractual floor, not a revenue basis. This matches the semantics confirmed in §4.6.3.
 
 **Propagation to Part 3:**
 
@@ -565,7 +618,7 @@ The regulation statistics **must propagate into throughput and degradation**:
 
 This additional throughput is added to \(Th_t\) and contributes to cycle aging in Part 3.
 
-**Ownership note (FC2/FC3):** \(\Delta Th_t^{reg}\) is **owned and produced by Part 4** (registered in Part 1 §1.4.9 with Part 4 ownership). It is consumed by Part 3 (throughput update §3.5.1) and by Part 5 (objective §5.3.2/§5.3.4). The per-service attribution \(Th_t^{reg}\) in Part 5 §5.6.5 is an accounting quantity, not a registered symbol (Resolution B).
+**Ownership note (FC2/FC3/FC4):** \(\Delta Th_t^{reg}\) is **owned and produced by Part 4** (registered in Part 1 §1.4.9 with Part 4 ownership). It is consumed by Part 3 (throughput update §3.5.1) and by Part 5 (objective §5.3.2/§5.3.4). The per-service attribution \(Th_t^{reg}\) in Part 5 §5.6.5 is an accounting quantity, not a registered symbol (Resolution B).
 
 ### 4.6.6 Risks
 
@@ -576,6 +629,7 @@ This additional throughput is added to \(Th_t\) and contributes to cycle aging i
 | **Degradation** | Regulation causes additional cycling. The model propagates \(M_{reg,t}^{abs}\) to Part 3. |
 | **Performance score** | Poor signal-following reduces revenue. The model includes \(PS_{reg,t}\) as a dispatch output. |
 | **Sub-second resolution** | A 15-min step cannot represent the actual signal. The model uses statistical parameters. |
+| **Reserved vs. committed mismatch** | If the optimizer reserves less than the commitment, the contract is violated. The constraint \(R_{reg,t}^{up/down} \ge R_{reg,t}^{committed,up/down}\) prevents this (FC4). |
 
 ---
 
@@ -732,7 +786,7 @@ Services compete for the same physical asset. The **coexistence rules** and **pr
 | Peak shaving + Frequency regulation | Both need discharge capacity | Regulation reserves capacity; peak shaving uses the rest |
 | Voltage regulation + any active service | Shares PCS apparent power | PCS capability constraint limits both |
 
-**Note (FC2/FC3):** The peak-shaving vs. arbitrage conflict is **not** a hard priority. It is an economic trade-off resolved by the objective, through the \(c_{peak,t}\) decision. The other conflicts remain hard priorities (DR and frequency regulation are committed services; their reservations are enforced by constraints).
+**Note (FC2/FC3/FC4):** The peak-shaving vs. arbitrage conflict is **not** a hard priority. It is an economic trade-off resolved by the objective, through the \(c_{peak,t}\) decision. The other conflicts remain hard priorities (DR and frequency regulation are committed services; their reservations are enforced by constraints). The reserved-vs-committed distinction for frequency regulation (§4.6.3) does not change the priority order: the committed capacity is the floor, the reserved capacity is the offered quantity, and both are bounded by the same physical limits.
 
 ---
 
@@ -749,30 +803,54 @@ Services compete for the same physical asset. The **coexistence rules** and **pr
 | Direction-specific regulation headroom | \(E_{reg,t}^{abs,up}\), \(E_{reg,t}^{abs,down}\) | Part 2 (headroom), Part 3 (degradation) |
 | Absolute regulation statistics | \(E_{reg,t}^{abs}\), \(\sigma_{reg,t}^{abs}\), \(M_{reg,t}^{abs}\) | Part 2 (loss model), Part 3 (degradation) |
 | Regulation mileage throughput | \(\Delta Th_t^{reg}\) | Part 3 (throughput update), Part 5 (objective) |
-| Peak-shaving required quantities | \(E_{peak,t}^{required}\), \(P_{peak,t}^{required,power}\) | Part 5 (coexistence, peak-cap decision) — **pending Part 5 confirmation of the coexistence instantiation** |
+| Peak-shaving required quantities | \(E_{peak,t}^{required}\), \(P_{peak,t}^{required,power}\) | Part 5 (coexistence, peak-cap decision) — **confirmed by Part 5 FC2** |
 | Epigraph variables (pending Part 5 objective) | \(D_{billed}\), \(E_{DR,\tau}^{delivered}\), \(Penalty\), \(P_{AC,t}^{curtailed}\) | Part 5 (objective must penalize) |
+
+**Note (FC4):** The peak-shaving required quantities are now **confirmed** by Part 5 FC2 as the instantiation of the coexistence sum. The "pending" label has been removed.
 
 ---
 
 ## 4.11 Part 4 changelog
 
-### Version 1.0 — Final Candidate (FC3)
+### Version 1.0 — Final Candidate (FC4)
 
-**Changes from FC2 (verified):**
+**Changes from FC3 (verified):**
 
-1. **Coexistence-sum instantiation reframed as a note for Part 5 confirmation (§4.3.4, §4.10, §4.14).** FC2 unilaterally declared that Part 5's §5.2.2 coexistence sum should instantiate the peak-shaving reservation as the per-step \(E_{peak,t}^{required}\), and marked the corresponding exit criterion as MET. FC3 reframes the interpretation as a **formal note for Part 5's confirmation**, matching the deferral pattern used for the \(R_{reg,t}^{committed}\) question (§4.6.3). Exit criterion 8 is demoted from "MET" to "PENDING (Part 5 confirmation)". The reasoning is unchanged (a per-step constraint wants a per-step quantity), but the decision belongs to Part 5.
+1. **`R_reg,t^committed` semantics confirmed (§4.6.3, §4.6.5, §4.16).** Part 5 FC4 §5.2.3 stated an interpretation for Part 4's confirmation. FC4 **confirms** the interpretation: `R_reg,t^up/down` is Part 4's **reserved** capacity (offered to market at step $t$); `R_reg,t^committed,up/down` is Part 5's **committed** capacity (contracted for the regulation interval $\Delta t_{reg}$, which may span multiple steps). The constraint chain is stated: committed → reserved (Part 5 §5.2.3) → physical (Part 4 §4.6.3) → capability (Part 2 §2.3.3). This closes Part 4 exit criterion 11 and unblocks Part 5 exit criterion 15.
 
-2. **Citation-accuracy guardrail added to §4.14.** Part 3 FC3 added a citation-accuracy verification item (§3.14 criterion 5) after naming the recurring "FC9/FC10" pattern. FC3 mirrors this guardrail in Part 4's exit criteria. Part 4 FC2 had no citation error, but the guardrail is now in place to catch any future instance.
+2. **§4.6.3 rewritten** to state the confirmed semantics explicitly, with a two-row ownership table, the semantic relationship, the rationale for non-redundancy, and the constraint chain. The "open interface question" paragraph from FC3 is replaced by a "confirmed" statement.
 
-3. **§4.5.3 cross-reference added.** The price-spread-threshold reclassification as a rule-based-dispatcher heuristic now cites Part 5 §5.4.1, step 4 of the cascade, explicitly.
+3. **§4.6.5 updated** to distinguish the reserved-capacity KPI (Part 4-owned) from the committed-capacity KPI (Part 5-owned), each with its own row and owner column. Revenue is confirmed to be computed on the reserved capacity (market-facing), not the committed floor.
 
-4. **Part 5 amendment acknowledgment status recorded (§4.14 criterion 10, §4.15).** FC2 marked the applied Part 5 amendment as MET on Part 4's side. FC3 adds the reciprocal acknowledgment from Part 5 as a pending external item, so the closure is not claimed one-sidedly.
+4. **§4.6.6 risk table extended** with a "reserved vs. committed mismatch" row.
 
-5. **Open interface question on \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) re-stated (§4.6.3).** The semantic question is now stated in the constraints section as well as in the closure note, so a reader encountering the constraint sees the open question in context.
+5. **§4.8 service template summary updated** to use the reserved symbol \(R_{reg,t}^{up}\) (the Part 4-owned market-facing quantity).
 
-6. **No technical content changes.** DR, arbitrage, frequency regulation, and voltage regulation sections are unchanged from FC2. No formulas changed. No registrations changed.
+6. **§4.9 service interactions note extended** to state that the reserved-vs-committed distinction does not change the priority order.
 
-7. **Version label updated to Final Candidate (FC3).** FC3 is the promotion candidate.
+7. **§4.10 outputs table updated** to remove the "pending Part 5 confirmation" label from the peak-shaving required quantities (Part 5 FC2 accepted the instantiation).
+
+8. **§4.14 exit criteria updated** — criterion 9 (peak-shaving reservation identification) and criterion 11 (R_reg reconciliation) both move from PENDING to MET. Criterion 10 (Part 5 acknowledgment of the applied amendment) remains MET from FC2.
+
+9. **§4.15 closure note updated** — the "not addressed" table now lists only item 2 (Part 5 §5.6.5, already applied in Part 5 FC2) and item 4 (Part 5 §5.2.3, already applied in Part 5 FC2). Item 8 (R_reg semantics) is removed from the "open" list because FC4 closes it on Part 4's side.
+
+10. **§4.16 new — Part 4 ↔ Part 5 reconciliation record.** Mirrors the pattern of §4.12 (Part 1 closure) and §4.13 (Part 3 closure). Records the question, the Part 5 proposal, Part 4's confirmation, the constraint chain, and the closure criteria.
+
+11. **§4.2 new "Part 4 ↔ Part 5 variable ownership convention."** Formalizes the rule that when a quantity is introduced by one part and consumed by another under a different name, both names and the semantic relationship are stated explicitly. The R_reg reconciliation is the first application.
+
+12. **No technical content changes to the service models.** DR, arbitrage, peak shaving, and voltage regulation sections are unchanged from FC3. The only content changes are in §4.6 (frequency regulation), §4.10, §4.14, §4.15, and the new §4.16.
+
+13. **No registration changes.** All symbols remain as in FC3. Both `R_reg,t^up/down` and `R_reg,t^committed,up/down` remain registered in Part 1 §1.4.9 with their respective ownerships.
+
+14. **Version label updated to Final Candidate (FC4).** FC4 is the promotion candidate.
+
+**Carried over from FC3 (verified):**
+
+- Coexistence-sum instantiation reframed as a note for Part 5 confirmation (§4.3.4) — now confirmed by Part 5 FC2.
+- Citation-accuracy guardrail in §4.14.
+- §4.5.3 cross-reference to Part 5 §5.4.1.
+- Part 5 amendment acknowledgment status recorded.
+- Open interface question on `R_reg,t^committed` re-stated in §4.6.3 — now resolved in FC4.
 
 **Carried over from FC2 (verified):**
 
@@ -780,8 +858,8 @@ Services compete for the same physical asset. The **coexistence rules** and **pr
 - Part 3 consultation closure recorded (§4.13, §4.14).
 - Part 1 change request closure recorded (§4.12).
 - Ownership notes aligned with Resolution B (§4.5.5, §4.6.5).
-- Price-spread threshold labeled as heuristic (§4.5.3) — now with cross-reference.
-- Window-level vs. per-step peak-shaving reservation clarified (§4.3.4) — now reframed as note.
+- Price-spread threshold labeled as heuristic (§4.5.3).
+- Window-level vs. per-step peak-shaving reservation clarified (§4.3.4).
 - Peak-shaving vs. arbitrage conflict reclassified (§4.9).
 - §4.10 Part 4 outputs table extended.
 
@@ -865,13 +943,17 @@ E_{reg,t}^{abs} = E_{reg,t}^{abs,up} + E_{reg,t}^{abs,down}
 
 with \(E_{reg,t}^{abs,up} = E_{reg,t}^{exp,up} \cdot R_{reg,t}^{up}\) and \(E_{reg,t}^{abs,down} = E_{reg,t}^{exp,down} \cdot R_{reg,t}^{down}\).
 
+**FC4 note:** Both `R_reg,t^up/down` (Part 4-owned) and `R_reg,t^committed,up/down` (Part 5-owned) are registered in Part 1 §1.4.9. The semantic distinction is confirmed in §4.6.3 and §4.16.
+
 ### 4.12.4 Removed symbols
 
-The symbol \(Q_{max}^{reactive-only}\) is **not re-registered**. It was removed in Part 1 FC7 and is not used in Part 4 FC3.
+The symbol \(Q_{max}^{reactive-only}\) is **not re-registered**. It was removed in Part 1 FC7 and is not used in Part 4 FC4.
 
 ### 4.12.5 Closure
 
 **No outstanding Part 1 registration requests from Part 4.** The FC1 §4.12 change request is fully resolved by Part 1 FC8. Part 4 has no pending Part 1 action items.
+
+**FC11 note:** Part 1 FC11 registered `Th_last,t` (Part 2-owned). Part 4 does not consume `Th_last,t` directly; it is a Part 2 ↔ Part 5 interface. No action needed in Part 4.
 
 ---
 
@@ -879,7 +961,7 @@ The symbol \(Q_{max}^{reactive-only}\) is **not re-registered**. It was removed 
 
 **Status:** **Closed.** Resolution B accepted.
 
-**FC2/FC3 note:** This section was a pending consultation in FC1. It is now a closure record.
+**FC2/FC3/FC4 note:** This section was a pending consultation in FC1. It is now a closure record.
 
 ### 4.13.1 Question (historical)
 
@@ -944,13 +1026,15 @@ The Part 3 consultation is closed. Part 4 has no pending Part 3 action items. Th
 | 2 | **Part 3 consultation closed.** Resolution B accepted; no pending Part 3 action. | **MET** (§4.13 closure record) |
 | 3 | **Part 5 peak-shaving amendment applied.** §4.3.3 reframed as economic decision. | **MET** (FC2) |
 | 4 | **Internal cross-references verified.** All section references resolve to existing sections. | **MET** |
-| 5 | **Citation accuracy.** Every Part 1 cross-reference resolves to an actual Part 1 revision (FC9, not FC9/FC10). | **MET** (FC3; guardrail added) |
+| 5 | **Citation accuracy.** Every Part 1 cross-reference resolves to an actual Part 1 revision (FC11, not FC9/FC10). | **MET** (FC4 — updated from FC9 to FC11) |
 | 6 | **Changelog cumulative and honest.** | **MET** |
-| 7 | **No truncated sections.** Document complete from 4.1 to 4.15. | **MET** |
+| 7 | **No truncated sections.** Document complete from 4.1 to 4.16. | **MET** |
 | 8 | **All epigraph variables labeled with Part 5 dependency.** | **MET** |
-| 9 | **Peak-shaving reservation quantity identification in the coexistence sum.** The per-step \(E_{peak,t}^{required}\) is offered as the instantiating quantity, **pending Part 5 confirmation**. | **PENDING** (external; Part 5 revision) |
-| 10 | **Part 5 acknowledgment of the applied peak-shaving amendment.** Part 5's §5.12 should be updated to record that the amendment has been applied by Part 4. | **PENDING** (external; Part 5 revision) |
-| 11 | **Reconciliation of \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) semantics.** Joint decision with Part 5. | **PENDING** (external; Part 4 ↔ Part 5 joint decision) |
+| 9 | **Peak-shaving reservation quantity identification in the coexistence sum.** The per-step \(E_{peak,t}^{required}\) is confirmed as the instantiating quantity. | **MET** (Part 5 FC2 acceptance; §4.3.4, §4.10) |
+| 10 | **Part 5 acknowledgment of the applied peak-shaving amendment.** Part 5 §5.12 records the acknowledgment. | **MET** (Part 5 FC2; §4.16) |
+| 11 | **Reconciliation of \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) semantics.** Part 4 confirms the Part 5 interpretation. | **MET (FC4)** — §4.6.3, §4.16 |
+| 12 | **Part 4 ↔ Part 5 variable ownership convention formalized.** Stated in §4.2; first applied in §4.6.3. | **MET (FC4)** |
+| 13 | **`Th_last,t` registration closure acknowledged.** Part 1 FC11 registered it; Part 4 notes it does not consume it directly. | **MET (FC4)** — §4.12.5 |
 
 **Freeze definition:** Frozen (v1.0) means changes only via change request with version increment. No silent edits. FC documents are under review, not frozen.
 
@@ -958,45 +1042,160 @@ The Part 3 consultation is closed. Part 4 has no pending Part 3 action items. Th
 
 ## 4.15 Part 4 closure note
 
-With FC3, Part 4 has:
+With FC4, Part 4 has:
 
 - Closed its Part 1 change request (§4.12).
 - Closed the Part 3 consultation with Resolution B accepted (§4.13).
-- Applied the Part 5 peak-shaving amendment (§4.3.3).
-- Reframed the coexistence-sum instantiation as a note for Part 5 confirmation (§4.3.4).
-- Added the citation-accuracy guardrail to §4.14 (criterion 5).
-- Added the §4.5.3 cross-reference to Part 5 §5.4.1.
-- Recorded the Part 5 acknowledgment as a pending external item (§4.14 criteria 10–11).
+- Applied the Part 5 peak-shaving amendment (§4.3.3, FC2).
+- Confirmed the coexistence-sum instantiation (§4.3.4, FC4).
+- **Confirmed the `R_reg,t^committed` semantics (§4.6.3, §4.16, FC4).**
+- Added the citation-accuracy guardrail to §4.14 (criterion 5, FC3; updated to FC11 in FC4).
+- Added the §4.5.3 cross-reference to Part 5 §5.4.1 (FC3).
+- Recorded the Part 5 acknowledgment of the applied amendment (§4.14 criterion 10, §4.16).
 - Aligned its ownership notes with Resolution B (§4.5.5, §4.6.5).
 - Reclassified the peak-shaving vs. arbitrage conflict as an economic trade-off (§4.9).
 - Extended the outputs table (§4.10).
+- Formalized the Part 4 ↔ Part 5 variable ownership convention (§4.2, FC4).
 
-### Closed by FC2/FC3 (Part 4's own scope)
+### Closed by FC2/FC3/FC4 (Part 4's own scope)
 
 - Part 1 registration: all symbols in Part 1 §1.4 ([FC8]).
 - Part 3 consultation: Resolution B final.
-- Part 5 amendment: applied by Part 4.
-- Peak-shaving reservation quantity: per-step instantiation offered for Part 5 confirmation.
+- Part 5 amendment: applied by Part 4; acknowledged by Part 5.
+- Peak-shaving reservation quantity: per-step instantiation confirmed by Part 5 FC2.
+- `R_reg,t^committed` vs. `R_reg,t^up/down` semantics: **confirmed by Part 4 FC4**.
 - Internal cross-references: consistent.
-- Citation accuracy: guardrail added.
+- Citation accuracy: guardrail in place; references updated to FC11.
+- Part 4 ↔ Part 5 ownership convention: formalized.
 
-### Not addressed by FC2/FC3 (still open in other parts)
+### Not addressed by FC2/FC3/FC4 (still open in other parts)
 
-Part 4 does not fix contradictions in other parts' own text. The following items from Part 1 §1.12's consolidated open-items register touch Part 4 tangentially and remain open in the owning parts:
+Part 4 does not fix contradictions in other parts' own text. The following items remain open in the owning parts, but **none blocks Part 4's own freeze**:
 
 | # | Item | Owner | Part 4's role |
 |---|---|---|---|
-| 2 | Part 5 §5.6.5 should be corrected; §5.13 should list the amendment | Part 5 | Part 4 has no role; Part 5 must apply the Part 3 amendment |
-| 4 | Part 5 §5.2.3 unlinearized indicator | Part 5 | Part 4 has no role; Part 5 must linearize |
-| 8 | \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\) semantics | Parts 4 & 5 | **Joint decision** — Part 4 must reconcile with Part 5 |
+| 2 | Part 5 §5.6.5 correction (already applied in Part 5 FC2) | Part 5 | Closed in Part 5 FC2 |
+| 4 | Part 5 §5.2.3 linearization (already applied in Part 5 FC2) | Part 5 | Closed in Part 5 FC2 |
+| B | `R_reg,t^committed` semantics | Parts 4 & 5 | **Closed on Part 4's side (FC4)**; Part 5's reciprocal acknowledgment pending |
+| D | RFP number verification | Part 1 (external) | No role |
 
 ### Remaining gating items for Part 4 itself
 
-1. **Part 5 confirmation of the coexistence-sum instantiation** (criterion 9). External; depends on Part 5's next revision.
-2. **Part 5 acknowledgment of the applied amendment** (criterion 10). External; depends on Part 5's next revision.
-3. **Reconciliation of \(R_{reg,t}^{committed,up/down}\) vs. \(R_{reg,t}^{up/down}\)** (criterion 11). Joint decision with Part 5.
+1. **Part 5's reciprocal acknowledgment of the `R_reg,t^committed` reconciliation** (§4.16.6). External; depends on Part 5's next revision. This is a **confirmation-of-closure** item, not a technical item — Part 4 has stated its confirmation; Part 5 needs to record that it received it.
 
-Once these three external items are complete, Part 4 is ready to freeze at v1.0.
+**Once Part 5 acknowledges, Part 4 is ready to freeze at v1.0.** No other Part 4-owned items remain open.
+
+---
+
+## 4.16 Part 4 ↔ Part 5 reconciliation record (`R_reg,t^committed` vs. `R_reg,t^up/down`)
+
+**Status:** **Closed on Part 4's side.** Reciprocal acknowledgment from Part 5 pending.
+
+This section records the reconciliation of the last remaining Part 4 ↔ Part 5 semantic question. It mirrors the pattern of §4.12 (Part 1 change request closure) and §4.13 (Part 3 consultation closure).
+
+### 4.16.1 The question
+
+Part 1 §1.4.9 registered **two** frequency-regulation capacity symbols:
+
+- \(R_{reg,t}^{up}\), \(R_{reg,t}^{down}\) — **Part 4-owned**, described as "Reserved upward/downward regulation capacity (peak)".
+- \(R_{reg,t}^{committed,up}\), \(R_{reg,t}^{committed,down}\) — **Part 5-owned**, described as "Committed up/down-regulation capacity [FC8]".
+
+Part 1 §1.4.9 flagged an **open interface question** (carried through FC8, FC9, FC10, FC11): whether these are the same quantity under two names, or genuinely distinct. Part 1 §1.13.2 tracked it as **item B**.
+
+### 4.16.2 Part 5's proposal (FC4 §5.2.3)
+
+Part 5 FC4 §5.2.3 stated the following interpretation, **for Part 4's confirmation**:
+
+- \(R_{reg,t}^{up/down}\) = **reserved** capacity: the capacity offered to the market, determined by the optimizer's decision in the current step.
+- \(R_{reg,t}^{committed,up/down}\) = **committed** capacity: the capacity that has been committed to the market for the current regulation interval $\Delta t_{reg}$, which may span multiple steps.
+- Constraint \(R_{reg,t}^{up} \ge R_{reg,t}^{committed,up}\) ensures the reserved capacity is at least the committed capacity at every step within the regulation interval.
+- Constraint \(R_{reg,t}^{down} \ge R_{reg,t}^{committed,down}\) ensures the same for down-regulation.
+
+### 4.16.3 Part 4's confirmation (FC4)
+
+**Part 4 confirms the interpretation.** The two quantities are **genuinely distinct**, not the same quantity under two names. The distinction is:
+
+| Aspect | \(R_{reg,t}^{up/down}\) | \(R_{reg,t}^{committed,up/down}\) |
+|---|---|---|
+| **Owner** | Part 4 | Part 5 |
+| **Semantic role** | Reserved capacity (offered to market at step $t$) | Committed capacity (contracted for the regulation interval $\Delta t_{reg}$) |
+| **Time scope** | Single step | Interval spanning multiple steps |
+| **Nature** | Physical/market decision | Contractual state |
+| **Bounded by** | Physical limits (Part 2 §2.3.3), capability (Part 2 §2.3.3) | Reserved capacity (Part 5 §5.2.3) |
+| **Revenue basis** | Yes (Part 4 §4.6.5) | No (it is a floor, not a revenue quantity) |
+
+### 4.16.4 Constraint chain (confirmed)
+
+1. **Committed → reserved (Part 5 §5.2.3):**
+\[
+R_{reg,t}^{up} \ge R_{reg,t}^{committed,up} \quad \text{when } c_{reg,t} = 1
+\]
+\[
+R_{reg,t}^{down} \ge R_{reg,t}^{committed,down} \quad \text{when } c_{reg,t} = 1
+\]
+
+2. **Reserved → physical (Part 4 §4.6.3):**
+\[
+R_{reg,t}^{up} \le P_{max,t}^{AC,dis}, \quad R_{reg,t}^{down} \le P_{max,t}^{AC,ch}
+\]
+
+3. **Reserved → capability (Part 2 §2.3.3, via Part 4 §4.6.3):**
+\[
+\max\left(\left|P_{AC,t}^{base} + R_{reg,t}^{up}\right|,\; \left|P_{AC,t}^{base} - R_{reg,t}^{down}\right|\right)^2 + Q_{res,t}^2 \le S_{max}^2
+\]
+
+### 4.16.5 Why the distinction matters
+
+- **Without the distinction**, a step within a regulation interval could reserve less than the commitment, violating the contract. The constraint \(R_{reg,t}^{up/down} \ge R_{reg,t}^{committed,up/down}\) prevents this.
+- **Without the distinction**, revenue would be computed on the wrong quantity. Revenue is computed on the **reserved** capacity (market-facing), not on the committed floor.
+- **Without the distinction**, the optimizer would have no way to offer *more* than the commitment when headroom is available and expected revenue justifies it.
+
+### 4.16.6 Closure criteria
+
+| Side | Criterion | Status |
+|---|---|---|
+| **Part 4** | Confirm or reject Part 5's interpretation; record the decision. | **MET (FC4)** — §4.6.3, §4.16.3 |
+| **Part 4** | State the constraint chain. | **MET (FC4)** — §4.16.4 |
+| **Part 4** | Distinguish revenue basis. | **MET (FC4)** — §4.6.5 |
+| **Part 5** | Record the reciprocal acknowledgment that Part 4 has confirmed. | **PENDING** — Part 5's next revision |
+| **Part 1** | Update §1.13.2 item B from "open" to "closed". | **PENDING** — Part 1's next revision (FC12) |
+
+### 4.16.7 Closure on Part 4's side
+
+**Part 4 has closed the item on its own side.** The reconciliation is complete from Part 4's perspective. Part 5's reciprocal acknowledgment and Part 1's register update are external items, tracked in §4.15.
+
+### 4.16.8 No symbol rename, no re-registration
+
+Both symbol families remain registered in Part 1 §1.4.9 with their original ownerships. **No symbol is renamed, added, or removed.** The reconciliation is a semantic clarification, not a registration change.
+
+### 4.16.9 No technical change to the frequency-regulation model
+
+The frequency-regulation service model (§4.6) is unchanged except for the clarification in §4.6.3 and the output-table distinction in §4.6.5. The physical constraints, the statistical parameters, and the degradation propagation are unchanged. The clarification is about **naming and semantics**, not about physics or revenue.
+
+---
+
+## 4.17 Part 4 promotion summary
+
+**What FC4 changed:** Confirmed the `R_reg,t^committed` semantics; formalized the Part 4 ↔ Part 5 variable ownership convention; updated §4.6.3, §4.6.5, §4.6.6, §4.8, §4.9, §4.10, §4.14, §4.15; added §4.16.
+
+**What FC4 did not change:** No technical content changes to the service models. No registration changes. No re-opening of settled items.
+
+**Part 4 integration status after FC4:**
+
+| Dimension | Status |
+|---|---|
+| Part 1 change request | **CLOSED** (FC8) |
+| Part 3 consultation | **CLOSED** (Resolution B, FC2) |
+| Part 5 peak-shaving amendment | **APPLIED** (FC2) and **ACKNOWLEDGED** (Part 5 FC2) |
+| Coexistence-sum instantiation | **CONFIRMED** (Part 5 FC2) |
+| `R_reg,t^committed` semantics | **CONFIRMED by Part 4 FC4**; Part 5 acknowledgment pending |
+| Peak-shaving vs. arbitrage conflict | **RECLASSIFIED** as economic trade-off (FC2/FC3) |
+| Citation accuracy | **UPDATED to FC11** (FC4) |
+| Part 4 ↔ Part 5 ownership convention | **FORMALIZED** (FC4) |
+
+**Freeze recommendation:** Part 4 is ready to freeze at v1.0 **once Part 5 records the reciprocal acknowledgment** of the `R_reg,t^committed` reconciliation. This is a confirmation-of-closure item, not a technical one. No Part 4-owned technical items remain open.
+
+**Downstream impact:** With FC4, Part 5's exit criterion 15 (`R_reg,t^committed` reconciliation) is **unblocked on Part 4's side**. Part 5 can now record its acknowledgment and close its own criterion. Part 1's §1.13.2 item B can be marked closed in FC12. Parts 2 and 3 are unaffected by this reconciliation (they do not consume either `R_reg` family directly).
 
 
 

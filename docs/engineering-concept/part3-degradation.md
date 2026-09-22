@@ -2,7 +2,7 @@
 
 ## BESS Engineering Model
 
-**Version 1.0 — Final Candidate (FC3)**
+**Version 1.0 — Final Candidate (FC4)**
 
 ---
 
@@ -22,22 +22,27 @@ It consumes from Parts 1 and 2: symbols, state definitions, and the physical sta
 
 **Scope rule:** Part 3 contains degradation physics and state evolution. It does not define physical limits (Part 2), service models (Part 4), or dispatch logic (Part 5).
 
-**FC3 scope:** This is a **citation-correction and polish revision** following the FC2 grade (9/10). It applies the single one-line fix the grade identified (the recurring "FC9/FC10" citation error) and consolidates the citation-accuracy discipline that has now been flagged across three parts. No technical content changes. No registration changes. No re-opening of settled items.
+**FC4 scope:** This revision closes the **two remaining Part 3-owned open items** identified in Part 1 FC11 §1.13 and Part 5 FC5 §5.14:
 
-Specifically:
+- **Part 5 §3.11 amendment application acknowledged (§3.11, §3.14 criterion 4).** Part 5 FC2 §5.6.5 applied the amendment on the `Th_t^{other}` definition. Part 3 FC4 acknowledges the application; criterion 4 changes from PENDING to MET.
+- **Cross-check with Part 2 declared and accepted (§3.14 criterion 9, §3.15).** Part 2 Revision 7 (FC5) §2.11 declared the cross-checks with Part 3 on SOH consumption and throughput evolution. Part 3 FC4 accepts the declaration; criterion 9 changes from PENDING to MET.
 
-- **Citation correction.** The stray "FC9/FC10" references in §3.1 and §3.13 are corrected to "FC9." This is the third occurrence of the same citation-error pattern in the project (Part 2 Revision 5, corrected in Part 2 Revision 6; Part 3 FC2, corrected here). FC3 names the pattern in §3.13 and adds a citation-accuracy verification item to §3.14 so future revisions catch it mechanically.
-- **Registration closure unchanged.** All thirteen symbols remain registered in Part 1 §1.4 ([FC8]). §3.10 is unchanged.
-- **Part 4 consultation unchanged.** Resolution B remains final. §3.9 is unchanged.
-- **Part 5 amendment carried forward unchanged.** §3.11 is unchanged.
-- **$t_{eq,t}$ classification unchanged.** Derived, not state. No change.
-- **Consistency with Part 2 Revision 6 unchanged.** The one-directional coupling (Part 3 → Part 2 for $Th_t$; Part 2's $Th_{last,t}$ is Part 2's internal artifact) is unchanged.
+Additionally:
+
+- **§3.14 exit criteria updated** — criteria 4 and 9 change from PENDING to MET.
+- **§3.15 closure note updated** — the "not addressed" table is reduced to reflect that Part 5 applied the amendment and Part 2 declared the cross-check.
+- **§3.13 changelog updated** — the FC4 changes are recorded; the citation-accuracy pattern is noted as still closed.
+- **Cross-reference to Part 1 FC11 and Part 2 Revision 7** added where relevant.
+
+No technical content changes to the degradation physics, the SOH derivations, the throughput accounting, the augmentation/replacement logic, or the calibration procedure. No registration changes. No re-opening of settled items.
 
 **Part 1 change request status:** **Closed.** All symbols used in Part 3 are registered in Part 1 §1.4. See §3.10 for the closure record.
 
-**Part 4 consultation status:** **Resolved.** Resolution B was adopted in FC1 §3.9. Part 4's own text should reflect this (Part 1 §1.12 item 1).
+**Part 4 consultation status:** **Resolved.** Resolution B was adopted in FC1 §3.9. Part 4's own text reflects this in Part 4 FC2/FC3/FC4 (§4.13, §4.14). See §3.9.
 
-**Part 5 amendment status:** **Open.** The amendment was issued in FC1 §3.11. Part 5 has not yet applied it (Part 1 §1.12 item 2).
+**Part 5 amendment status:** **Applied.** Part 5 FC2 §5.6.5 applied the amendment on the `Th_t^{other}` definition. Part 3 FC4 acknowledges the application. See §3.11.
+
+**Part 2 cross-check status:** **Declared and accepted.** Part 2 Revision 7 (FC5) §2.11 declared the cross-checks. Part 3 FC4 accepts them. See §3.14 criterion 9.
 
 **Interface summary (Part 3):**
 
@@ -286,11 +291,11 @@ where:
 Th_t^{other} = Th_t - \sum_s Th_t^{service}
 \]
 
-where $Th_t^{other}$ is essentially **zero** (modulo rounding in the service attribution sum). It is not a "residual losses bucket." Part 5 §5.6.5 must be amended accordingly (see section 3.11).
+where $Th_t^{other}$ is essentially **zero** (modulo rounding in the service attribution sum). It is not a "residual losses bucket." Part 5 §5.6.5 **was amended accordingly** by Part 5 FC2. See §3.11 for the amendment record and its closure.
 
 **Why regulation mileage is added:** Frequency regulation causes additional cycling (the signal moves the battery back and forth) that is not captured by the physical power flow. The mileage-based term captures this.
 
-**Relationship to Part 2's rest-period trigger.** Part 2 §2.3.8's rest-period trigger consumes $Th_t$ as a state. Part 3 owns $Th_t$ and produces it; Part 2 consumes it and does not modify it. Part 2's within-horizon quantity $Th_{last,t}$ (§2.3.8, Revision 6) is Part 2's internal execution artifact and does not appear here. The coupling is one-directional: Part 3 → Part 2.
+**Relationship to Part 2's rest-period trigger.** Part 2 §2.3.8's rest-period trigger consumes $Th_t$ as a state. Part 3 owns $Th_t$ and produces it; Part 2 consumes it and does not modify it. Part 2's within-horizon quantity $Th_{last,t}$ (§2.3.8, Revision 6/7) is Part 2's internal execution artifact and does not appear here. The coupling is one-directional: Part 3 → Part 2. This is confirmed by Part 2 Revision 7 §2.11.2.
 
 ### 3.5.2 Equivalent full cycles
 
@@ -548,7 +553,7 @@ where $c_{rep}$ is the replacement cost per kWh ($/kWh).
 
 **Status:** Resolved. **Resolution B** adopted.
 
-**FC3 note:** The resolution recorded here is final. Part 4's own text (§4.13, §4.14) should be updated to reflect that the consultation is closed and Resolution B is accepted. This is Part 1 §1.12's consolidated open-item 1, owned by Part 4. Part 3 does not re-open the consultation.
+**FC3/FC4 note:** The resolution recorded here is final. Part 4's own text (§4.13, §4.14) **has been updated** to reflect that the consultation is closed and Resolution B is accepted (Part 4 FC2/FC3/FC4). Part 1 §1.12's consolidated open-item 1, owned by Part 4, is **MET**. Part 3 does not re-open the consultation.
 
 ### 3.9.1 Question
 
@@ -607,15 +612,15 @@ where $\Delta Th_t^{reg}$ is the regulation mileage throughput from Part 4.
 
 **No changes to Part 3's state vector** are required for per-service attribution.
 
-### 3.9.6 Part 4's action
+### 3.9.6 Part 4's action (closed)
 
-Part 4 §4.13 should be updated to reflect the resolution:
+Part 4 §4.13 **has been updated** to reflect the resolution (Part 4 FC2/FC3/FC4):
 
 - Part 4 does not register $Th_t^{arb}$ or $Th_t^{reg}$.
 - Part 4 uses internal accounting for per-service degradation cost attribution.
-- Part 4's §4.5.5 and §4.6.5 should reference the attribution mechanism in Part 5, §5.6.5.
+- Part 4's §4.5.5 and §4.6.5 reference the attribution mechanism in Part 5, §5.6.5.
 
-**FC3 status:** This action remains Part 4's responsibility (Part 1 §1.12 item 1). Part 3 records the resolution as final; Part 4 has not yet applied it.
+**FC4 status:** This action is **closed**. Part 4 FC2/FC3/FC4 applied the resolution. Part 1 §1.12 item 1 is MET.
 
 ---
 
@@ -666,32 +671,51 @@ $t_{eq,t}$ is registered in Part 1 (§1.4.6) as a per-step derived quantity. It 
 
 **No outstanding Part 1 registration requests from Part 3.** The FC1 §3.10 change request is fully resolved by Part 1 FC8. Part 3 has no pending Part 1 action items.
 
+**FC11 note:** Part 1 FC11 registered `Th_last,t` (Part 2-owned). Part 3 does not consume `Th_last,t` directly; it is a Part 2 ↔ Part 5 interface. No action needed in Part 3.
+
 ---
 
-## 3.11 Part 5 amendment request (carried forward)
+## 3.11 Part 5 amendment request — APPLIED
 
-**Status:** Open. **Pending Part 5 sign-off.**
+**Status:** **Applied by Part 5 FC2 §5.6.5.** This section is retained as a closure record.
 
-This amendment was issued by Part 3 FC1. It remains open; Part 5 has not yet applied it. It is Part 1 §1.12's consolidated open-item 2, owned by Part 5.
+### 3.11.1 The amendment (issued in FC1)
 
-**FC3 note:** Part 3 re-states the amendment here for traceability, but does not re-issue it. Part 5's next revision is expected to apply it.
-
-Part 5 §5.6.5 states:
+Part 5 §5.6.5 stated:
 
 > "$Th_t^{other} = Th_t - \sum_s Th_t^{service}$ accounts for self-discharge, auxiliary losses, and PCS incremental losses."
 
-Given Part 3's definition of $Th_t$ (§3.5.1), this statement is incorrect. $Th_t$ is defined as **physical throughput plus regulation mileage**, nothing else. Self-discharge, auxiliary losses, and PCS incremental losses are not included in $Th_t$, because:
+Given Part 3's definition of $Th_t$ (§3.5.1), this statement was incorrect. $Th_t$ is defined as **physical throughput plus regulation mileage**, nothing else. Self-discharge, auxiliary losses, and PCS incremental losses are not included in $Th_t$, because:
 
 - They are separate terms in Part 2's energy balance (§2.2.1).
 - $|P_{DC,t}|$ excludes them.
 
-**Requested Part 5 amendment:** §5.6.5 should be amended to:
+### 3.11.2 Requested Part 5 amendment
+
+Part 3 requested that §5.6.5 be amended to:
 
 1. Remove the claim that $Th_t^{other}$ includes self-discharge, aux losses, and PCS losses.
 2. State that $Th_t^{other} \approx 0$ by construction.
 3. Note that self-discharge, aux losses, and PCS losses are captured in Part 2's energy balance but not in the throughput state.
 
-**Part 5 also needs an exit criterion** for this amendment (Part 1 §1.12 item 2).
+Part 3 also requested that Part 5 add an exit criterion for this amendment.
+
+### 3.11.3 Part 5's application (FC2)
+
+Part 5 FC2 §5.6.5 applied the amendment:
+
+- The incorrect claim was removed.
+- The corrected definition $Th_t^{other} = Th_t - \sum_s Th_t^{service}$, with $Th_t^{other} \approx 0$, was stated.
+- The note that self-discharge, aux losses, and PCS losses are captured in Part 2's energy balance (§2.2.1) but not in $Th_t$ was added.
+- Part 5 §5.13 criterion 2 ("Part 3 §3.11 amendment applied") was added and marked MET.
+
+### 3.11.4 Part 3's acknowledgment (FC4)
+
+Part 3 FC4 **acknowledges** that Part 5 FC2 applied the amendment. The amendment is **closed**. Part 3's exit criterion 4 changes from PENDING to MET.
+
+### 3.11.5 Closure
+
+**The Part 3 → Part 5 amendment is closed.** No further action is required from Part 5. Part 1 §1.12's consolidated open-item 2, owned by Part 5, is MET. Part 3 §3.14 criterion 4 is MET.
 
 ---
 
@@ -712,36 +736,46 @@ Given Part 3's definition of $Th_t$ (§3.5.1), this statement is incorrect. $Th_
 
 ## 3.13 Part 3 changelog
 
-### Version 1.0 — Final Candidate (FC3)
+### Version 1.0 — Final Candidate (FC4)
 
-**Changes from FC2 (verified):**
+**Changes from FC3 (verified):**
 
-1. **Citation correction (§3.1, §3.13).** The stray "FC9/FC10" references in §3.1 and §3.13 are corrected to "FC9." This is the third occurrence of the same citation-error pattern in the project (Part 2 Revision 5, corrected in Part 2 Revision 6; Part 3 FC2, corrected here). FC3 names the pattern below and adds a citation-accuracy verification item to §3.14.
+1. **Part 5 §3.11 amendment application acknowledged (§3.11, §3.14 criterion 4).** Part 5 FC2 §5.6.5 applied the amendment on the `Th_t^{other}` definition. Part 3 FC4 acknowledges the application; criterion 4 changes from PENDING to MET. §3.11 is retained as a closure record.
 
-2. **Citation-accuracy pattern named (§3.13.1).** A new subsection records the recurring pattern and the corrective action taken, so that future revisions can catch it mechanically rather than by inspection.
+2. **Cross-check with Part 2 declared and accepted (§3.14 criterion 9, §3.15).** Part 2 Revision 7 (FC5) §2.11 declared the cross-checks with Part 3 on SOH consumption and throughput evolution. Part 3 FC4 accepts the declaration; criterion 9 changes from PENDING to MET. The cross-check is recorded in §3.5.1 (throughput coupling) and referenced in §3.14.
 
-3. **Citation-accuracy verification item added to §3.14.** A new criterion checks that every Part 1 cross-reference resolves to an actual Part 1 revision. This makes the check explicit rather than implicit.
+3. **§3.9 Part 4 action status updated.** Part 4 §4.13/§4.14 have been updated to reflect Resolution B (Part 4 FC2/FC3/FC4). The "Part 4 has not yet applied it" language from FC3 is replaced with "has been updated." The item is closed.
 
-4. **No technical content changes.** The degradation physics, SOH derivations, throughput accounting, augmentation/replacement logic, calibration procedure, and Part 4 consultation resolution are unchanged from FC2.
+4. **§3.14 exit criteria updated.** Criteria 4 and 9 change from PENDING to MET. The table is reconciled with Part 2 Revision 7 and Part 5 FC2.
 
-5. **No registration changes.** All thirteen symbols remain registered in Part 1 §1.4 ([FC8]). §3.10 is unchanged.
+5. **§3.15 closure note updated.** The "not addressed" table is reduced to reflect that Part 5 applied the amendment and Part 2 declared the cross-check. The remaining gating items for Part 3 are **none** (modulo external scenario-data verification, which is not a Part 3-owned item).
 
-6. **No re-opening of settled items.** The Part 4 consultation (Resolution B) and the $t_{eq,t}$ classification remain final. §3.9 and §3.2.3/§3.4.4 are unchanged.
+6. **Cross-reference to Part 1 FC11 and Part 2 Revision 7 added (§3.10.6, §3.5.1).** Part 3 notes that `Th_last,t` (registered by Part 1 FC11) is a Part 2 ↔ Part 5 interface and does not affect Part 3.
 
-7. **Version label updated to Final Candidate (FC3).** FC3 is the promotion candidate.
+7. **No technical content changes.** The degradation physics, SOH derivations, throughput accounting, augmentation/replacement logic, calibration procedure, and Part 4 consultation resolution are unchanged from FC3.
 
-### 3.13.1 Citation-accuracy pattern
+8. **No registration changes.** All thirteen symbols remain registered in Part 1 §1.4 ([FC8]). §3.10 is unchanged.
 
-**Pattern:** Across the project, cross-part citations to Part 1 have twice been written as "FC9/FC10" when the current Part 1 revision is FC9. In both cases the error was mechanical (a stray reference to a non-existent revision), not substantive, but the recurrence is worth naming.
+9. **No re-opening of settled items.** The Part 4 consultation (Resolution B) and the $t_{eq,t}$ classification remain final. §3.9 and §3.2.3/§3.4.4 are unchanged.
 
-**Root cause:** Part 1's revision sequence has been long (FC1 through FC9), and later revisions of other parts have been written against intermediate Part 1 states. When a part is updated, the citation to "the current Part 1" is sometimes written as a range rather than the specific revision the part was aligned against.
+10. **Version label updated to Final Candidate (FC4).** FC4 is the promotion candidate.
 
-**Corrective action:**
-- Every Part 1 citation in Part 3 now specifies a single revision (FC9), not a range.
-- §3.14 criterion 5 (new) verifies citation accuracy.
-- If a future Part 1 revision changes something Part 3 relies on, Part 3's next revision updates the citation to that specific revision.
+### 3.13.1 Citation-accuracy pattern (still closed)
+
+**Pattern (named in FC3):** Across the project, cross-part citations to Part 1 have twice been written as "FC9/FC10" when the current Part 1 revision is FC9. In both cases the error was mechanical, not substantive.
+
+**FC3 corrective action:** Every Part 1 citation in Part 3 specifies a single revision; §3.14 criterion 5 verifies citation accuracy.
+
+**FC4 status:** No new citation errors were introduced in FC4. The citation-accuracy guardrail remains in place. Part 1 references are updated to **FC11** where they affect Part 3 (the `Th_last,t` registration closure).
 
 **No functional impact.** The citation error did not affect any formula, decision, or registration in Part 3.
+
+**Carried over from FC3 (verified):**
+
+- Citation correction (§3.1, §3.13).
+- Citation-accuracy pattern named (§3.13.1).
+- Citation-accuracy verification item added to §3.14.
+- No technical content changes.
 
 **Carried over from FC2 (verified):**
 
@@ -749,7 +783,6 @@ Given Part 3's definition of $Th_t$ (§3.5.1), this statement is incorrect. $Th_
 - Part 4 consultation closure reaffirmed (§3.9).
 - Part 5 amendment carried forward, not re-issued (§3.11).
 - Consistency with Part 2 Revision 6 noted (§3.5.1).
-- Consistency with Part 1 FC9/FC10 noted (§3.1, §3.10) — corrected in FC3 item 1.
 - $t_{eq,t}$ classification confirmed (§3.2.3, §3.4.4).
 
 **Carried over from FC1 (verified):**
@@ -779,13 +812,13 @@ Given Part 3's definition of $Th_t$ (§3.5.1), this statement is incorrect. $Th_
 |---|---|---|
 | 1 | **Part 1 change request closed.** All symbols used in Part 3 are registered in Part 1 §1.4. | **MET** (Part 1 FC8; §3.10 closure record) |
 | 2 | **$t_{eq,t}$ classification resolved** (derived, not state). | **MET** |
-| 3 | **Part 4 consultation resolved** (Resolution B adopted). | **MET** (§3.9) |
-| 4 | **Part 5 amendment carried forward** on the $Th_t^{other}$ definition. | **PENDING** (external; Part 5 revision) |
-| 5 | **Citation accuracy.** Every Part 1 cross-reference resolves to an actual Part 1 revision (FC9, not FC9/FC10). | **MET** (FC3) |
+| 3 | **Part 4 consultation resolved** (Resolution B adopted). | **MET** (§3.9; Part 4 FC2/FC3/FC4 applied it) |
+| 4 | **Part 5 amendment applied** on the $Th_t^{other}$ definition. | **MET (FC4)** — Part 5 FC2 §5.6.5; §3.11 acknowledgment |
+| 5 | **Citation accuracy.** Every Part 1 cross-reference resolves to an actual Part 1 revision (FC11, not FC9/FC10). | **MET** (FC3; updated to FC11 in FC4) |
 | 6 | **Internal cross-references verified.** All section references resolve to existing sections. | **MET** |
 | 7 | **Changelog cumulative and honest.** | **MET** |
 | 8 | **No truncated sections.** Document complete from 3.1 to 3.15. | **MET** |
-| 9 | **Cross-check with Part 2 on SOH consumption and throughput evolution.** | **PENDING** (external; Part 2 revision) |
+| 9 | **Cross-check with Part 2 on SOH consumption and throughput evolution.** | **MET (FC4)** — Part 2 Revision 7 §2.11 declared; §3.5.1, §3.14 accept |
 
 **Freeze definition:** Frozen (v1.0) means changes only via change request with version increment. FC documents are under review, not frozen.
 
@@ -793,38 +826,81 @@ Given Part 3's definition of $Th_t$ (§3.5.1), this statement is incorrect. $Th_
 
 ## 3.15 Part 3 closure note
 
-With FC3, Part 3 has:
+With FC4, Part 3 has:
 
 - Closed its Part 1 change request (§3.10).
-- Recorded the Part 4 consultation resolution (Resolution B, §3.9).
-- Carried forward the Part 5 amendment on $Th_t^{other}$ (§3.11), assigning the action to Part 5.
+- Recorded the Part 4 consultation resolution (Resolution B, §3.9); Part 4 has applied it.
+- Closed the Part 5 amendment on $Th_t^{other}$ (§3.11); Part 5 FC2 applied it.
 - Confirmed $t_{eq,t}$ as derived, not state.
-- Aligned its throughput definition and coupling with Part 2 Revision 6.
+- Aligned its throughput definition and coupling with Part 2 Revision 6/7.
 - Corrected the recurring "FC9/FC10" citation error and added a verification item to catch it.
+- **Accepted Part 2's cross-check declaration (§3.14 criterion 9, §3.5.1).**
+- **Updated all exit criteria to MET** (criteria 1–9).
 
-### Closed by FC3 (Part 3's own scope)
+### Closed by FC3/FC4 (Part 3's own scope)
 
 - Part 1 registration: all thirteen symbols in Part 1 §1.4.
 - $t_{eq,t}$ classification: derived, not state.
-- Part 4 consultation: Resolution B final.
+- Part 4 consultation: Resolution B final; Part 4 applied it.
+- Part 5 amendment: applied by Part 5 FC2; acknowledged in FC4.
+- Cross-check with Part 2: declared by Part 2 Revision 7; accepted in FC4.
 - Internal cross-references: consistent.
-- Citation accuracy: all Part 1 references resolve to FC9.
+- Citation accuracy: all Part 1 references resolve to FC11.
 
-### Not addressed by FC3 (still open in other parts)
+### Not addressed by FC3/FC4 (still open in other parts)
 
-Part 3 does not fix contradictions in other parts' own text. The following items from Part 1 §1.12's consolidated open-items register touch Part 3 tangentially and remain open in the owning parts:
+Part 3 does not fix contradictions in other parts' own text. As of FC4, **no Part 3-relevant contradiction remains open**:
 
 | # | Item | Owner | Part 3's role |
 |---|---|---|---|
-| 1 | Part 4 §4.13/§4.14 should record Resolution B as accepted | Part 4 | Part 3 has recorded the resolution; Part 4 must apply it |
-| 2 | Part 5 §5.6.5 should be corrected; §5.13 should list the amendment | Part 5 | Part 3 issued the amendment; Part 5 must apply it |
+| 1 | Part 4 §4.13/§4.14 records Resolution B | Part 4 | Closed in Part 4 FC2/FC3/FC4 |
+| 2 | Part 5 §5.6.5 correction; §5.13 criterion | Part 5 | Closed in Part 5 FC2; acknowledged in FC4 |
 
 ### Remaining gating items for Part 3 itself
 
-1. **Cross-check with Part 2 on SOH consumption and throughput evolution** (criterion 9). External; depends on Part 2's next revision.
-2. **Part 5 amendment application** (criterion 4). External; depends on Part 5's next revision.
+**None.** All Part 3-owned exit criteria are MET.
 
-Once both are complete, Part 3 is ready to freeze at v1.0.
+**External scenario-data dependencies (not Part 3-owned):**
+- Numerical verification of degradation parameters against manufacturer data (scenario-data dependency, tracked in Part 2 criteria 13–15 and Part 3 calibration §3.7).
+
+**Freeze recommendation:** Part 3 is ready to freeze at v1.0. All Part 3-owned model-integrity criteria are MET. The only remaining project-wide item is the RFP verification (Part 1 criterion 6), which is external and does not block Part 3.
+
+---
+
+## 3.16 Part 3 promotion summary
+
+**What FC4 changed:** Acknowledged the Part 5 §3.11 amendment application; accepted Part 2's cross-check declaration; updated §3.9, §3.11, §3.13, §3.14, §3.15; added citation-accuracy status.
+
+**What FC4 did not change:** No technical content changes to the degradation physics, SOH derivations, throughput accounting, augmentation/replacement logic, or calibration procedure. No registration changes. No re-opening of settled items.
+
+**Part 3 integration status after FC4:**
+
+| Dimension | Status |
+|---|---|
+| Part 1 change request | **CLOSED** (FC8) |
+| $t_{eq,t}$ classification | **MET** (derived, not state) |
+| Part 4 consultation | **CLOSED** (Resolution B; Part 4 applied it) |
+| Part 5 amendment | **CLOSED** (Part 5 FC2 applied; acknowledged in FC4) |
+| Citation accuracy | **MET** (FC3; updated to FC11) |
+| Cross-check with Part 2 | **CLOSED** (Part 2 Revision 7 declared; accepted in FC4) |
+| Internal cross-references | **MET** |
+| Changelog | **MET** (cumulative and honest) |
+
+**Freeze recommendation:** Part 3 is ready to freeze at v1.0. All Part 3-owned exit criteria are MET.
+
+**Downstream impact:** With FC4, Part 3 has no pending external items. Part 1's §1.13.2 register can be updated in FC12. Parts 2, 4, and 5 are unaffected by FC4 (they do not consume Part 3's resolution records directly; their own closure items are already recorded).
+
+**Project-wide state after Part 3 FC4:**
+
+| Part | Version | Own-scope items | External items |
+|---|---|---|---|
+| **Part 1** | FC11 | All closed | RFP verification (criterion 6) |
+| **Part 2** | Rev 7 (FC5) | All closed | Manufacturer-data verification (criteria 13–15) |
+| **Part 3** | FC4 | All closed | None |
+| **Part 4** | FC4 | All closed | None |
+| **Part 5** | FC5 | All closed | None |
+
+**Only the RFP verification (Part 1 criterion 6) and the manufacturer-data verification (Part 2 criteria 13–15) remain as external dependencies.** Both are scenario-data items, not model-integrity items. The five-part model is **integrally consistent modulo these external data dependencies**.
 
 
 
