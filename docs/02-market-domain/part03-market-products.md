@@ -25,7 +25,7 @@
 | 1.2 | 2026-09-22 | Development Draft | Removed the "transversal product-specific" owner category and the residual full-M3 dependency from the eligibility path. Rekeyed path-dependent records to Product-Mechanism. Defined qualification states, aggregation, and validity. Moved the M3 split into Introduction v1.2 and stated the revised freeze order. Consolidated degradation to a single reference. Added the aggregate-validity rule. Moved market-level temporal attributes to the framework reference. Clarified ID uniqueness. Retied the pilot to a single in-scope product. Aligned §5.1 examples with the candidate list. |
 | 1.3 | 2026-09-22 | Development Draft | **Renamed from "M2" to "Parte 3" per project nomenclature.** **Updated all references from M1 → Parte 1, M3a → Parte 2, M3b → Parte 4, M4 → Parte 5.** **Updated Document ID from ME-M2-001 to ME-P3-001.** **Updated open item IDs from M2-Oxx to P3-Oxx.** **Updated Parent Document citation from Introduction v1.2 (already correct).** **Corrected all cross-references to the new nomenclature.** |
 
-**Change control note:** The product definition template and the "reference, do not redefine" rule are owned by the **Introduction Document v1.2**. The **M3 split into M3a (Transversal Market Values) and M3b (Full Rules)** is established by **Introduction v1.2**, not by Parte 3. Parte 3 references it. Where Parte 3 and the Introduction differ, the Introduction governs.
+**Change control note:** The product definition template and the "reference, do not redefine" rule are owned by the **Introduction Document v1.2**. The **split of the rules layer into Parte 2 (Transversal Market Values) and Parte 4 (Full Rules, Signals, Commitments and Constraints)** is established by **Introduction v1.2**, not by Parte 3. Parte 3 references it. Where Parte 3 and the Introduction differ, the Introduction governs.
 
 ---
 
@@ -301,7 +301,7 @@ The practical effect is the same as many-to-many for the cases that matter: a pr
 | **Parte 5 settlement reference** | Links to the Parte 5 settlement identifier for this Product-Mechanism |
 | **Parte 4 rule reference** | Link to Parte 4 rules for this Product-Mechanism (to be populated) |
 
-**Commitment type is not stored** — it is derived from **Commitment created** and **Commitment trigger**.
+**Commitment type is not stored on the Product-Mechanism record.** It is stored in the Commitment Definition (owned by Parte 4 §7.3). The Product-Mechanism record only declares whether a commitment is created (Yes/No) and the commitment trigger (award, enrollment, instruction, standing obligation).
 
 ### 5.4 Mechanism Distinctions
 

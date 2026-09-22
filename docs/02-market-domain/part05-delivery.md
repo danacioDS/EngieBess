@@ -25,7 +25,7 @@
 | 1.1 | 2026-09-22 | Development Draft | **Added null-path linkage rule:** assessment, deviation, and penalty records key on `Product-Mechanism + settlement window` when no Commitment Instance exists. **Added settlement amount** as an M4-owned market output; Financial Engineering values it. **Added compliance-to-instance state mapping** and disambiguated compliance states. **Removed "delivery scoring thresholds" from M4's consumes-from-M3b list;** tolerance is M4-owned or referenced. **Restated BTM as a market environment, not a participation branch;** rewrote Appendix A as a two-dimensional table. **Distinguished raw delivered quantity (Op/Opt) from recognized delivery quantity (M4).** **Replaced M4-O13** with a confirmation that settlement rules apply unchanged to simulated inputs. **Fixed cross-reference errors** (§14 uncertainty; M1 §16.4 materiality; §12.9 Network Engineering; §5.4 M1-O14). **Removed M2 capability mappings from the consumes list.** **Clarified that real settlement uses actual prices.** |
 | 1.2 | 2026-09-22 | Development Draft | **Renamed from "M4" to "Parte 5" per project nomenclature.** **Updated all references from M1 → Parte 1, M2 → Parte 3, M3a → Parte 2, M3b → Parte 4.** **Updated Document ID from ME-M4-001 to ME-P5-001.** **Updated open item IDs from M4-Oxx to P5-Oxx.** **Updated Parent Document citation from Introduction v1.2 (already correct).** **Corrected all cross-references to the new nomenclature.** |
 
-**Change control note:** The canonical lifecycle, the optional-node rule, the null-commitment path rule, the M2 template reference rule, and the M3 split are owned by **Introduction v1.2**. Parte 4 owns commitment definitions, delivery obligations, signals, and constraints. Parte 5 applies them and defines delivery, performance, and settlement. Where Parte 5 and the Introduction differ, the Introduction governs.
+**Change control note:** The canonical lifecycle, the optional-node rule, the null-commitment path rule, the product template reference rule, and the split into Parte 2 (Transversal Market Values) and Parte 4 (Full Rules) are owned by **Introduction v1.2**. Parte 4 owns commitment definitions, delivery obligations, signals, and constraints. Parte 5 applies them and defines delivery, performance, and settlement. Where Parte 5 and the Introduction differ, the Introduction governs.
 
 **Pending change requests:**
 - **Introduction v1.3** — Add Network Engineering as an engineering domain (owned by Introduction; referenced by Parte 5 §12.9).
@@ -1082,6 +1082,7 @@ Parte 5 is ready for engineering freeze when:
 - uncertainty records are defined per delivery, performance, baseline, and settlement;
 - **P5-O14 (simulation confirmation) is resolved**;
 - **P5-O18 (settlement statement ownership) is resolved**;
+- **P5-O17 (null-path linkage confirmation) is resolved**;
 - P1-O14 is resolved, where baselines depend on site/interconnection capability;
 - Introduction v1.3 is issued, where network-side delivery evidence is required;
 - all required market symbols are registered through BESS Engineering Part 1;

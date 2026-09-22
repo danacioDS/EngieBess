@@ -31,3 +31,10 @@ P1-O01 a P1-O03: jurisdicción, operador, wholesale/BTM.
 - P4-O17 (award simulation rule)
 - P5-O17 (null-path linkage confirmation)
 - P5-O18 (settlement statement ownership)
+
+###
+
+git status
+git add .
+git commit -m "update"
+git push origin main 

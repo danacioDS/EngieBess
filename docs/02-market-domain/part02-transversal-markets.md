@@ -20,9 +20,9 @@
 
 | Version | Date | Status | Change |
 | --- | --- | --- | --- |
-| 1.0 | 2026-09-22 | Development Draft | Initial Parte 2 baseline. Created from the M3a specification owned by Introduction v1.2. Establishes the transversal market values early baseline: gate closure conventions, registration requirements, timing conventions (non-signal), data formats and telemetry requirements, transversal minimum participation sizes, transversal aggregation rules, eligibility-relevant transversal limits, and the temporal framework instance. |
+| 1.0 | 2026-09-22 | Development Draft | Initial Parte 2 baseline. Created from the Transversal Market Values specification owned by Introduction v1.2. Establishes the transversal market values early baseline: gate closure conventions, registration requirements, timing conventions (non-signal), data formats and telemetry requirements, transversal minimum participation sizes, transversal aggregation rules, eligibility-relevant transversal limits, and the temporal framework instance. |
 
-**Change control note:** The M3 split into M3a (Transversal Market Values) and M3b (Full Rules) is owned by **Introduction v1.2**. Parte 2 is the M3a deliverable. The canonical lifecycle, the optional-node rule, the null-commitment path rule, and the M2 template reference rule are owned by **Introduction v1.2**. Where Parte 2 and the Introduction differ, the Introduction governs.
+**Change control note:** The split of the rules layer into **Parte 2 — Transversal Market Values** and **Parte 4 — Full Rules, Signals, Commitments and Constraints** is owned by **Introduction v1.2**. Parte 2 is the Transversal Market Values deliverable. The canonical lifecycle, the optional-node rule, the null-commitment path rule, and the product template reference rule are owned by **Introduction v1.2**. Where Parte 2 and the Introduction differ, the Introduction governs.
 
 **Scope restriction (normative):** Parte 2 is limited to values that Parte 3 needs to evaluate eligibility and participation **before Parte 3 freezes**. Values that are not on the eligibility path belong to Parte 4, even if they are transversal.
 

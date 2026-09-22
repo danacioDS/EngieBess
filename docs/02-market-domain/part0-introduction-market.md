@@ -578,7 +578,7 @@ This template defines the **required semantic coverage** of each product. It doe
 | 13. Technical Outputs | Parte 3 (Product-Mechanism outputs); downstream Parts | Define; reference downstream |
 | 14. Risks and Uncertainties | Parte 3 (Product-Mechanism); owning Part (Parte 1 §18) | Define; reference owning Part |
 
-**M2 references, but does not redefine, concepts owned by Parte 4 and Parte 5.** Specifically:
+**Parte 3 references, but does not redefine, concepts owned by Parte 4 and Parte 5.** Specifically:
 
 * Market Signal → reference Parte 4 identifier
 * Operator Dispatch Instruction → reference Parte 4 identifier

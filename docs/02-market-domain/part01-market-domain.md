@@ -18,7 +18,7 @@
 | 1.2 | 2026-09-22 | Development Draft | Fixed three-branch lifecycle diagram; corrected definition–instance rule and its examples; qualified every use of "dispatch"; relaxed null-path absolutes; cited Introduction v1.1 rather than restating its rules; stabilized Document ID; corrected open-items critical path; added materiality tiers; extended evidence record fields; resolved minor ownership and categorization gaps. |
 | 1.3 | 2026-09-22 | Development Draft | **Renamed from "M1" to "Parte 1" per project nomenclature.** **Updated Parent Document citation from Introduction v1.1 to v1.2.** **Updated all internal references to Introduction v1.2.** **Added the M3a/M3b split reference owned by Introduction v1.2.** **Renamed the M3a/M3b references to Parte 2/Parte 4.** **Renamed all M2 references to Parte 3.** **Renamed all M4 references to Parte 5.** **Updated Document ID from ME-M1-001 to ME-P1-001.** **Updated open item IDs from M1-Oxx to P1-Oxx.** **Added note that M3a/M3b split is owned by Introduction v1.2, not by Parte 1.** **Added P1-O14 (site/interconnection capability).** **Added Network Engineering reference.** **Added identifier scheme reference.** **Corrected all cross-references to the new nomenclature.** |
 
-**Change control note:** The canonical lifecycle, the optional-node rule, the null-commitment path rule, the M2 template reference rule, and the M3 split into M3a (Transversal Market Values) and M3b (Full Rules) are owned by the **Introduction Document v1.2**. Parte 1 cites them and treats the corresponding text in §8, §10, and §27 as **informative**, not normative. Where Parte 1 and the Introduction differ, the Introduction governs.
+**Change control note:** The canonical lifecycle, the optional-node rule, the null-commitment path rule, the product template reference rule, and the split into Parte 2 (Transversal Market Values) and Parte 4 (Full Rules) are owned by the **Introduction Document v1.2**. Parte 1 cites them and treats the corresponding text in §8, §10, and §27 as **informative**, not normative. Where Parte 1 and the Introduction differ, the Introduction governs.
 
 ---
 
@@ -49,6 +49,8 @@ BESS Engineering Part 1
         ▼
      PARTE 1
 Market Domain & Conventions
+        │
+        ├──────────► PARTE 2 — Transversal Market Values
         │
         ├──────────► PARTE 3 — Products & Participation
         │
@@ -723,6 +725,7 @@ Parte 1 establishes the ownership principle:
 Additionally:
 
 - Parte 1 owns domain-scope, role, structural, and foundational assumption uncertainty;
+- Parte 2 owns transversal value and eligibility-path transversal value uncertainty;
 - Parte 3 owns product, qualification, and eligibility-rule uncertainty;
 - Parte 4 owns market-rule, signal, market-data, commitment, and operational-constraint uncertainty;
 - Parte 5 owns delivery, performance, and settlement uncertainty.
@@ -961,7 +964,7 @@ When such requirements affect BESS physical specifications or engineering assump
 
 No Market Engineering Part shall silently modify the BESS physical model.
 
-**Change control for shared artifacts:** Changes to the canonical lifecycle, the optional-node rule, the null-commitment path rule, the M2 template reference rule, or the M3 split (M3a/M3b) are owned by the **Introduction Document**. Such changes shall be made in the Introduction and referenced from Parte 1–Parte 5. Parte 1 does not declare them unilaterally.
+**Change control for shared artifacts:** Changes to the canonical lifecycle, the optional-node rule, the null-commitment path rule, the product template reference rule, or the split into Parte 2 and Parte 4 are owned by the **Introduction Document**. Such changes shall be made in the Introduction and referenced from Parte 1–Parte 5. Parte 1 does not declare them unilaterally.
 
 ---
 
@@ -990,13 +993,11 @@ These are **engineering open items**, not assumptions to be silently resolved by
 
 **Critical path:** P1-O01 → P1-O02 → P1-O03 block nearly all other items and shall be resolved first. P1-O13 blocks freeze independently of the P1-O01–P1-O03 chain. P1-O14 blocks Parte 3 and Parte 4 freeze independently.
 
-**Roadmap note:** P1-O01–P1-O03 are the **single blocking decision** for the entire Market Engineering sequence. Without jurisdiction, operator, and wholesale/BTM determination, Parte 2 cannot be written, and nothing downstream can proceed.
-
 ---
 
 ## 24. Parte 1 Validation Criteria
 
-Parte 1 shall be validated before proceeding to a frozen Parte 3 baseline.
+Parte 1 shall be validated before proceeding to a frozen Parte 2 baseline.
 
 Each validation category shall specify **method**, **reference case**, **reviewer**, and **pass/fail condition**.
 
