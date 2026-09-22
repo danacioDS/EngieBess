@@ -1,35 +1,46 @@
+Perfecto. Aquí tienes el documento completo en un bloque, listo para guardar o copiar.
+
+---
 
 # Semantic Systems Engineering Method
 
 ## From Product Intent to Validated and Executable Systems
 
-**Version 3.0 — Engineering Method**
+**Version 4.0 — Engineering Method**
 
 ---
 
 # Executive Summary
 
-Semantic Systems Engineering is a method for transforming an initial product intent into a validated, executable system while progressively reducing uncertainty.
+Semantic Systems Engineering is a systematic method for transforming an initial product intent, RFP, business requirement, or stakeholder need into a validated and executable system while progressively reducing uncertainty.
 
-The method is based on five principles:
+The method is designed to be applied **at the beginning of a project and throughout its execution**. It defines how engineering decisions are made, how technical work is decomposed, how uncertainty is reduced, how evidence is generated, and how implementation is controlled.
+
+It is therefore a **methodological framework**, not a project-status document and not a specification of any particular implementation.
+
+The method is based on seven principles:
 
 1. **Meaning precedes implementation.**
 2. **Engineering precedes architecture.**
-3. **Uncertain technical decisions are validated through prototypes rather than assumed.**
-4. **Work, responsibility, and cost are progressively derived from the engineering definition.**
-5. **Validation, traceability, uncertainty management, and feedback operate across the entire lifecycle.**
+3. **Uncertain technical decisions are validated through evidence rather than assumed.**
+4. **Complexity is introduced progressively.**
+5. **Work, responsibility, and cost are derived from the engineering definition.**
+6. **Traceability, validation, uncertainty management, and change control operate across the entire lifecycle.**
+7. **Implementation instantiates an engineered system rather than redefining it implicitly.**
 
 The fundamental transformation is:
 
-**Intent → Concept → Engineering Model → Architecture → Design → Prototype → Evidence → Decision → Specification → Execution → Implementation → Acceptance**
+**Intent → Concept → Engineering Model → Architecture → Design → Prototype → Evidence → Decision → Specification → Execution → Implementation → Validation → Acceptance**
 
-This is not a waterfall.
+This is **not a waterfall process**.
 
-It is an iterative engineering system in which evidence can cause controlled revision of earlier decisions.
+It is an iterative engineering system in which evidence may cause controlled revision of decisions at the appropriate abstraction level.
 
-For complex systems such as the ENGIE BESS modeling platform, this is particularly important because requirements, physical models, market behavior, forecasting, optimization techniques, software architecture, schedule, and cost are interdependent.
+The method is particularly relevant to complex systems such as BESS operational and financial modeling, where physical behavior, market conditions, forecasting, optimization, software architecture, schedule, cost, and acceptance are interdependent.
 
-The method therefore treats engineering as a process of **progressive uncertainty reduction**.
+The central idea is therefore:
+
+> **Engineering is the progressive reduction of uncertainty while preserving the semantic integrity of the system.**
 
 ---
 
@@ -39,27 +50,43 @@ This document defines a systematic method for transforming a product concept, RF
 
 The method is intended for systems where:
 
-* requirements may initially be incomplete;
+* requirements may initially be incomplete or evolving;
 * multiple engineering domains interact;
-* mathematical models are required;
-* computational techniques may be uncertain;
-* prototypes are needed to validate architecture;
+* mathematical or computational models are required;
+* technical implementation choices are uncertain;
+* prototypes are required to validate assumptions;
 * implementation effort depends on unresolved technical decisions;
-* acceptance requires objective evidence.
+* acceptance requires objective evidence;
+* changes must be controlled without losing traceability.
 
-The method is applicable to the ENGIE BESS Operational & Financial Modeling context, but is intentionally defined at a level that allows application to other complex engineering systems.
+The method is intentionally defined independently of any particular project artifact.
+
+A project applies this method to produce its own:
+
+* engineering models;
+* architecture;
+* prototypes;
+* specifications;
+* work breakdown structures;
+* organizational structures;
+* cost baselines;
+* execution specifications;
+* implementations;
+* validation evidence.
+
+For the ENGIE BESS context, the method provides the process by which the BESS engineering and software solution can be progressively developed and validated.
 
 ---
 
 # 2. Fundamental Principle
 
-The system should not be developed by moving directly from requirements to code.
+A complex system should not be developed by moving directly from requirements to code.
 
 Instead:
 
 > **The product's meaning must progressively become more precise until implementation becomes an instantiation of an already-engineered system.**
 
-The fundamental chain is:
+The fundamental transformation is:
 
 ```text
 Product Intent
@@ -72,13 +99,13 @@ LLD
       ↓
 Prototype
       ↓
-Validation
+Validation / Evidence
       ↓
 Engineering Decision
       ↓
 Product Specification
       ↓
-WBS / OBS / CBS
+WBS / Competencies / OBS / CBS
       ↓
 Tasks
       ↓
@@ -86,31 +113,40 @@ Execution Specification
       ↓
 Implementation
       ↓
-Testing
+Testing / Validation
       ↓
 Acceptance
 ```
 
-This chain represents **increasing implementation specificity**.
+This chain represents increasing implementation specificity.
 
-It does not imply that information only flows downward.
+It does **not** imply that information flows only downward.
 
-Validation can trigger controlled movement upward.
+Evidence may propagate upward when a problem is discovered.
+
+For example:
+
+```text
+Implementation Failure
+       ↓
+LLD Problem?
+       ↓
+Architecture Problem?
+       ↓
+Engineering Model Problem?
+       ↓
+Requirement Problem?
+```
+
+The correction must be applied at the level where the underlying meaning is incorrect.
 
 ---
 
 # 3. The Engineering Lifecycle
 
-The complete lifecycle is organized around four transversal mechanisms:
+The lifecycle consists of progressive engineering levels supported by transversal control mechanisms.
 
-* **Traceability**
-* **Validation**
-* **Uncertainty Management**
-* **Feedback / Change Control**
-
-These are not sequential stages.
-
-They operate across all stages of the lifecycle.
+The principal lifecycle is:
 
 ```text
                     PRODUCT INTENT
@@ -128,7 +164,7 @@ They operate across all stages of the lifecycle.
                       PROTOTYPE
                           │
                           ▼
-               VALIDATION / BENCHMARK
+                 VALIDATION / EVIDENCE
                           │
                     ┌─────┴─────┐
                     │           │
@@ -138,7 +174,7 @@ They operate across all stages of the lifecycle.
                  DECISION    ROOT CAUSE
                     │           │
                     │           ▼
-                    │      RE-ENGINEER
+                    │      CORRECTIVE ACTION
                     │           │
                     └─────◄─────┘
                     │
@@ -158,8 +194,33 @@ They operate across all stages of the lifecycle.
               IMPLEMENTATION
                     │
                     ▼
-             TEST / ACCEPTANCE
+             TEST / VALIDATION
+                    │
+                    ▼
+                ACCEPTANCE
 ```
+
+Four mechanisms operate across every stage:
+
+### 3.1 Traceability
+
+Every important artifact and decision must have an identifiable origin and purpose.
+
+### 3.2 Validation
+
+Engineering claims must progressively be supported by evidence.
+
+### 3.3 Uncertainty Management
+
+Requirement, model, and implementation uncertainty must be identified and reduced explicitly.
+
+### 3.4 Change and Feedback Control
+
+Changes and failures must propagate through the appropriate abstraction level without uncontrolled redesign.
+
+These mechanisms are not sequential phases.
+
+They are **continuous controls over the lifecycle**.
 
 ---
 
@@ -167,7 +228,7 @@ They operate across all stages of the lifecycle.
 
 Product Intent defines why the system exists.
 
-It answers three fundamental questions:
+It answers three fundamental questions.
 
 ### WHAT?
 
@@ -181,33 +242,40 @@ What problem or opportunity does it address?
 
 Who uses, evaluates, owns, or receives value from it?
 
-For the ENGIE BESS case:
+For the ENGIE BESS context:
 
-**WHAT**
+### WHAT
 
 A system capable of modeling the operational and financial performance of BESS projects.
 
-**WHY**
+### WHY
 
-To support project evaluation, business development, scenario analysis, and financial viability assessment.
+To support project evaluation, business development, scenario analysis, operational assessment, and financial viability analysis.
 
-**FOR WHOM**
+### FOR WHOM
 
 Stakeholders evaluating BESS projects and their operational and economic performance.
 
-At this stage, implementation choices should remain open.
+At this level:
+
+* implementation technologies remain open;
+* architectural details remain open;
+* optimization techniques remain open;
+* unresolved requirements are explicitly recorded.
+
+Product Intent establishes the direction of the system without prematurely determining its implementation.
 
 ---
 
 # 5. Level 2 — Conceptual Engineering
 
-Conceptual Engineering converts Product Intent into a coherent engineering representation.
+Conceptual Engineering transforms Product Intent into a coherent representation of the system.
 
-It determines:
+It answers:
 
-> **What must be represented, modeled, constrained, optimized, and measured for the intended product to exist?**
+> **What must be represented, modeled, constrained, optimized, measured, and validated for the intended product to exist?**
 
-For a BESS system, the major engineering domains are:
+For a BESS modeling system, the principal domains may include:
 
 1. BESS Engineering
 2. Market Engineering
@@ -215,43 +283,50 @@ For a BESS system, the major engineering domains are:
 4. Forecasting Engineering
 5. Operational & Optimization Engineering
 6. Financial Engineering
-7. Validation/Benchmark Engineering
+7. Validation & Benchmark Engineering
+
+These domains are not necessarily independent modules.
+
+They represent **engineering responsibilities and semantic domains** whose interactions must be understood before software architecture is finalized.
 
 ---
 
 # 6. BESS Engineering
 
-BESS Engineering defines the physical capabilities and limitations of the asset.
+BESS Engineering defines the physical capabilities, states, limitations, and behavior of the energy storage asset.
 
-It includes:
+It may include:
 
-* battery cells/modules/racks;
+* battery cells, modules, racks, and strings;
 * DC system;
 * PCS/inverter;
 * AC system;
 * grid interface;
 * site load;
-* SOC;
-* SOH;
 * energy capacity;
 * power capacity;
-* efficiency;
+* SOC;
+* SOH;
+* charging and discharging efficiency;
 * ramp limitations;
-* thermal constraints;
+* thermal behavior;
 * degradation;
-* operating limits.
+* operating limits;
+* availability and derating.
 
 The fundamental question is:
 
-> **What can the physical BESS actually do?**
+> **What can the physical BESS actually do under the applicable operating conditions?**
+
+The physical model establishes the constraints within which all subsequent operational decisions must remain feasible.
 
 ---
 
 # 7. Market Engineering
 
-Market Engineering defines the environment in which the BESS can create value.
+Market Engineering defines the environment in which the BESS can create or preserve economic value.
 
-It includes:
+It may include:
 
 * energy markets;
 * day-ahead prices;
@@ -262,22 +337,25 @@ It includes:
 * demand response;
 * tariffs;
 * demand charges;
-* eligibility;
+* eligibility requirements;
 * participation rules;
-* settlement;
-* market constraints.
+* settlement rules;
+* market constraints;
+* market timing and sequencing.
 
 The fundamental question is:
 
 > **Under what market conditions and rules can the BESS create value?**
 
-Market Engineering is therefore distinct from BESS Engineering.
+Market Engineering must remain distinct from BESS Engineering because physical capability and market opportunity are different concepts.
+
+A physically feasible action is not necessarily a market-eligible action.
 
 ---
 
 # 8. Data/Input Engineering
 
-Data/Input Engineering defines the information required to represent reality.
+Data/Input Engineering defines the information required by the engineering system to represent reality.
 
 For each input, the model should establish:
 
@@ -286,29 +364,34 @@ For each input, the model should establish:
 * unit;
 * temporal resolution;
 * timestamp convention;
-* historical vs. forecast status;
+* historical or forecast status;
 * quality requirements;
 * validation rules;
 * missing-data behavior;
-* uncertainty.
+* uncertainty characteristics.
 
-This is not yet an ETL architecture.
+This is not yet an ETL or data-platform architecture.
 
-It defines **what information the engineering system requires**, leaving implementation of ingestion and transformation to later stages.
+Its purpose is to define:
+
+> **What information does the engineering system require, what does that information mean, and what quality must it satisfy?**
+
+Implementation of ingestion, transformation, storage, and processing belongs to subsequent architectural and software stages.
 
 ---
 
 # 9. Forecasting Engineering
 
-Forecasting is explicitly separated from general Data Engineering because forecasts influence optimization decisions.
+Forecasting is explicitly separated from general Data Engineering because forecasts influence operational decisions.
 
-Possible forecasts include:
+Potential forecasts include:
 
 * load;
 * market prices;
 * PV production;
 * ancillary-service prices;
-* market availability.
+* market availability;
+* other operational variables.
 
 A basic representation is:
 
@@ -322,48 +405,63 @@ where:
 * \(\hat{X}_t\) is the forecast;
 * \(\epsilon_t\) is the forecast error.
 
-The conceptual architecture must determine whether the system requires:
+The engineering model must determine whether forecast uncertainty requires:
 
-* deterministic forecasting;
-* scenario-based forecasting;
+* deterministic forecasts;
+* sensitivity analysis;
+* scenario-based forecasts;
 * stochastic optimization;
 * robust optimization;
-* sensitivity analysis.
+* probabilistic modeling.
 
-The exact forecasting algorithm can remain open until evidence justifies its selection.
+The forecasting algorithm itself should not be frozen until project requirements and evidence justify the choice.
 
 ---
 
 # 10. Operational and Optimization Engineering
 
-Operational Engineering is where the major domains converge.
+Operational Engineering is the principal convergence domain of the physical, market, forecasting, service, and degradation models.
 
 ```text
 BESS Physics ─────────────┐
-                         │
-Market Conditions ───────┤
-                         │
-Load / Forecasts ────────┤
-                         ▼
-                  DISPATCH ENGINE
-                         ▲
-                         │
-Service Requirements ────┤
-                         │
-Operating Strategy ──────┤
-                         │
-Degradation ─────────────┘
+                          │
+Market Conditions ────────┤
+                          │
+Load / Forecasts ─────────┤
+                          ▼
+                   DISPATCH ENGINE
+                          ▲
+                          │
+Service Requirements ─────┤
+                          │
+Operating Strategy ────────┤
+                          │
+Degradation ──────────────┘
 ```
 
-The Dispatch Engine determines how the available physical capability should be allocated across competing operational opportunities.
+The Dispatch Engine determines how available BESS capability should be allocated across competing operational opportunities.
 
-This makes dispatch the **convergence point**, not simply another downstream module.
+Dispatch is therefore a **convergence point**, not merely a downstream module.
+
+The dispatch problem may involve:
+
+* energy arbitrage;
+* peak shaving;
+* demand response;
+* frequency regulation;
+* voltage/reactive power services;
+* reserve allocation;
+* operational constraints;
+* degradation;
+* market opportunities.
+
+The operational model must define the decision problem before an optimization technique is selected.
 
 ---
 
 # 11. Financial Engineering
 
-Financial Engineering translates operational behavior into economic value.
+Financial Engineering translates validated operational behavior into economic consequences.
 
 Operational outputs may include:
 
@@ -387,57 +485,86 @@ Financial outputs may include:
 * IRR;
 * payback.
 
-The boundary is:
+The fundamental boundary is:
 
 > **Operational Engineering determines what the asset does; Financial Engineering determines the economic consequence of what it does.**
+
+Financial assumptions must not silently alter the physical behavior of the BESS.
 
 ---
 
 # 12. Uncertainty Management
 
-The method distinguishes three fundamental uncertainties.
+The method distinguishes three principal categories of uncertainty.
 
 ## 12.1 Requirement Uncertainty
 
-Uncertainty about what the stakeholder requires.
+Uncertainty regarding what the stakeholder actually requires.
 
-Reduced through:
+It is reduced through:
 
 **Requirements Validation → Conceptual Engineering → Stakeholder Review**
+
+Examples include:
+
+* ambiguous requirements;
+* missing acceptance criteria;
+* conflicting stakeholder expectations;
+* unclear scope.
 
 ---
 
 ## 12.2 Model Uncertainty
 
-Uncertainty about whether the engineering representation adequately represents reality.
+Uncertainty regarding whether the engineering representation adequately represents the real system.
 
-Reduced through:
+It is reduced through:
 
-**Prototype → Benchmark → Backtesting → Validation**
+**Engineering Analysis → Prototype → Benchmark → Backtesting → Validation**
+
+Examples include:
+
+* uncertain degradation behavior;
+* uncertain service constraints;
+* uncertain market representation;
+* uncertain mathematical formulation.
 
 ---
 
 ## 12.3 Implementation Uncertainty
 
-Uncertainty about whether the selected technical architecture can implement the model adequately.
+Uncertainty regarding whether the selected architecture and implementation can adequately realize the engineered system.
 
-Reduced through:
+It is reduced through:
 
-**LLD → Technical Prototype → Performance Testing**
+**HLD → LLD → Technical Prototype → Performance Testing**
 
-These uncertainties must not be conflated.
+Examples include:
 
-A solver timing problem does not automatically invalidate the physical model.
+* computational scalability;
+* solver performance;
+* data-processing limitations;
+* architectural bottlenecks.
 
-A stakeholder changing a requirement does not automatically invalidate the software architecture.
+These categories must not be conflated.
+
+For example:
+
+> A solver timing problem does not automatically invalidate the physical model.
+
+Similarly:
+
+> A stakeholder changing a requirement does not automatically invalidate the software architecture.
+
+The failure must first be classified.
 
 ---
 
 # 13. High-Level Design — HLD
 
-Once the conceptual engineering model reaches sufficient maturity, it can be transformed into a system architecture.
+Once conceptual engineering reaches sufficient maturity, it can be transformed into a system architecture.
 
-A representative architecture is:
+A representative architecture for a BESS modeling platform may be:
 
 ```text
                 INPUT / DATA LAYER
@@ -469,13 +596,14 @@ Validation and benchmarking operate across the architecture.
 
 HLD defines:
 
-* components;
+* major components;
 * responsibilities;
 * interfaces;
 * dependencies;
-* major data flows.
+* major data flows;
+* architectural boundaries.
 
-It should not yet specify implementation-level details unnecessarily.
+HLD should avoid unnecessary implementation detail.
 
 ---
 
@@ -483,15 +611,15 @@ It should not yet specify implementation-level details unnecessarily.
 
 LLD transforms architectural components into implementable mechanisms.
 
-For the optimization engine, this may include:
+For an optimization engine, LLD may include:
 
-* state manager;
+* state management;
 * SOC state;
 * SOH state;
 * available-energy calculation;
 * available-power calculation;
-* constraint builder;
-* market opportunity builder;
+* constraint construction;
+* market opportunity construction;
 * service allocation;
 * reserve/headroom calculation;
 * objective function;
@@ -502,17 +630,19 @@ For the optimization engine, this may include:
 * infeasibility handling;
 * result validation.
 
-LLD is where implementation uncertainty becomes explicit.
+LLD is the level at which implementation uncertainty becomes explicit.
+
+A technical decision should not be promoted to a fixed implementation requirement merely because it appears in an early design document.
 
 ---
 
 # 15. Technique Selection Protocol
 
-The methodology does not assume the final optimization technique.
+The methodology does not assume a final optimization technique in advance.
 
 Candidate techniques may include:
 
-* heuristic;
+* heuristic methods;
 * LP;
 * MILP;
 * MISOCP;
@@ -524,113 +654,108 @@ Candidate techniques may include:
 
 The correct question is not:
 
-> "Which solver do we normally use?"
+> "Which technique is normally used for this type of problem?"
 
 It is:
 
-> **"What is the simplest technique that satisfies the validated engineering requirements?"**
+> **What is the simplest technique that satisfies the validated engineering requirements?**
+
+Technique selection therefore follows engineering evidence.
 
 ---
 
 # 16. Prototype 0 — Minimum Viable Formulation
 
-The first optimization prototype should deliberately minimize unnecessary complexity.
+The first prototype should minimize unnecessary complexity.
 
-A suitable starting point for many BESS dispatch problems is:
+For many BESS dispatch problems, a suitable initial formulation may be:
 
-### Simplified deterministic LP
+### Simplified Deterministic LP
 
 with:
 
 * short horizon;
-* continuous charge/discharge;
+* continuous charge/discharge variables;
 * SOC constraints;
 * energy limits;
 * power limits;
 * basic efficiency;
-* simplified revenue streams;
-* deterministic forecasts;
+* simplified revenue representation;
+* deterministic inputs;
 * no unnecessary binary variables.
 
-Its purpose is not production deployment.
+Prototype 0 is not intended to be production software.
 
 Its purpose is to answer:
 
-> **Does the fundamental physical and economic logic work?**
+> **Does the fundamental physical and operational logic behave correctly?**
+
+The prototype should therefore prioritize **semantic validation over optimization sophistication**.
 
 ---
 
 # 17. Progressive Technique Complexity
 
-Complexity should increase only when engineering evidence justifies it.
+Complexity should increase only when evidence justifies it.
 
 A possible progression is:
 
-**Prototype 0**
-
+```text
+Prototype 0
 Simplified LP
-
-↓
-
-**Prototype 1**
-
+      ↓
+Prototype 1
 Detailed physical constraints
-
-↓
-
-**Prototype 2**
-
+      ↓
+Prototype 2
 MILP for genuinely discrete decisions
-
-↓
-
-**Prototype 3**
-
+      ↓
+Prototype 3
 Rolling Horizon / MPC
-
-↓
-
-**Prototype 4**
-
-Scenario / stochastic / robust formulation
-
-↓
-
-**Prototype 5**
-
+      ↓
+Prototype 4
+Scenario / Stochastic / Robust formulation
+      ↓
+Prototype 5
 Production-scale formulation
+```
 
-This sequence is not mandatory.
+This sequence is a default strategy rather than a mandatory path.
 
-It is a default engineering strategy.
+A project may skip, reorder, or combine stages when evidence demonstrates that doing so is appropriate.
 
-The actual sequence should depend on the questions being investigated.
+The governing principle is:
+
+> **Complexity must be introduced to solve an identified engineering problem, not to demonstrate mathematical sophistication.**
 
 ---
 
 # 18. Technique Evaluation Matrix
 
-A major improvement over an unweighted criteria list is to distinguish between **hard constraints** and **optimization criteria**.
+Technique selection must distinguish between **hard constraints** and **weighted criteria**.
 
 ## 18.1 Hard Constraints
 
-A candidate technique must satisfy these conditions.
+A candidate technique must satisfy mandatory requirements.
 
-Examples:
+Examples include:
 
 * physical feasibility;
 * numerical reliability;
 * maximum acceptable runtime;
 * required solution availability;
-* required temporal resolution.
+* required temporal resolution;
+* required scalability.
 
-A technique failing a hard constraint is rejected regardless of its score elsewhere.
+A technique failing a mandatory constraint is rejected regardless of its performance elsewhere.
 
 ---
 
 ## 18.2 Weighted Criteria
 
-Among techniques satisfying the hard constraints, evaluate:
+Among techniques satisfying all hard constraints, candidates may be evaluated against weighted criteria.
+
+Example:
 
 | Criterion                 | Example Weight |
 | ------------------------- | -------------: |
@@ -642,7 +767,7 @@ Among techniques satisfying the hard constraints, evaluate:
 | Maintainability           |            10% |
 | Implementation complexity |            10% |
 
-The exact weights should be defined according to project priorities.
+The exact weights must be defined according to project requirements.
 
 The general decision rule is:
 
@@ -667,32 +792,30 @@ Therefore:
 
 > **Hard constraints eliminate unacceptable techniques; weighted criteria distinguish among technically acceptable alternatives.**
 
-This prevents committee indecision when techniques trade off different strengths.
-
 ---
 
 # 19. Tie-Breaking Rule
 
-If two candidate techniques remain materially equivalent after evaluation, the preferred tie-breaker is:
+If two candidate techniques remain materially equivalent after evaluation, use the following tie-breaking order:
 
 1. lower computational complexity;
 2. lower implementation complexity;
 3. greater extensibility;
 4. greater interpretability.
 
-This expresses a general engineering principle:
+The principle is:
 
 > **When two solutions satisfy the requirements equivalently, prefer the simpler one.**
 
-The rule prevents unnecessary mathematical sophistication from becoming an architectural objective in itself.
+Mathematical sophistication is not itself an engineering objective.
 
 ---
 
 # 20. Validation and Benchmark Engineering
 
-Validation operates continuously throughout the lifecycle.
+Validation is a continuous engineering function.
 
-It includes:
+It may include:
 
 * physical validation;
 * mathematical validation;
@@ -701,18 +824,23 @@ It includes:
 * historical backtesting;
 * performance testing;
 * regression testing;
+* integration testing;
 * UAT;
 * acceptance testing.
 
-Validation is therefore a **technical engineering function**, not merely QA.
+Validation answers the question:
+
+> **Does the implemented or proposed system behave consistently with the intended engineering model and requirements?**
+
+Validation is therefore not merely a final QA activity.
 
 ---
 
 # 21. Historical Backtesting
 
-Market-facing systems require historical validation whenever appropriate data and settlement rules are available.
+Market-facing systems should use historical validation when appropriate historical data and settlement rules are available.
 
-The loop is:
+The general loop is:
 
 ```text
 Historical Data
@@ -732,9 +860,18 @@ Performance Metrics
 Benchmark Comparison
 ```
 
-Backtesting evaluates whether the combined model produces plausible historical behavior.
+Backtesting should evaluate more than historical revenue maximization.
 
-It should not be reduced to simply asking whether the optimizer maximizes historical revenue.
+It should also examine:
+
+* physical feasibility;
+* constraint compliance;
+* operational behavior;
+* service performance;
+* sensitivity to forecast error;
+* stability;
+* degradation implications;
+* computational behavior.
 
 ---
 
@@ -742,16 +879,19 @@ It should not be reduced to simply asking whether the optimizer maximizes histor
 
 The project progresses through explicit decision gates.
 
-### Gate 1 — Concept Freeze
+## Gate 1 — Concept Freeze
 
 Required evidence:
 
 * product intent defined;
 * system boundary defined;
 * stakeholders identified;
-* major objectives identified.
+* major objectives identified;
+* major unresolved requirements recorded.
 
-### Gate 2 — Engineering Baseline
+---
+
+## Gate 2 — Engineering Baseline
 
 Required evidence:
 
@@ -759,69 +899,96 @@ Required evidence:
 * interfaces identified;
 * major constraints identified;
 * inputs identified;
-* outputs identified.
+* outputs identified;
+* principal assumptions documented.
 
-### Gate 3 — Architecture Baseline
+---
+
+## Gate 3 — Architecture Baseline
 
 Required evidence:
 
 * HLD coherent;
 * interfaces defined;
-* dependencies understood.
+* dependencies understood;
+* architectural boundaries established;
+* major implementation risks identified.
 
-### Gate 4 — Prototype Validation
+---
+
+## Gate 4 — Prototype Validation
 
 Required evidence:
 
 * core physical behavior validated;
-* core economic behavior validated;
-* critical assumptions tested.
+* core operational behavior validated;
+* critical assumptions tested;
+* prototype results reproducible;
+* known limitations documented.
 
-### Gate 5 — Technique Selection
+---
+
+## Gate 5 — Technique Selection
 
 Required evidence:
 
-* candidate techniques prototyped sufficiently;
+* relevant candidate techniques considered;
+* sufficient prototype evidence generated;
 * hard constraints evaluated;
-* weighted criteria evaluated;
+* weighted criteria evaluated where applicable;
 * selected technique documented;
-* rationale recorded.
+* alternatives and rationale recorded.
 
-### Gate 6 — Product Baseline
+---
+
+## Gate 6 — Product Baseline
 
 Required evidence:
 
 * requirements sufficiently stable;
 * acceptance criteria defined;
 * validation methods defined;
-* interfaces documented.
+* interfaces documented;
+* major residual risks identified.
 
-### Gate 7 — Execution Baseline
+---
+
+## Gate 7 — Execution Baseline
 
 Required evidence:
 
 * WBS defined;
-* competencies identified;
+* required competencies identified;
+* responsibilities established;
 * OBS established;
 * CBS estimated;
-* remaining uncertainty documented.
+* remaining uncertainty documented;
+* execution dependencies identified.
+
+A gate does not imply that the system is permanently frozen.
+
+It means that the system has reached **sufficient evidence-based maturity to proceed to the next level**.
 
 ---
 
 # 23. Gate Failure and Escalation Protocol
 
-A critical addition is that failure cannot result in indefinite iteration.
+A failed gate must not automatically trigger unlimited iteration.
 
-When a gate fails, the process is:
+The process is:
 
 ```text
 Gate Failure
      ↓
+Observed Failure
+     ↓
 Root Cause
      ↓
-Estimate Impact
+Affected Abstraction
      ↓
-Classify Response
+Impact Assessment
+     ↓
+Response Classification
      ↓
 ┌──────────────┬──────────────┬───────────────┐
 │ Re-engineer  │ Reduce Scope │ Escalate      │
@@ -835,37 +1002,53 @@ Re-test
 Gate Re-evaluation
 ```
 
-The response depends on the failure.
-
 ### Re-engineer
 
-Used when the required capability remains feasible but the current design is inadequate.
+Used when the required capability remains feasible but the current engineering solution is inadequate.
 
 ### Reduce Scope
 
-Used when the capability is not achievable within the available time/resources without unacceptable risk.
+Used when the capability cannot reasonably be achieved within available project constraints without unacceptable risk.
 
 ### Escalate Decision
 
-Used when the issue requires stakeholder or project-level trade-offs.
+Used when the issue requires a stakeholder or project-level trade-off.
+
+The objective is controlled convergence rather than indefinite experimentation.
 
 ---
 
 # 24. Iteration Budget
 
-Each uncertain engineering activity should have a predefined iteration budget.
+Every uncertain engineering activity should have an explicit iteration budget.
+
+The budget may define:
+
+* maximum number of prototype iterations;
+* maximum investigation time;
+* maximum computational experimentation;
+* maximum engineering effort;
+* decision deadline.
 
 For example:
 
-* number of prototype iterations;
-* maximum investigation time;
-* maximum computational experimentation effort.
+```text
+Technical Question
+      ↓
+Investigation Budget
+      ↓
+Prototype / Experiment
+      ↓
+Evidence
+      ↓
+Decision
+```
 
-If the budget is exhausted without convergence, the issue becomes a **management decision**, not an implicit invitation to continue engineering indefinitely.
+If the budget is exhausted without convergence, the issue becomes a **project-level decision**.
 
-This is particularly important in a fixed-duration engagement.
+This is particularly important for fixed-duration engagements.
 
-The principle is:
+The governing principle is:
 
 > **Engineering iteration must be bounded by project constraints.**
 
@@ -873,7 +1056,7 @@ The principle is:
 
 # 25. Product Specification
 
-Once the engineering baseline is sufficiently validated, requirements are transformed into Product Specifications.
+Once engineering decisions are sufficiently stable, they are transformed into Product Specifications.
 
 Each requirement should contain:
 
@@ -921,13 +1104,15 @@ SOC shall remain within defined operational limits for all valid test scenarios.
 
 Engineering benchmark and automated test cases.
 
+The Product Specification should represent a validated engineering decision, not an untested assumption.
+
 ---
 
 # 26. WBS — Work Breakdown Structure
 
-The WBS decomposes the product into the work necessary to create it.
+The WBS decomposes the product into the work required to create and validate it.
 
-Example:
+For example:
 
 ```text
 BESS Modeling Product
@@ -962,17 +1147,19 @@ WBS answers:
 
 > **What work must be performed?**
 
+The WBS should be derived from the engineered product rather than from an arbitrary organizational structure.
+
 ---
 
 # 27. Competency Decomposition
 
-OBS should be derived from WBS.
+Before assigning people or organizational units, the required competencies should be derived from the work.
 
 The sequence is:
 
 **WBS Element → Required Competencies → Responsibilities → Resources → OBS**
 
-For example:
+Example:
 
 ### WBS Element
 
@@ -985,7 +1172,7 @@ For example:
 * energy-market modeling;
 * Python;
 * numerical methods;
-* testing/validation.
+* testing and validation.
 
 ### Responsibilities
 
@@ -998,9 +1185,9 @@ For example:
 
 ### Resource Type
 
-Optimization/BESS engineering specialist.
+BESS / optimization engineering specialist.
 
-Only after this analysis should the organizational assignment be made.
+This prevents organizational structure from driving technical decomposition.
 
 ---
 
@@ -1022,17 +1209,17 @@ Dispatch Optimization
 
 These responsibilities may belong to:
 
-* one person;
+* one individual;
 * multiple specialists;
 * one multidisciplinary team.
 
-The OBS should therefore emerge from actual engineering needs rather than from predefined organizational titles.
+The OBS should therefore emerge from engineering responsibilities rather than predefined organizational titles.
 
 ---
 
 # 29. CBS — Cost Breakdown Structure
 
-CBS converts the work and resource requirements into cost.
+CBS translates work and resource requirements into cost.
 
 Conceptually:
 
@@ -1040,7 +1227,7 @@ $$
 Cost_i = Effort_i \times Rate_i + Contingency_i
 $$
 
-The problem is that effort may be uncertain.
+However, effort may be uncertain.
 
 Therefore:
 
@@ -1048,19 +1235,19 @@ $$
 Effort_i = E_{base} + E_{uncertainty}
 $$
 
-The dispatch engine is a representative example.
+For example, before prototyping a dispatch engine:
 
-Before prototyping:
+* formulation complexity may be uncertain;
+* solver selection may be uncertain;
+* scalability may be uncertain;
+* integration effort may be uncertain.
 
-* formulation complexity is uncertain;
-* solver choice is uncertain;
-* scaling behavior is uncertain.
+After prototype evidence:
 
-After prototyping:
-
-* complexity becomes better understood;
+* formulation complexity becomes better understood;
 * technique selection becomes evidence-based;
-* effort uncertainty decreases.
+* scalability uncertainty decreases;
+* effort estimates become more reliable.
 
 ---
 
@@ -1071,7 +1258,7 @@ CBS should therefore evolve with engineering evidence.
 ```text
 Initial Engineering Estimate
              ↓
-       Initial WBS/CBS
+       Initial WBS / CBS
              ↓
           Prototype
              ↓
@@ -1084,13 +1271,11 @@ Initial Engineering Estimate
        Cost Baseline
 ```
 
-This establishes:
+This establishes the principle:
 
-> **Technical evidence progressively increases cost-estimation confidence.**
+> **Technical evidence progressively increases confidence in cost estimation.**
 
-CBS is therefore not necessarily a one-time activity.
-
-It can be progressively refined until an appropriate baseline is established.
+CBS may therefore be refined rather than treated as a single irreversible estimate.
 
 ---
 
@@ -1101,22 +1286,27 @@ Each WBS element is decomposed into executable tasks.
 A task should define:
 
 * objective;
+* scope;
 * inputs;
 * prerequisites;
+* engineering references;
 * expected output;
 * acceptance criterion;
 * validation method;
 * dependencies;
 * required competency;
-* estimated effort.
+* estimated effort;
+* applicable constraints.
 
-The task should not require the executor to rediscover the engineering model.
+A task should **not require the executor to rediscover the engineering model**.
+
+A well-defined task transforms an already-engineered requirement into a bounded unit of work.
 
 ---
 
 # 32. Execution Specification
 
-The Execution Specification is the bridge between engineering definition and execution.
+The Execution Specification is the formal bridge between engineering definition and execution.
 
 It combines:
 
@@ -1124,24 +1314,31 @@ It combines:
 
 into a precise execution instruction.
 
-It should define:
+An Execution Specification should define:
 
-* context;
-* objective;
-* constraints;
-* interfaces;
-* assumptions;
-* expected artifact;
-* acceptance criteria;
-* validation procedure.
+1. **Context**
+2. **Objective**
+3. **Scope**
+4. **Inputs**
+5. **Prerequisites**
+6. **Engineering constraints**
+7. **Interfaces**
+8. **Assumptions**
+9. **Expected artifact**
+10. **Acceptance criteria**
+11. **Validation procedure**
+12. **Dependencies**
+13. **Out-of-scope items**
+
+The Execution Specification should be sufficiently precise that the executor can perform the task without inventing missing architecture or requirements.
 
 ---
 
 # 33. Prompt as Execution Interface
 
-The prompt is an execution interface.
+A prompt is an execution interface.
 
-It is not the engineering specification itself.
+It is **not** the engineering specification.
 
 The relationship is:
 
@@ -1163,7 +1360,34 @@ Execution Agent
    Validation
 ```
 
-If the agent repeatedly needs to invent missing architecture or requirements, this is evidence that the upstream engineering definition is incomplete.
+The prompt should communicate the already-defined execution specification to the execution agent.
+
+A prompt may specify:
+
+* required context;
+* referenced artifacts;
+* exact task;
+* constraints;
+* expected output;
+* acceptance criteria;
+* validation requirements;
+* prohibited scope expansion.
+
+The agent should not be expected to determine fundamental architecture unless that task is explicitly assigned as an engineering activity.
+
+If an execution agent repeatedly needs to invent:
+
+* requirements;
+* interfaces;
+* data structures;
+* architecture;
+* engineering assumptions;
+
+this is evidence that the upstream definition is incomplete.
+
+Therefore:
+
+> **Prompt quality is downstream evidence of upstream engineering completeness.**
 
 ---
 
@@ -1171,62 +1395,68 @@ If the agent repeatedly needs to invent missing architecture or requirements, th
 
 Implementation instantiates the validated design.
 
-Examples include:
+Possible implementation technologies include:
 
 * Python;
 * PySpark;
 * SQL;
 * optimization models;
-* Databricks components;
+* Databricks;
 * APIs;
 * dashboards;
-* reports.
+* reporting systems.
 
-Implementation should not silently redefine the engineering model.
+Implementation should not silently redefine:
 
-If implementation reveals a fundamental design problem, the problem should be returned to the appropriate engineering level.
+* physical assumptions;
+* engineering constraints;
+* interfaces;
+* requirements;
+* optimization objectives.
+
+If implementation reveals a fundamental design problem, the issue must be returned to the appropriate engineering abstraction level.
 
 ---
 
-# 35. Testing
+# 35. Testing and Validation
 
-Testing occurs at multiple levels:
+Testing occurs at multiple levels.
 
-### Unit Testing
+## Unit Testing
 
-Individual components.
+Tests individual software components.
 
-### Integration Testing
+## Integration Testing
 
-Component interactions.
+Tests interactions between components.
 
-### Engineering Validation
+## Engineering Validation
 
-Implementation against engineering equations and constraints.
+Tests implementation against approved engineering equations, constraints, and behaviors.
 
-### Benchmark Testing
+## Benchmark Testing
 
-Comparison against reference cases.
+Tests against defined reference cases.
 
-### Backtesting
+## Backtesting
 
-Historical behavior.
+Tests behavior against historical conditions where appropriate.
 
-### Performance Testing
+## Performance Testing
 
-Runtime and scalability.
+Tests runtime, scalability, resource consumption, and stability.
 
-### User Acceptance Testing
+## User Acceptance Testing
 
-Stakeholder requirements.
+Tests whether stakeholder requirements have been satisfied.
 
-These activities answer different questions and should not be collapsed into one generic "testing" phase.
+These activities answer different questions and should not be collapsed into a generic "testing" stage.
 
 ---
 
 # 36. Integrated Traceability
 
-A single traceability chain should replace multiple overlapping diagrams.
+A single integrated traceability chain should connect intent to implementation and acceptance.
 
 ```text
 RFP / Stakeholder Intent
@@ -1256,17 +1486,78 @@ Validation Evidence
 Acceptance
 ```
 
-The reverse direction must also be possible.
+Traceability must operate in both directions.
 
-Given an implementation artifact, the team should be able to answer:
+Forward:
 
-> **Why does this artifact exist?**
+> **Why was this artifact created?**
 
-And trace it back to the original product requirement.
+Backward:
+
+> **What implementation artifacts demonstrate that this requirement has been satisfied?**
+
+Given an implementation artifact, the team should be able to trace it back to its originating requirement.
+
+Given a requirement, the team should be able to identify the evidence demonstrating satisfaction.
 
 ---
 
-# 37. Feedback and Root-Cause Analysis
+# 37. Change Control
+
+Requirements and engineering assumptions may change during the project.
+
+A change must therefore be treated as an engineering event rather than an informal edit.
+
+The change process is:
+
+```text
+Change Request
+      ↓
+Change Classification
+      ↓
+Affected Requirements
+      ↓
+Affected Engineering Model
+      ↓
+Affected Architecture
+      ↓
+Affected Tasks / Cost / Schedule
+      ↓
+Impact Assessment
+      ↓
+Decision
+      ↓
+Controlled Revision
+      ↓
+Re-validation
+      ↓
+Traceability Update
+```
+
+A change should be classified according to its affected abstraction level.
+
+Examples include:
+
+* requirement change;
+* scope change;
+* engineering-model change;
+* architecture change;
+* implementation change.
+
+The change assessment should consider:
+
+* technical impact;
+* validation impact;
+* schedule impact;
+* cost impact;
+* dependencies;
+* residual risk.
+
+No significant requirement or engineering change should be incorporated without determining its downstream impact.
+
+---
+
+# 38. Feedback and Root-Cause Analysis
 
 When validation fails:
 
@@ -1284,25 +1575,29 @@ Corrective Action
 Re-validation
 ```
 
-Possible affected levels include:
+Potential affected levels include:
 
 * Product Intent;
+* Requirement;
 * Conceptual Engineering;
 * HLD;
 * LLD;
 * Product Specification;
 * Task;
+* Execution Specification;
 * Implementation.
 
-The key principle is:
+The governing principle is:
 
 > **Fix the problem at the level where its meaning is wrong, not merely at the level where the symptom appears.**
 
+This creates nested feedback loops rather than one generic feedback loop.
+
 ---
 
-# 38. Semantic Stability
+# 39. Semantic Stability
 
-A technical decision should not be considered stable merely because it has been written down.
+A technical decision should not be considered stable merely because it has been documented.
 
 For example:
 
@@ -1312,19 +1607,23 @@ For example:
 
 This is an assumption.
 
-After validation:
+After sufficient evidence:
 
-> MILP satisfies the defined feasibility, solution-quality, runtime, scalability, and extensibility criteria for the required dispatch use cases.
+> MILP satisfies the defined feasibility, solution-quality, runtime, scalability, and extensibility requirements for the required dispatch use cases.
 
 This is an engineering decision.
 
 Therefore:
 
-> **A decision becomes semantically stable when it is supported by sufficient evidence.**
+> **A decision becomes semantically stable when sufficient evidence supports its validity within the defined scope and assumptions.**
+
+Semantic stability does not mean permanent immutability.
+
+A previously stable decision may be revised when requirements or evidence change.
 
 ---
 
-# 39. Decision Evidence
+# 40. Decision Evidence
 
 Major technical decisions should have a minimal decision record containing:
 
@@ -1334,17 +1633,186 @@ Major technical decisions should have a minimal decision record containing:
 * evidence;
 * assumptions;
 * constraints;
-* selected option;
 * rationale;
-* residual risks.
+* selected option;
+* residual risks;
+* validation status;
+* date/version.
 
-This prevents the project from losing the reasoning behind architectural choices.
+This prevents the project from losing the reasoning behind architectural and technical choices.
+
+Decision records should preserve **why** a decision was made, not merely **what** was selected.
 
 ---
 
-# 40. Application to the ENGIE BESS System
+# 41. Repository and External Implementation Review
 
-The method applied to the BESS project becomes:
+External implementations, open-source repositories, literature, benchmarks, and reference systems may be used as **engineering evidence**.
+
+They should not automatically determine the architecture or technical solution.
+
+For example, in a BESS project, existing repositories may provide evidence regarding:
+
+* physical modeling;
+* degradation;
+* dispatch;
+* revenue stacking;
+* forecasting;
+* market sequencing;
+* optimization techniques;
+* testing;
+* backtesting.
+
+The correct process is:
+
+```text
+Engineering Question
+        ↓
+Reference / External Evidence
+        ↓
+Comparison with Current Model
+        ↓
+Gap Identification
+        ↓
+Engineering Assessment
+        ↓
+Decision
+        ↓
+Prototype / Validation
+```
+
+External implementation is therefore **evidence, not authority**.
+
+The fact that a particular repository uses MILP, MPC, Pyomo, or another technique does not establish that the same technique is correct for the target system.
+
+---
+
+# 42. Evidence Review Criteria
+
+A repository or external reference should be evaluated according to at least five dimensions:
+
+### Breadth
+
+How many relevant engineering domains are covered?
+
+### Depth
+
+How deeply is each domain modeled?
+
+### Evidence
+
+What has actually been implemented, tested, benchmarked, or validated?
+
+### Architecture
+
+How are the components and domains related?
+
+### Traceability
+
+Can assumptions, decisions, and implementation choices be connected to identifiable requirements or engineering objectives?
+
+Additional criteria may include:
+
+* reproducibility;
+* documentation quality;
+* test coverage;
+* model transparency;
+* applicability to the target system;
+* known limitations.
+
+External references should be used to reduce **model or implementation uncertainty**, not to bypass engineering decisions.
+
+---
+
+# 43. Engineering Review Sufficiency
+
+External-reference review must have a defined stopping condition.
+
+A review is sufficient when:
+
+1. the relevant engineering domains have been examined;
+2. major alternative formulations have been identified;
+3. important gaps and contradictions have been recorded;
+4. relevant implementation evidence has been assessed;
+5. unresolved questions have been converted into explicit engineering questions;
+6. decisions required for the next prototype or design stage have sufficient evidence.
+
+The review should also have an explicit investigation budget, such as:
+
+* maximum number of references;
+* maximum investigation time;
+* maximum experimentation effort;
+* predefined decision deadline.
+
+The objective is not to find every existing implementation.
+
+It is to obtain **sufficient evidence for the next engineering decision**.
+
+---
+
+# 44. Glossary
+
+### Product Intent
+
+The initial definition of what the product must accomplish, why it exists, and for whom.
+
+### Conceptual Engineering
+
+The process of determining what must be represented and how the system behaves conceptually before implementation architecture is fixed.
+
+### HLD — High-Level Design
+
+The architectural representation of major system components, responsibilities, interfaces, and dependencies.
+
+### LLD — Low-Level Design
+
+The detailed design of implementable mechanisms within architectural components.
+
+### Prototype
+
+A deliberately limited implementation or formulation used to answer a specific engineering question.
+
+### Validation
+
+Evidence-based evaluation that the model or implementation satisfies its intended behavior and requirements.
+
+### Benchmark
+
+A defined reference case used to compare model or implementation behavior.
+
+### Backtesting
+
+Evaluation of a model against historical conditions.
+
+### WBS — Work Breakdown Structure
+
+Decomposition of the work required to create the system.
+
+### OBS — Organizational Breakdown Structure
+
+Mapping of responsibilities and work to organizational resources.
+
+### CBS — Cost Breakdown Structure
+
+Decomposition and estimation of project cost.
+
+### Execution Specification
+
+A precise definition of how a task is to be executed and validated.
+
+### Semantic Stability
+
+The state in which a decision is sufficiently supported by evidence to serve as a reliable engineering baseline within its defined scope.
+
+### Engineering Evidence
+
+Information, analysis, experiment, prototype result, benchmark, test, or other objective basis used to support an engineering decision.
+
+---
+
+# 45. Application to the ENGIE BESS System
+
+When applied to the ENGIE BESS context, the methodology becomes:
 
 ```text
 ENGIE RFP
@@ -1354,16 +1822,19 @@ Product Intent
 Conceptual Engineering
    ├── BESS Engineering
    ├── Market Engineering
-   ├── Data Engineering
+   ├── Data/Input Engineering
    ├── Forecasting Engineering
-   ├── Operational Engineering
-   └── Financial Engineering
+   ├── Operational & Optimization Engineering
+   ├── Financial Engineering
+   └── Validation / Benchmark Engineering
    ↓
 HLD
    ↓
 LLD
    ↓
-Optimization Prototype
+External Evidence / Repository Review
+   ↓
+Prototype
    ↓
 Benchmark / Backtest
    ↓
@@ -1373,7 +1844,7 @@ Product Specification
    ↓
 WBS
    ↓
-Competencies
+Competency Decomposition
    ↓
 OBS
    ↓
@@ -1392,11 +1863,17 @@ Testing / UAT
 Acceptance
 ```
 
-The optimization engine is deliberately treated as an engineering decision point rather than a predetermined implementation detail.
+The optimization engine is deliberately treated as an **engineering decision point** rather than a predetermined implementation detail.
+
+Likewise, external repositories are treated as **evidence sources**, not architecture templates.
+
+The engineering model determines what the system must represent.
+
+Evidence helps determine how that representation should be implemented.
 
 ---
 
-# 41. Core Engineering Rules
+# 46. Core Engineering Rules
 
 ### Rule 1
 
@@ -1474,9 +1951,25 @@ The optimization engine is deliberately treated as an engineering decision point
 
 **Every failure must have a path back to the appropriate abstraction level.**
 
+### Rule 20
+
+**Requirements and engineering changes must be assessed for downstream impact before implementation.**
+
+### Rule 21
+
+**External implementations are evidence, not authority.**
+
+### Rule 22
+
+**Engineering reviews must have explicit sufficiency criteria and investigation budgets.**
+
+### Rule 23
+
+**A decision is stable only to the extent that its assumptions and evidence remain valid.**
+
 ---
 
-# 42. Final Integrated Model
+# 47. Final Integrated Model
 
 The complete method can be summarized as:
 
@@ -1526,28 +2019,70 @@ The complete method can be summarized as:
                           ACCEPTANCE
 
 
-        ┌──────────────────────────────────────────┐
-        │             TRANSVERSAL                  │
-        │                                          │
-        │  TRACEABILITY                            │
-        │  VALIDATION                              │
-        │  UNCERTAINTY MANAGEMENT                  │
-        │  CHANGE / FEEDBACK                       │
-        │  DECISION EVIDENCE                       │
-        └──────────────────────────────────────────┘
+        ┌─────────────────────────────────────────────┐
+        │                 TRANSVERSAL                 │
+        │                                             │
+        │  TRACEABILITY                               │
+        │  VALIDATION                                 │
+        │  UNCERTAINTY MANAGEMENT                     │
+        │  CHANGE CONTROL                             │
+        │  FEEDBACK                                   │
+        │  DECISION EVIDENCE                          │
+        │  EXTERNAL EVIDENCE REVIEW                   │
+        │  ITERATION BUDGET                           │
+        └─────────────────────────────────────────────┘
 ```
+
+The model is not strictly linear.
+
+Evidence may trigger controlled movement to an earlier abstraction level:
+
+```text
+                         ┌─────────────────┐
+                         │   REQUIREMENT   │
+                         └────────┬────────┘
+                                  │
+                                  ▼
+                           ENGINEERING MODEL
+                                  │
+                                  ▼
+                              ARCHITECTURE
+                                  │
+                                  ▼
+                               DESIGN
+                                  │
+                                  ▼
+                              PROTOTYPE
+                                  │
+                                  ▼
+                              EVIDENCE
+                                  │
+                         ┌────────┴────────┐
+                         │                 │
+                       VALID             INVALID
+                         │                 │
+                         ▼                 ▼
+                      PROCEED        ROOT-CAUSE ANALYSIS
+                                           │
+                                           ▼
+                                  APPROPRIATE LEVEL
+                                           │
+                                           └──────► REVISE
+```
+
+This creates **controlled iteration rather than uncontrolled rework**.
 
 ---
 
-# 43. Guiding Principle
+# 48. Guiding Principle
 
-The method can ultimately be reduced to one statement:
+The methodology can ultimately be reduced to one statement:
 
-> **Semantic Systems Engineering is a controlled process for transforming product intent into a validated and executable system while progressively reducing requirement, model, and implementation uncertainty through engineering decomposition, prototyping, evidence-based decision making, and controlled feedback.**
+> **Semantic Systems Engineering is a controlled process for transforming product intent into a validated and executable system while progressively reducing requirement, model, and implementation uncertainty through engineering decomposition, evidence-based decision making, progressive prototyping, controlled change, and traceable execution.**
 
 For the ENGIE BESS project:
 
-> **First define what the BESS system means from an engineering perspective. Then define how physical behavior, markets, data, forecasting, operations, and finance interact. Then design the architecture. Then prototype the uncertain technical assumptions. Use evidence to select the appropriate computational techniques. Only then progressively establish the product specification, work structure, organizational responsibilities, cost baseline, and implementation.**
+> **First define what the BESS system means from an engineering perspective. Then define how physical behavior, markets, data, forecasting, operations, and finance interact. Then design the architecture. Use external evidence and targeted prototypes to reduce uncertainty. Select computational techniques based on evidence rather than assumption. Only then progressively establish the product specification, work structure, organizational responsibilities, cost baseline, execution specifications, and implementation.**
 
 The essential transformation is therefore:
 
@@ -1561,5 +2096,5 @@ And not:
 
 **Prompt → Code → Hope**
 
-The purpose of the methodology is to preserve the meaning of the product while progressively transforming it from an idea into a **validated, traceable, executable system**.
+The purpose of the methodology is to preserve the meaning of the product while progressively transforming it from an initial idea into a **validated, traceable, executable, and maintainable system**.
 
