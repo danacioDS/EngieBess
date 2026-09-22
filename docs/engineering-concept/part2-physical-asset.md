@@ -672,16 +672,3 @@ The following symbols are used in Part 2 but not yet registered in Part 1's mast
 
 ---
 
-## 2.10 Next steps
-
-Part 2 is **at Revision 3, pending Part 1 sign-off** on the change request. The document is otherwise stable and ready for Parts 3, 4, and 5 to build on.
-
-**Recommended writing order:**
-
-1. **Part 1** — FC5 (or v1.0): process the Part 2 change request. Register the four new symbols and adopt the auxiliary-binary convention.
-2. **Part 2** — Revision 3, pending sign-off. Once signed off, promote to v1.0.
-3. **Part 4** — Services.
-4. **Part 5** — Dispatch, stacking, outputs.
-5. **Part 3** — Degradation.
-
-Shall I continue with **Part 1 FC5** (processing the change request), or with **Part 4 — Services**?

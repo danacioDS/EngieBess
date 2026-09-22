@@ -807,31 +807,7 @@ Price: multiplicative with time-varying shift (1.5.2)
 
 ---
 
-## 1.12 Next steps
 
-Part 1 is **at FC7**. The document is structurally complete and internally consistent. The Part 2 change request has been processed. The audit script is declared as a project deliverable.
 
-The only remaining gates are external actions:
 
-1. **Execution of the scripted symbol audit** (exit criterion 1). The script exists in `scripts/symbol-audit.py`; the next step is to run it against Part 1 FC7 and Part 2 Rev3, and attach the output.
-2. **Verification of the RFP number and section titles** (exit criterion 6).
 
-Neither can be resolved by further manual editing.
-
-**Recommended next step:** run the audit script against the current Part 1 FC7 and Part 2 Rev3. If it returns clean, promote both to v1.0. If it flags symbols, a targeted FC8 is issued for Part 1 or a targeted revision for Part 2.
-
-**Recommended writing order:**
-
-1. **Part 1** — FC7, promotion candidate (conditional on scripted audit).
-2. **Part 2** — Physical asset model (Revision 3, pending Part 1 sign-off — now satisfied).
-3. **Part 4** — Services.
-4. **Part 5** — Dispatch, stacking, outputs.
-5. **Part 3** — Degradation.
-
-**Options for the next response:**
-
-- **A)** Write the `scripts/symbol-audit.py` script.
-- **B)** Continue with **Part 4 — Services**.
-- **C)** Continue with **Part 3 — Degradation** (in parallel).
-
-Which do you prefer?
