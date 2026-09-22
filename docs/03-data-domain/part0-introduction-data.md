@@ -1,302 +1,268 @@
-# Data Engineering Model — Introduction Document (v0.4)
+# Data Scope and Requirements — BESS Integrated Model
 
-**Version:** 0.4 — Development Draft
-**Status:** Under Engineering Development — Not Frozen
+**Edition:** Client
+**Version:** 3.0
+**Status:** Baseline — Data scope and Phase 1 decision list
 **Date:** 2026-09-22
-**Owner:** BESS Data Engineering
-**Document ID:** DE-INTRO-001 *(stable across versions)*
-
-| Version | Date | Status | Change |
-|---|---|---|---|
-| 0.1 | 2026-09-22 | Development Draft | Initial Data Engineering Introduction. |
-| 0.2 | 2026-09-22 | Development Draft | Restored the cross-Part rules section; restored the version-history table; clarified the lifecycle chain as a loop plus a terminal state; changed the interface description from a linear chain to a hub; restored interface direction and semantic-boundary sentences. |
-| 0.3 | 2026-09-22 | Development Draft | Fixed three consumption-path violations: acquisition-branch concept moved to Part 1 (instance in Part 3); as-of rule moved to Part 2 (revision mechanics stay in Part 4); quality-dimensions row corrected to Part 1. Replaced `RSV-` type prefix with reserved final identifiers plus a status field. Normalized "Parte" to "Part". Replaced DE-INTRO-002 with a change-request identifier. Added an open-items table. Defined vacuous/indeterminate. Replaced forward section references with topic references. Fixed rule 7 self-count. Fixed §8 Data Governance wording. Fixed the version-history gap. Moved the Spanish change notes to a cover note. |
-| 0.4 | 2026-09-22 | Development Draft | Closed the last consumption-path violation: data-uncertainty classification concept moved to Part 1; Part 4 keeps quality-, lineage-, and reconciliation-specific uncertainty only. Removed the acquisition-branch parenthetical contradiction from §4. Split D1-O02 into a Part 1 concept row and a Part 3 instance row. Corrected the blocking column so Part 2 items block the Part 2 freeze first. Documented that open-item prefixes are historical, not ownership indicators. Retired the old D2-O03 (lineage/transformation) and assigned new IDs for as-of. Clarified CR-DE-001's critical path and the interim arrangement for transversal quality thresholds. Restored the optional display-prefix definition. Added Financial Engineering to §4 consumption owners. Verified Part naming against Market Engineering. Recorded the as-of rule placement rationale. |
+**Owner:** Project Engineering (cross-domain: BESS, Market, Data, Forecasting, Operational/Optimization, Financial, Validation)
+**Source:** ENGIE RFP-264144-1 + SSE v4.4 methodology
 
 ---
 
-## 1. Purpose and Boundary
+## 1. Governing Question and Traceability
 
-This document establishes the engineering baseline for the **data and input domain** of the BESS operational and market simulation system. It is the parent document for the Data Engineering Parts and the owner of the rules common across them.
+> **GQ:** *What is the optimal revenue-stacking strategy for the ENGIE BESS, accounting for physical degradation and market rules, over the contract horizon?*
 
-Data Engineering defines **what data must exist, what it must mean, what quality it must satisfy, under what as-of conditions it may be read, and how it is delivered and retained**. It does not define the physical BESS model, market rules, forecasting methods, optimization strategies, financial valuation, or software implementation.
+Each domain answers a domain question **DQn**. Data items are **`D-NN`**; open items are **`OI-NN`**.
 
-Data Engineering interfaces with each of the following domains:
+**ID rule.** IDs are permanent once assigned. Removed items keep their ID, marked as retired. New items are added at the end of the sequence.
 
-**BESS Engineering · Market Engineering · Forecasting Engineering · Operational & Optimization Engineering · Financial Engineering · Software Engineering**
-
-Data is a hub: it interfaces with each domain independently. Data requirements may propagate upstream when they impose acquisition, quality, timing, or retention requirements on other domains, following project change control.
-
-**Naming convention.** This model uses **"Part"** throughout, matching the convention used by BESS Engineering and Market Engineering. Where an earlier draft used "Parte" as a display label, the two forms are equivalent; this document uses "Part" in all normative text.
+Each item's "Why" column names the domain question it serves. The explicit `(DQn → GQ)` path is stated in **§§5–8**; in §§2–4 the path is implicit in the domain heading.
 
 ---
 
-## 2. Organization
+## 2. BESS Engineering (the physical asset)
 
-Data Engineering is divided into **five Parts**:
+**Domain question DQ1:** *What can the asset physically do, and what does it cost to do it?*
 
-| Part | Engineering responsibility |
+| ID | Data | Why |
+|---|---|---|
+| D-01 | Rated power (MW), energy capacity (MWh), duration (h) | Defines the feasible dispatch envelope. |
+| D-02 | Round-trip efficiency; separate charge and discharge efficiency; efficiency vs. C-rate if available | Determines energy losses in every arbitrage decision. |
+| D-03 | Self-discharge rate | Affects standing losses. |
+| D-04 | Allowed DoD; SoC min/max | Bounds usable energy. |
+| D-05 | Maximum charge and discharge C-rate | Bounds power. |
+| D-06 | **Warranty terms:** throughput cap, cycle-count cap, permitted SoC window, permitted temperature range | Warranty is frequently the binding operational constraint. |
+| D-07 | **Degradation curves:** cycle aging and calendar aging as functions of temperature, C-rate, DoD, and average SoC | Determines degradation cost and end-of-life. |
+| D-08 | **Internal heterogeneity:** SOH per string or module, where applicable | Ignoring it produces infeasible schedules and material revenue loss. |
+| D-09 | **Historical operational data** (if the asset exists): temperatures, SOC, C-rates, maintenance events | Validates the physical model against reality. |
+| D-10 | **Auxiliary and HVAC load**; augmentation or replacement plan with schedule and cost | Auxiliary load reduces net energy; augmentation changes capacity over time. |
+| D-11 | **Interconnection and POI limits:** export cap, import cap, grid-charging restrictions | Bounds dispatch; grid-charging restrictions affect eligibility. |
+| D-12 | **Renewable co-location** and site layout: is there co-located solar or wind, and does the BESS share a POI | Determines which meteorological and generation data are needed (feeds D-23 and D-24). |
+
+**Source and owner.** Answer owner: ENGIE. Driver: BESS Engineering.
+
+---
+
+## 3. Market Engineering (the value-creation rules)
+
+**Domain question DQ2:** *How does BESS capacity become money, under which rules, and with what uncertainty?*
+
+**Jurisdiction note.** Market terminology is given with parallel US and EU examples. The applicable market is set by **OI-06**. Native market resolution is a **public fact** once the market is known.
+
+| ID | Data | Why |
+|---|---|---|
+| D-13 | Historical prices at the market's native resolution: Day-Ahead, Real-Time/Balancing, Intraday | The price signal arbitrage and stacking consume. |
+| D-14 | **Settlement rules** and, where the asset exists, **settlement records**: energy settlement, penalties for under-delivery, make-whole / OOM payments | Defines how revenue is recognized and what non-delivery costs. |
+| D-15 | Ancillary products available and, per product: historical prices, minimum duration, activation time, co-optimization rules. **US:** Regulation Up/Down, Spinning/Non-Spinning Reserve, Resource Adequacy. **EU:** FCR, aFRR, mFRR, capacity mechanisms. | Ancillary revenue is often the majority of stacked revenue. |
+| D-16 | Revenue-stacking rules: simultaneous participation; capacity-reservation limits that prevent double counting | Determines the shape of the co-optimization problem. |
+| D-17 | **Price-influence assumption:** price-taker or price-maker. If price-maker, system demand data and clearing prices. | Price-maker changes the objective function. |
+
+**Source and owner.** Answer owner: ENGIE, confirmed with the market operator and regulator. Driver: Market Engineering.
+
+---
+
+## 4. Data / Input Engineering (the data infrastructure)
+
+**Domain question DQ3:** *Can the model be built with the data ENGIE already has, or must new infrastructure be created?*
+
+**Trace to GQ.** DQ3 is indirect: it makes the other items buildable.
+
+| ID | Data | Why |
+|---|---|---|
+| D-18 | Existing data sources at ENGIE: data lake, SQL, Databricks, market APIs, manual CSV files | Determines what must be built vs. reused. |
+| D-19 | Frequency and granularity: market data update rate, BESS data update rate, latency | Determines whether the pipeline can keep up with the model. |
+| D-20 | **Quality conventions:** gaps, outliers, inconsistent timestamps, current handling rules | Determines the validation rules. |
+| D-21 | Available history: years of prices, cycles of BESS operation | Determines whether backtesting is credible. |
+| D-22 | **Data practicalities:** market-data licensing, timezone and DST conventions, SCADA/telemetry access, security and access approvals | Prevents Phase 2 stalls on non-technical blockers. |
+
+**Source and owner.** Answer owner: ENGIE IT and data platform team. Driver: Data / Input Engineering.
+
+---
+
+## 5. Forecasting Engineering (future uncertainty)
+
+**Domain question DQ4:** *How predictable is the environment, and with what error?*
+
+| ID | Data | Why |
+|---|---|---|
+| D-23 | Historical meteorological data: ambient temperature, irradiance (if solar co-located), wind speed (if wind co-located) | Degradation depends on temperature; co-located renewable revenue depends on weather (DQ4 → GQ). |
+| D-24 | Historical renewable generation profiles (if applicable): hourly capacity factors | Determines renewable-coupled operation (DQ4 → GQ). |
+| D-25 | Demand / load data: behind-the-meter load, or zonal demand if applicable | Required for load forecasting and BTM modes (DQ4 → GQ). |
+| D-26 | Historical price series with exogenous features (load forecast, renewable generation forecast) | Inputs to the price forecast model (DQ4 → GQ). |
+| D-27 | **Forecast-error assumptions** acceptable to ENGIE | Determines the risk envelope of the schedule (DQ4 → GQ). |
+
+**Source and owner.** Answer owner: ENGIE, meteorological service, market operator. Driver: Forecasting Engineering.
+
+---
+
+## 6. Operational / Optimization Engineering (the formulation)
+
+**Domain question DQ5:** *What objective function reflects ENGIE's real intent?*
+
+| ID | Data | Why |
+|---|---|---|
+| D-28 | Current or desired operating strategy: pure arbitrage, revenue stacking, capacity market with availability obligations, or a combination | Determines the objective function (DQ5 → GQ). |
+| D-29 | Decision horizon: Day-ahead, intraday, rolling horizon; re-optimization frequency | Determines the optimization formulation (DQ5 → GQ). |
+| D-30 | Operational constraints: max cycles/day/year, internal C-rate policy, maintenance windows, warranty constraints from D-06, POI limits from D-11 | Bounds the feasible set (DQ5 → GQ). |
+| D-31 | Risk appetite: robust vs. aggressive schedule | Determines the risk posture (DQ5 → GQ). |
+
+**Source and owner.** Answer owner: ENGIE (operating intent). Driver: Operational / Optimization Engineering.
+
+---
+
+## 7. Financial Engineering
+
+**Domain question DQ6:** *Does the revenue-maximizing schedule also maximize financial value?*
+
+| ID | Data | Why |
+|---|---|---|
+| D-32 | CAPEX of the BESS (or replacement value if the asset exists) | Required for NPV and IRR (DQ6 → GQ). |
+| D-33 | OPEX: fixed (O&M) and variable (charging/discharging cost, if applicable) | Required for cash flow (DQ6 → GQ). |
+| D-34 | Financing structure: discount rate, accounting life | Required for discounting (DQ6 → GQ). |
+| D-35 | Incentives or subsidies applicable, including tax-credit implications of grid charging | Affects net cash flow (DQ6 → GQ). |
+| D-36 | Existing contracts: PPAs, tolling agreements, capacity (RA) contracts that fix revenue or impose obligations | Bounds the revenue envelope (DQ6 → GQ). |
+
+**Source and owner.** Answer owner: ENGIE project finance. Driver: Financial Engineering.
+
+---
+
+## 8. Validation Engineering
+
+**Domain question DQ7:** *How do we prove the system works for ENGIE, not in the abstract?*
+
+| ID | Data | Why |
+|---|---|---|
+| D-37 | Backtesting data: price history, ancillary activations, and BESS operation (if the asset exists) covering at least 1–2 years | Required to demonstrate the model reproduces history (DQ7 → GQ). |
+| D-38 | **Baseline definition:** reference case against which "revenue uplift" is measured — no-BESS, historical operation, or rule-based control | Without a baseline, "uplift" is undefined (DQ7 → GQ). |
+| D-39 | ENGIE acceptance metric and numeric threshold: revenue uplift vs. baseline, SOH retention, RA obligation compliance, or another | Makes acceptance falsifiable (DQ7 → GQ). |
+| D-40 | Stress scenarios: extreme conditions ENGIE wants evaluated — negative prices, scarcity events, forecast failures | Tests the model outside the base case (DQ7 → GQ). |
+
+**Source and owner.** Answer owner: ENGIE and market operator historical data. Driver: Validation Engineering.
+
+---
+
+## 9. What We Will Request and What We Will Not Assume
+
+| We will request | We will not assume |
 |---|---|
-| **Part 1 — Data Domain and Conventions** | Domain, scope, entities, roles, concepts, evidence classification, interfaces, temporal conventions, the acquisition-branch concept, the quality-dimension concept, the data-authority axis concept, the data-uncertainty classification concept, assumptions, traceability |
-| **Part 2 — Transversal Data Values** | Data-wide values on the consumption path: time-zone, resolution, null/missing-data, format, as-of conventions, transversal quality thresholds, temporal framework instance |
-| **Part 3 — Data Entities and Sources** | Entity catalogue, entity-to-source mapping, source authority instances, acquisition-branch instances, entity-specific temporal requirements, entity-to-consumer mappings, reference and master data |
-| **Part 4 — Data Quality, Lineage, and Transformation Rules** | Entity-specific quality rules, validation rules, lineage, transformation semantics, reconciliation, revision-versioning mechanics, quality-, lineage-, and reconciliation-specific uncertainty |
-| **Part 5 — Data Delivery, Interfaces, and Acceptance** | Delivery semantics, interfaces, consumption contracts, latency and availability, access and confidentiality, retention, acceptance criteria, validation evidence, outputs |
+| Complete BESS datasheet, including warranty terms | We will validate any supplied degradation model against the functional form the operational model uses, rather than adopt it as calibrated |
+| Degradation curves by temperature / C-rate / DoD / SoC | We will not use a single annual degradation number |
+| Historical prices at market resolution | We will not use monthly averaged prices |
+| Settlement rules and penalties | We will not assume there are no penalties |
+| Ancillary products with prices and requirements | We will not assume all products can be stacked without restriction |
+| Data sources, quality conventions, current handling | We will not assume data is clean and available |
+| Historical meteorological data | We will not defer forecasting |
+| CAPEX/OPEX and financing structure | We will not optimize revenue without financial context |
+| ENGIE acceptance criteria and baseline | We will not define success unilaterally |
 
-Construction and freeze order:
-
-**Part 1 → Part 2 → Part 3 → Part 4 → Part 5**
-
-Part 2 exists because Part 3 requires **transversal data values** that would otherwise belong to the full quality and transformation layer. Referencing them from Part 4 before Part 4 exists would create a Part 3 → Part 4 → Part 3 loop. The quality and transformation layer is therefore split into a transversal-values layer (Part 2, drafted before Part 3 freezes) and an entity-specific layer (Part 4, drafted after Part 3 freezes).
-
-**Acquisition-branch concept.** The three acquisition branches — authoritative source, derived source, assumed/modeled input — are **defined in Part 1** and **instantiated per entity in Part 3**. They are not owned by Part 4.
-
-**Quality-dimension concept.** Quality dimensions — completeness, accuracy, consistency, timeliness, validity, uniqueness, lineage integrity — are **defined in Part 1**, with transversal thresholds in Part 2 and entity-specific rules in Part 4.
-
-**Data-uncertainty classification concept.** The classification scheme for data uncertainty — entity-level, source-level, quality-level, lineage-level, reconciliation-level, delivery-level — is **defined in Part 1**. Part 4 owns only the quality-, lineage-, and reconciliation-specific uncertainty of the entities it rules over.
+Where ENGIE already has a calibrated degradation model, it is still requested (D-07); the point is that it must be validated against the functional form the operational model uses, not adopted unverified.
 
 ---
 
-## 3. Cross-Part Rules Owned by This Introduction
+## 10. How the Data Maps to Engineering Models
 
-These rules span more than one Part and therefore cannot be owned by any single Part.
-
-1. **Consumption-path rule.** No entity definition in Part 3 shall depend on a *value* owned by Part 4. If an entity definition appears to require a Part 4 value, either the requirement is entity-specific (Part 3) or the value is transversal (Part 2). This rule is the sole justification for the Part 2 / Part 4 split.
-
-2. **Forward-reference mechanism.** A frozen Part may reference **reserved identifiers** of a later, not-yet-frozen Part. A reserved identifier is the *final* identifier — for example `QR-012` — carrying a `status = reserved` field in the identifier registry. It is not a separate type. When the later Part populates the reserved identifier, the identifier itself does not change; only its `status` field changes from `reserved` to `populated`. An unpopulated reserved identifier blocks the later Part's freeze gate.
-
-3. **Identifier-scheme owner.** The cross-Part identifier scheme is owned by **Part 1, "Identifier scheme"** (topic, not section number), consistent with the Market Engineering identifier scheme. Identifiers use the format `<type>-<sequence>` (e.g., `ENT-001`, `SRC-001`, `QR-012`). The optional namespace prefix (`DE:`) is display-only and never part of the identifier. Identifiers are **unique on the unprefixed form** and stable across versions. Ownership and lifecycle status are recorded in fields, not in the identifier. The identifier registry is separate from the master symbol registry.
-
-4. **Definition–instance ownership rule.** Where a concept has both a domain-level definition and an application in a specific context, the **definition is owned by the defining Part** and the **application is owned by the applying Part**. They are recorded as two separate ownership rows. This is an ownership rule, not a sequencing rule.
-
-5. **Point-in-time owner.** The as-of rule has three components, each owned separately. The **concept** of as-of — that revisable data has vintages and that reads are timestamped — is owned by **Part 1**. The **transversal conventions and values** — how vintages are represented, what the default as-of resolution is — are owned by **Part 2**. The **consumer declaration obligation** — that a consumer declares its as-of condition, and the no-look-ahead requirement for simulations — is owned by **Part 5** as part of the consumption contract. The **revision-versioning mechanics** — how a revision is recorded, retained, and traced — remain in **Part 4**. Conflicts across the four are resolved at this Introduction.
-
-6. **Named project-wide authority.** Project-wide conventions — symbols, units, naming, state, decision, temporal conventions, and the master symbol registry — are owned by **BESS Engineering Part 1**. Part 1 of this model inherits from a specific, versioned release of that document; the pin is recorded in the Part 1 header and updated only through project change control (open item D1-O13). The pin independently blocks freeze.
-
-7. **Ownership of the rules above.** The rules above are owned by this Introduction. Changes are made here and referenced from the Parts. No Part shall declare them unilaterally.
-
----
-
-## 4. Canonical Data Lifecycle
-
-**Requirement → Entity Definition → Source Identification → Acquisition → Validation → Transformation → Storage → Delivery → Consumption → Feedback ↺**
-
-**Archival** is the terminal state for data that has exited active consumption.
-
-Nodes **Transformation**, **Storage**, and **Archival** are conditional: they apply only where a semantic or structural change is required, where persistence is required by a consumer contract, or where retention is required by Part 5.
-
-The detailed lifecycle rules are owned as follows:
-
-- acquisition branches: concept in **Part 1**, instances in **Part 3**;
-- null-transformation path: **Part 4**;
-- revision versioning: **Part 4**;
-- transversal timing and as-of conventions: **Part 2**;
-- delivery contracts: **Part 5**.
-
-Data Engineering owns the definition of a **data entity** and its **quality requirements**. **Operational/Optimization Engineering**, **Forecasting Engineering**, and **Financial Engineering** own **consumption**. Software Engineering owns the **implementation** of acquisition, transformation, storage, delivery, and archival.
-
----
-
-## 5. Structural Engineering Rules
-
-1. There shall be **one project-wide master symbol registry** (BESS Engineering Part 1).
-2. Every data concept shall have a **single semantic owner**.
-3. Entities and applicable quality requirements shall be defined before delivery contracts.
-4. Data requirements shall be evaluated against the needs of consuming engineering domains.
-5. Data periods shall map onto, not redefine, project temporal conventions.
-6. Evidence shall be classified as: verified source; engineering interpretation; modeling assumption; unresolved requirement.
-7. Entity definition, source, acquisition, validation, transformation, delivery, consumption, and archival shall not be conflated.
-8. Each Part shall define its interfaces, validation method, and acceptance criteria.
-9. Changes to shared foundations shall follow project change control.
-10. **Reference rule:** A downstream Part references a concept by identifier and does not redefine it.
-11. **Entity template reference rule:** The entity template is owned by this Introduction and applied by Part 3.
-
----
-
-## 6. Data Scope
-
-Data Engineering covers the data and input domain relevant to the project use case. The applicability of:
-
-- market data (prices, signals, awards, settlements);
-- BESS operational data (power, energy, SOC, temperature, SOH);
-- BESS configuration data (nameplate, limits, efficiency curves);
-- site and grid data (interconnection limits, network constraints);
-- forecasting inputs (weather, load, price drivers);
-- financial data (tariffs, contract prices, discount rates);
-- reference and master data (nodes, asset IDs, market product codes);
-- validation data (historical outcomes, benchmark results)
-
-shall be established in **Part 1** from project requirements and authoritative evidence.
-
-If multiple data environments are in scope, they retain distinct entity definitions, authority hierarchies, quality requirements, delivery semantics, and access/retention rules.
-
-**Scope vs. rule authority.** Project/customer requirements select scope (this section). They rank *sixth* for rule authority (Part 1, "Rule authority"). These are different questions.
-
-**Acquisition branch vs. data environment.** The acquisition branch (concept in Part 1, instance in Part 3) determines authority semantics; the data environment determines what reality the data represents. Separate axes.
-
----
-
-## 7. Cross-Cutting Considerations
-
-**Evidence and traceability.** Every material data requirement shall be traceable to its originating evidence. Maturity proportional to impact on eligibility, dispatch, delivery, settlement, and financial outputs. Detailed structure in Part 1.
-
-**Uncertainty.** Each Part owns the uncertainty of the concepts it defines. The classification scheme is defined in **Part 1**. Uncertainty types shall not be conflated.
-
-**Data-authority axis.** The axis concept — authoritative; authoritative-derived; non-authoritative; modeled; other — is **defined in Part 1**. The per-entity instance is owned by **Part 3**. Independent of the acquisition branch.
-
-**Quality dimensions.** Defined in **Part 1**; transversal thresholds owned by **Part 2**; entity-specific rules owned by **Part 4**.
-
-**Data Governance Engineering.** Data Governance Engineering will be defined in a separate document, requested under change request **CR-DE-001**. Until that document is issued, the interim arrangement is: the Data Source Owner role and Software Engineering jointly supply transversal quality thresholds to Part 2 and retention/confidentiality evidence to Part 5. The interim arrangement is authorized for the Part 2 freeze; CR-DE-001 formally closes when the separate document is issued and reviewed, and the Part 4 freeze gate requires it to be closed. This document states only the interface; it does not define the domain itself.
-
----
-
-## 8. Engineering Interfaces
-
-Each domain below is described in the form *the domain defines…; Data defines…*. Data is a hub and interfaces with each domain independently.
-
-**BESS Engineering.** BESS defines the physical entity model, configuration parameters, operating limits, response characteristics, and degradation-related requirements. Data defines the entities through which BESS operational and configuration state is represented, together with their quality requirements and delivery contracts.
-
-**Market Engineering.** Market defines what a signal means — its semantic content, publication timing, and observation conventions. Data defines how the signal is acquired, validated, and delivered to consumers.
-
-**Forecasting Engineering.** Forecasting owns forecast data entities and defines how future quantities are predicted, including their uncertainty. Data defines what historical and input data must exist and what quality it must satisfy for those forecasts to be produced.
-
-**Operational / Optimization Engineering.** Operational/Optimization defines how data is used in dispatch decisions and owns dispatch and trajectory entities. Data defines what data must exist and what quality it must satisfy for those decisions to be made.
-
-**Financial Engineering.** Financial Engineering defines how settlement, price, and cost data are used in economic valuation and owns valuation entities. Data defines what settlement, price, and cost entities must exist and what quality they must satisfy.
-
-**Software Engineering.** Data defines semantic and functional requirements. Software owns architecture and implementation.
-
-**Data Governance Engineering.** Referenced in §7. Data Engineering states the interface; Data Governance Engineering is defined in the document requested under CR-DE-001.
-
----
-
-## 9. Validation, Acceptance, and Freeze
-
-Each Part shall define its validation method, acceptance criteria, evidence requirements, unresolved items, and dependencies.
-
-**Terminology.** *Vacuous* means the check passes because no data falls under the condition being tested. *Indeterminate* means the check cannot be decided because a required input is missing or ambiguous; indeterminate is not a pass.
-
-Default validation categories:
-
-- **Source** — sources and their authority correctly represented.
-- **Semantic** — concepts correspond to actual entities; definition–instance rule applied.
-- **Temporal** — observation, publication, ingestion, availability, and as-of periods represented correctly; interval labeling, time zone, DST, resolution mapping applied.
-- **Quality** — quality requirements correctly evaluated; vacuous and indeterminate cases handled.
-- **Boundary** — every responsibility owned by exactly one domain; consumption path avoids Part 4 *value* references.
-- **Delivery** — delivery availability, timing, quality, access, and retention correctly distinguished.
-- **As-of** — as-of reads return the correct vintage; revisions preserved as separate vintages.
-- **Historical** — historical behavior and quality outcomes reproduced without look-ahead bias.
-
-Maturity ladder:
-
-**Semantic Definition → Internal Consistency → External Evidence → Engineering Validation → Frozen**
-
----
-
-## 10. Change Control
-
-**Owned by this Introduction:** the cross-Part rules in §3; the canonical data lifecycle (§4) including the conditional-node rule; the structural engineering rules (§5); the data entity definition template (§11); the identifier-scheme ownership declaration (§3, rule 3).
-
-Changes to these artifacts are made here and referenced from the Parts. Each Part owns its own content and follows its own change control.
-
-**Pending change request:** **CR-DE-001** — define Data Governance Engineering in a separate document.
-
----
-
-## 11. Data Entity Definition Template (Owned Here)
-
-Applied to every entity in **Part 3**:
-
-1. Definition
-2. Data Purpose
-3. Source Authority
-4. Acquisition Branch (concept in Part 1; instance in Part 3)
-5. Temporal Requirements (including as-of behavior, per the Part 2 as-of conventions)
-6. Quality Requirements
-7. Transformation Requirements
-8. Delivery Requirements
-9. Consumption Contract
-10. Interaction with Other Entities
-11. Lineage
-12. Technical Outputs
-13. Risks and Uncertainties (using the Part 1 classification scheme; quality-, lineage-, and reconciliation-specific uncertainty owned by Part 4)
-
-**Application rule:** Part 3 defines items 1–5, 12, and 13. Items 6–11 are owned by Part 4 or Part 5 and are referenced by identifier, using reserved final identifiers with `status = reserved` where necessary (§3, rule 2).
-
----
-
-## 12. Baseline Status and Next Activity
-
-**Status:** Baseline established — Part 1 development approved — Data model not yet frozen.
-
-Next activities, in freeze order:
-
-1. Resolve critical-path items: **D1-O01** (data scope), **D1-O02a/b** (authority axis concept and instance mapping), **D1-O03** (data environment applicability).
-2. Draft **Part 2 — Transversal Data Values** once D1-O01–O03 are resolved. The interim arrangement in §7 is authorized to supply transversal quality thresholds for the Part 2 freeze.
-3. Run the **pilot Data Entity sheet (D3-O15)** in parallel with Part 2 drafting.
-4. Freeze Part 2, then draft and freeze Part 3, Part 4, Part 5.
-5. Close **CR-DE-001** before the Part 4 freeze gate.
-
----
-
-## 13. Open Items
-
-**Prefix convention.** Open-item prefixes (`D1-`, `D2-`, `D5-`) are historical and record the Part that first raised the item. They are **not** ownership indicators. Ownership is recorded in the *Owner* column. An item may be owned by a Part different from its prefix, and this is intentional under the identifier-stability principle (ownership lives in a field, not in the identifier).
-
-| ID | Description | Owner | Blocks |
+| Domain | Engineering Model | Validated by | Test |
 |---|---|---|---|
-| D1-O01 | Data scope | Part 1 | Nearly all |
-| D1-O02a | Authority axis concept | Part 1 | Nearly all |
-| D1-O02b | Authority axis per-entity instance | Part 3 | Nearly all |
-| D1-O03 | Data environment applicability | Part 1 | Nearly all |
-| D1-O13 | Pinned BESS Engineering Part 1 version | Part 1 | Part 1 freeze |
-| D1-O14 | Transversal quality thresholds | Part 2 | Part 2 freeze, then Part 3 and Part 4 freeze |
-| D2-O01 | Time-zone and resolution conventions | Part 2 | Part 2 freeze, then Part 3 freeze |
-| D2-O02 | Null/missing-data conventions | Part 2 | Part 2 freeze, then Part 3 freeze |
-| D2-O03a | Lineage and transformation conventions *(retired from v0.3; superseded by D2-O04 and Part 4 rules)* | — | — |
-| D2-O04 | As-of conventions *(new ID; replaces the meaning previously attached to D2-O03)* | Part 2 | Part 2 freeze, then Part 3 freeze |
-| D3-O15 | Pilot Data Entity sheet | Part 3 | Validation of Part 2 |
-| D5-O10 | Access, confidentiality, and retention rules | Part 5 | Acceptance |
-| CR-DE-001 | Data Governance Engineering document | Separate document | Part 4 freeze (interim arrangement authorized for Part 2 freeze) |
+| BESS | Physical asset model | D-01–D-12; manufacturer data; historical operation | Dispatch feasibility against D-01–D-12 on sampled schedules; degradation trajectory within the manufacturer band defined by D-07. |
+| Market | Market participation model | D-13–D-17; settlement rules | Where the asset exists: simulated settlement reproduces **settlement records**. Where it does not: simulated settlement is compared against an **independent reference** — settlement statements from a comparable asset in the same market, or the operator's published worked examples. If neither is available, the test is stated as **unverified for Phase 2** and flagged as a Phase 2 risk. The Market Engineering test specification, produced by the Market Engineering driver in Phase 1, names the reference. |
+| Data / Input | Data pipeline | D-18–D-22; quality reports; lineage | Every model-ready row traces to a raw source row; validation report reproducible. |
+| Forecasting | Forecast models (price, load, weather) | D-23–D-27 | Out-of-sample error within the tolerance set by OI-16. |
+| Operational / Optimization | Dispatch and stacking formulation | D-28–D-31; schedule feasibility | Schedule feasible against D-01–D-12 and D-30; backtest revenue within the tolerance set by OI-25. |
+| Financial | Financial model (NPV, IRR, payback) | D-32–D-36 | **Arithmetic test.** NPV and IRR computed from a reference cash-flow match a hand-computed reference within a numeric tolerance stated in the Financial Engineering test specification, a Phase 1 deliverable of the Financial Engineering driver. This confirms the calculation, not correspondence to reality; model validity is addressed in Phase 2 through backtesting once OI-21 and OI-25 are answered. |
+| Validation | Backtesting and acceptance framework | D-37–D-40 | Model output meets the threshold defined by OI-25 on the baseline defined by OI-26. |
 
 ---
 
-## 14. Guiding Principle
+## 11. Phase 1 Open-Item Registry
 
-> **What data must exist, what must it mean, where does it come from, what quality must it satisfy, under what as-of conditions may it be read, how is it delivered, and how is it retained?**
+**Flag key.**
+
+- **Gating** — blocks Phase 2 until answered.
+- **Conditional** — the item may not apply at all, depending on how a gating item resolves.
+- **Sequenced** — the item always applies, but must be answered after a gating item because its content depends on the gating answer.
+- **Deferred** — applies in Phase 2 or later; not gating, and does not depend on a gating item.
+
+| ID | Domain | Item | Answer owner | Driver | Flag | Depends on |
+|---|---|---|---|---|---|---|
+| OI-01 | BESS | Asset exists or hypothetical | ENGIE | BESS Eng. | Gating | — |
+| OI-02 | BESS | Degradation curves supplied or literature-based | ENGIE | BESS Eng. | Gating | — |
+| OI-03 | BESS | Subsystem-level data available | ENGIE | BESS Eng. | Conditional | OI-01 |
+| OI-04 | BESS | Historical operational data available | ENGIE | BESS Eng. | Conditional | OI-01 |
+| OI-05 | BESS | Augmentation plan available | ENGIE | BESS Eng. | Conditional | OI-01 |
+| OI-06 | Market | Markets in scope | ENGIE | Market Eng. | Gating | — |
+| OI-07 | Market | Ancillary products in scope | ENGIE | Market Eng. | Gating | OI-06 |
+| OI-08 | Market | Price-taker or price-maker | ENGIE | Market Eng. | Gating | OI-06 |
+| OI-09 | Market | Settlement / penalty documentation source | ENGIE | Market Eng. | Gating | OI-06 |
+| OI-10 | Data | Existing sources inventory, **including quality conventions** | ENGIE IT | Data Eng. | Gating | — |
+| OI-11 | Data | Access method per source | ENGIE IT | Data Eng. | Sequenced | OI-10 |
+| OI-12 | Data | Databricks workspace status | ENGIE IT | Data Eng. | Sequenced | OI-10 |
+| OI-13 | Data | Historical depth available | ENGIE | Data Eng. | Gating | OI-06, OI-10 |
+| OI-14 | Data | Data practicalities: licensing, timezone/DST, SCADA access, security approvals | ENGIE IT | Data Eng. | Sequenced | OI-10 |
+| OI-15 | Forecasting | BTM or front-of-meter | ENGIE | Forecasting Eng. | Gating | OI-01 |
+| OI-16 | Forecasting | Forecast-error assumptions acceptable | ENGIE | Forecasting Eng. | Sequenced | OI-17, OI-25 |
+| OI-17 | Operational | Base-case strategy | ENGIE | Ops/Opt. Eng. | Gating | OI-06 |
+| OI-18 | Operational | Decision horizon | ENGIE | Ops/Opt. Eng. | Sequenced | OI-17 |
+| OI-19 | Operational | Binding operational constraints | ENGIE | Ops/Opt. Eng. | Sequenced | OI-01, OI-17 |
+| OI-20 | Operational | Risk posture | ENGIE | Ops/Opt. Eng. | Sequenced | OI-17 |
+| OI-21 | Financial | CAPEX / OPEX base case | ENGIE | Financial Eng. | Gating | OI-01 |
+| OI-22 | Financial | Discount rate and accounting life | ENGIE | Financial Eng. | Deferred | — |
+| OI-23 | Financial | Incentives / subsidies applicable | ENGIE | Financial Eng. | Conditional | OI-21 |
+| OI-24 | Financial | Binding contracts (PPA, tolling, RA) | ENGIE | Financial Eng. | Conditional | OI-06 |
+| OI-25 | Validation | Acceptance metric and numeric threshold | ENGIE | Validation Eng. | Gating | OI-17 |
+| OI-26 | Validation | Baseline definition | ENGIE | Validation Eng. | Gating | OI-17 |
+| OI-27 | Validation | Required stress scenarios | ENGIE | Validation Eng. | Sequenced | OI-06, OI-25 |
+| OI-28 | BESS | Renewable co-location confirmed | ENGIE | BESS Eng. | Conditional | OI-01 |
+| OI-29 | BESS | Interconnection and POI limits provided | ENGIE | BESS Eng. | Gating | OI-01 |
+
+**Totals.** 29 open items. **Gating: 14**. **Sequenced: 8**. **Conditional: 6**. **Deferred: 1**.
+
+**Notes.**
+
+- Quality conventions are covered by **OI-10**, whose wording includes them.
+- Native market resolution is **not** an open item — it is a public fact once OI-06 is known.
+- Discount rate (OI-22) is **Deferred**: a placeholder is standard practice.
 
 ---
 
-*End of Data Engineering Model — Introduction Document (v0.4)*
+## 12. Phase 1 Decisions Log
+
+The registry is §11; this is the log of the answers.
+
+| ID | Decision | Answer | Answer owner | Driver | Flag | Due | Date closed |
+|---|---|---|---|---|---|---|---|
+| OI-01 | Asset exists or hypothetical | | ENGIE | BESS Eng. | Gating | | |
+| OI-02 | Degradation curves supplied or literature-based | | ENGIE | BESS Eng. | Gating | | |
+| OI-03 | Subsystem-level data available | | ENGIE | BESS Eng. | Conditional | | |
+| OI-04 | Historical operational data available | | ENGIE | BESS Eng. | Conditional | | |
+| OI-05 | Augmentation plan available | | ENGIE | BESS Eng. | Conditional | | |
+| OI-06 | Markets in scope | | ENGIE | Market Eng. | Gating | | |
+| OI-07 | Ancillary products in scope | | ENGIE | Market Eng. | Gating | | |
+| OI-08 | Price-taker or price-maker | | ENGIE | Market Eng. | Gating | | |
+| OI-09 | Settlement / penalty documentation source | | ENGIE | Market Eng. | Gating | | |
+| OI-10 | Existing sources inventory, including quality conventions | | ENGIE IT | Data Eng. | Gating | | |
+| OI-11 | Access method per source | | ENGIE IT | Data Eng. | Sequenced | | |
+| OI-12 | Databricks workspace status | | ENGIE IT | Data Eng. | Sequenced | | |
+| OI-13 | Historical depth available | | ENGIE | Data Eng. | Gating | | |
+| OI-14 | Data practicalities | | ENGIE IT | Data Eng. | Sequenced | | |
+| OI-15 | BTM or front-of-meter | | ENGIE | Forecasting Eng. | Gating | | |
+| OI-16 | Forecast-error assumptions | | ENGIE | Forecasting Eng. | Sequenced | | |
+| OI-17 | Base-case strategy | | ENGIE | Ops/Opt. Eng. | Gating | | |
+| OI-18 | Decision horizon | | ENGIE | Ops/Opt. Eng. | Sequenced | | |
+| OI-19 | Binding operational constraints | | ENGIE | Ops/Opt. Eng. | Sequenced | | |
+| OI-20 | Risk posture | | ENGIE | Ops/Opt. Eng. | Sequenced | | |
+| OI-21 | CAPEX / OPEX base case | | ENGIE | Financial Eng. | Gating | | |
+| OI-22 | Discount rate and accounting life | | ENGIE | Financial Eng. | Deferred | | |
+| OI-23 | Incentives / subsidies applicable | | ENGIE | Financial Eng. | Conditional | | |
+| OI-24 | Binding contracts (PPA, tolling, RA) | | ENGIE | Financial Eng. | Conditional | | |
+| OI-25 | Acceptance metric and numeric threshold | | ENGIE | Validation Eng. | Gating | | |
+| OI-26 | Baseline definition | | ENGIE | Validation Eng. | Gating | | |
+| OI-27 | Required stress scenarios | | ENGIE | Validation Eng. | Sequenced | | |
+| OI-28 | Renewable co-location confirmed | | ENGIE | BESS Eng. | Conditional | | |
+| OI-29 | Interconnection and POI limits provided | | ENGIE | BESS Eng. | Gating | | |
+
+When every **gating** row is filled, Phase 2 can start. Sequenced, Conditional, and Deferred rows close during Phase 2.
 
 ---
 
-**Cover note (outside the controlled document).** Records the changes applied in v0.4 in response to the 91/100 review. Not part of the controlled body.
-
-**Last consumption-path violation closed**
-
-- *Data-uncertainty classification*: concept moved to **Part 1** (§2 row, §7, §11 item 13). Part 4 now owns only quality-, lineage-, and reconciliation-specific uncertainty.
-
-**§4 contradiction removed**
-
-- The phrase assigning acquisition branches to Part 4 is gone. §4 now lists ownership cleanly: acquisition branches (Part 1 concept, Part 3 instances), null-transformation path (Part 4), revision versioning (Part 4), transversal timing/as-of conventions (Part 2), delivery contracts (Part 5).
-
-**Open-items table corrected**
-
-- **D1-O02 split** into D1-O02a (Part 1 concept) and D1-O02b (Part 3 instance), per §3 rule 4.
-- **Blocking column corrected**: Part 2 items now block the **Part 2** freeze first, then Part 3 / Part 4.
-- **Prefix convention** documented above the table: prefixes are historical, ownership lives in the *Owner* column.
-- **D2-O03 retired** and replaced by **D2-O04** for as-of conventions; the retired row is kept for traceability rather than reused with a new meaning.
-
-**CR-DE-001 critical path clarified**
-
-- §7 now states the interim arrangement is **authorized for the Part 2 freeze**, and CR-DE-001 closes formally when the separate document is issued. The Part 4 freeze gate requires CR-DE-001 to be closed. §13 table updated to match.
-
-**Minor points addressed**
-
-- **Display prefix restored**: §3 rule 3 now defines the optional `DE:` prefix as display-only and never part of the identifier. "Unique on the unprefixed form" has a referent again.
-- **§4 consumption owners** now include **Financial Engineering**.
-- **Part naming** in §1 verified against the convention used by BESS Engineering and Market Engineering.
-- **As-of placement** refined: concept in Part 1, conventions in Part 2, consumer obligation and no-look-ahead in Part 5, revision mechanics in Part 4. §3 rule 5 and §11 item 5 updated.
-
-**Recommendation.** Per the 91/100 review, this is the stopping point for the Introduction. Remaining gains depend on external evidence — D1-O13 (BESS Part 1 version pin), D1-O14 (transversal quality thresholds from the interim arrangement), CR-DE-001 (Data Governance Engineering document) — and on contact with real data through the pilot Data Entity sheet (D3-O15). Further iteration on the Introduction would produce diminishing returns; the pilot will test the framework harder than another review.
+*End of Data Scope and Requirements — BESS Integrated Model, Client edition, v3.0*
