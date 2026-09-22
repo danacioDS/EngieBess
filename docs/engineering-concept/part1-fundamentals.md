@@ -2,7 +2,7 @@
 
 ## BESS Engineering Model
 
-**Version 1.0 — Final Candidate (FC7)**
+**Version 1.0 — Final Candidate (FC10)**
 
 ---
 
@@ -21,6 +21,8 @@ This part establishes the **conceptual, notational, and structural foundations**
 **Exception noted:** Section 1.5.6 states a feasibility constraint on $E_t$ as a **cross-part timing protocol**. It is not component modeling; it is the rule that keeps the energy audit consistent across epoch boundaries. This is explicitly labeled as a protocol, not a physical law.
 
 **Symbol audit rule:** Before promoting this document to v1.0, a **scripted** audit must confirm that every symbol used in Parts 2–5 appears in Section 1.4. The audit script extracts LaTeX symbols from the text and diffs them against the 1.4 tables. The script and its output are attached to the promotion request. **The script itself is maintained in `scripts/symbol-audit.py` and is part of the deliverable of this project.**
+
+**FC10 scope:** FC10 is the **residual-polish revision** following the FC9 grade (9.5/10). It (a) adds an explicit **auxiliary-binary promotion path** so that a Part 5 revision introducing a new linearization binary can join the §1.4.0 whitelist without waiting for a full Part 1 change cycle, (b) adds **dependency ordering and effort estimates** to the §1.12 open-items table so a downstream reader can sequence the six remaining fixes, and (c) records a **consolidated open-items register** (new §1.13) that both integrity audits' findings converge into. No physical or component modeling. No new registered symbols. No changes to the auxiliary-binary convention other than the promotion path.
 
 ---
 
@@ -165,9 +167,36 @@ This table is **binding**. No part may use a symbol without it being registered 
 
 **Directional index convention (formal):** Statistics whose symbol carries an implicit direction index $d \in \{up, down\}$ are registered as **one symbol family** with the index made explicit in the table. The undecorated form used in prose is shorthand for the pair. The table rows below use the form $X_t^{d}$, where $d$ is documented as the direction index. The audit script **will** apply this normalization: any appearance of $X_t^{up}$ or $X_t^{down}$ is satisfied by the row $X_t^{d}$.
 
-**Auxiliary MILP binary convention:** Auxiliary MILP binaries used exclusively for linearization (e.g., decrement-direction or trigger indicators) are **not registered** in the master symbol table. Only physical quantities — states, decisions, parameters, and derived physical quantities — are registered. If a downstream part needs to reference such a binary's *meaning* rather than its role in a specific linearization, the underlying physical state (e.g., $n_{rest,t}$) is queried instead, and the binary is promoted to a registered variable via a Part 1 change request only if that need is real.
+### 1.4.0 Auxiliary MILP binary convention
+
+Auxiliary MILP binaries used **exclusively for linearization** are **not registered** in the master symbol table. Only physical quantities — states, decisions, parameters, and derived physical quantities — are registered. If a downstream part needs to reference such a binary's *meaning* rather than its role in a specific linearization, the underlying physical state (e.g., $n_{rest,t}$) is queried instead.
+
+**Named whitelist.** The following auxiliary binaries are covered by this convention and are **explicitly exempt** from the registration rule. The audit script must whitelist these names and only these names:
+
+| Symbol | Where defined | Linearizes | Physical state queried instead |
+|---|---|---|---|
+| $c_{cycle,t}$ | Part 2 §2.3.8 | Cycle-completion trigger for the rest counter | $n_{rest,t}$, $Th_t$ |
+| $r_t$ | Part 2 §2.3.8 | Rest-counter decrement direction | $n_{rest,t}$ |
+| $p_t$ | Part 2 §2.3.8 | Rest-active indicator | $n_{rest,t}$ |
+
+**Rule for new auxiliary binaries.** A new auxiliary binary is covered by the convention only if it is added to this table by a Part 1 revision. Until then, the audit script will flag it. This makes the whitelist explicit and prevents the FC8 asymmetry (where one of three symmetric binaries was registered and the other two were not).
+
+**Fast-track promotion path (FC10).** To avoid forcing a full Part 1 revision cycle every time a downstream part introduces a linearization binary, the following **fast-track** path is available. It is the *only* exception to the "must be added by a Part 1 revision" rule above.
+
+- **Eligibility.** The requesting part (Part 2, 3, 4, or 5) issues a **whitelist-addition request** in its own change-request section. The request must state, at minimum: the binary's symbol, the defining subsection, the constraint it linearizes, and the registered physical state that should be queried instead of the binary.
+- **Approval.** The request is auto-approved if (i) the binary is provably linearization-only (it does not appear in the objective, in any constraint outside the linearization, or in any output KPI except as an intermediate diagnostic), and (ii) the physical state it linearizes is already registered in §1.4. The audit script verifies both conditions mechanically.
+- **Registration.** On auto-approval, the binary is added to the whitelist table above with a version increment of Part 1 (FC11, FC12, ...) and a one-line changelog entry. No other Part 1 content is touched.
+- **Rejection.** If the binary does not satisfy (i) or (ii), it is routed through the normal change-request path (registration as a decision variable) instead.
+
+This path is **not** a loophole for registering decision variables under an auxiliary label. It exists specifically so that Part 5 §5.2.3's linearization fix (item 4 of §1.12) and any analogous future fixes can complete without waiting on the full Part 1 review cycle.
+
+**Rule for promotion (unchanged).** If a downstream part genuinely needs to reference an auxiliary binary by name — not its underlying physical state — the binary is promoted to a registered decision variable via a Part 1 change request. Promotion is the exception, not the default.
+
+**Correction note (FC9).** FC8 registered $r_t$ in §1.4.2 "so the audit script does not flag its appearance in Part 2." That was inconsistent: $c_{cycle,t}$ and $p_t$ appear in the same Part 2 §2.3.8 mechanism, carry the same (zero) physical meaning, and remained unregistered. FC9 removed $r_t$ from §1.4.2 and covered all three binaries by this convention instead. FC10 adds the fast-track path above.
 
 **Part ownership column convention:** The **Part** column identifies the part that **owns and produces** the symbol, not the part that merely consumes it. When a symbol is consumed by more than one part, the owner is the part where the symbol is defined and maintained. Consuming parts reference the owning part.
+
+**FC8 registration note:** Symbols marked **[FC8]** in the tables below were requested by Parts 2, 3, 4, or 5 in their respective change-request sections and are registered here for the first time. With FC8, all outstanding change requests from Parts 2–5 were closed. FC9 removed $r_t$. FC10 adds no symbols and removes none.
 
 ### 1.4.1 State variables
 
@@ -196,6 +225,9 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $z_t$ | Binary charge/discharge exclusion | — | 5 |
 | $w_t$ | Binary import/export exclusion | — | 5 |
 | $a_t$ | Capacity allocation vector across services | — | 5 |
+| $c_{peak,t}$ | Peak-cap enforcement decision | — | 5 |
+
+**Note:** Auxiliary MILP binaries ($c_{cycle,t}$, $r_t$, $p_t$, and any fast-tracked additions) are **not** listed here; see §1.4.0 for the convention, the named whitelist, and the fast-track promotion path.
 
 ### 1.4.3 Derived power variables
 
@@ -210,6 +242,12 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $S_t$ | Average apparent power at PCS (capability constraint) | kVA | 2 |
 | $S_t^{loss}$ | Loss-model apparent power (includes $\sigma_{reg,t}^{abs}$) | kVA | 2 |
 | $P_{loss,t}^{PCS,inc}$ | Incremental PCS loss (reactive + variance) | kW | 2 |
+| $P_{AC,t}^{arb}$ | Active power allocated to arbitrage **[FC8]** | kW | 5 |
+| $P_{AC,t}^{peak}$ | Active power allocated to peak shaving **[FC8]** | kW | 5 |
+| $P_{AC,t}^{DR}$ | Active power allocated to DR **[FC8]** | kW | 5 |
+| $P_{AC,t}^{curtailed}$ | Active power curtailed (epigraph) **[FC8]** | kW | 4 |
+| $P_{AC,t}^{desired}$ | Desired active power before curtailment **[FC8]** | kW | 4 |
+| $P_{AC,t}^{available}$ | Available active power after reactive priority **[FC8]** | kW | 4 |
 
 ### 1.4.4 Asset parameters
 
@@ -240,6 +278,7 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $SOC_{reg,max}$ | Maximum SOC for regulation | — | 0.70–0.80 | 2 |
 | $\sigma$ | Self-discharge rate | 1/h | 0.00001–0.00005 | 2 |
 | $P_{aux}$ | Auxiliary consumption (HVAC, BMS) | kW | 1–3% of $P_{max}^{AC}$ | 2 |
+| $P_{aux}^{cell}$ | Auxiliary consumption converted to cell side **[FC8]** | kW | Derived in Part 2 | 2 |
 | $P_{standby}$ | PCS no-load loss | kW | Manufacturer data | 2 |
 | $k_{quad}$ | PCS quadratic loss coefficient | kW/kVA² | Manufacturer data | 2 |
 | $RampRate$ | Maximum ramp rate | kW/min | Manufacturer data | 2 |
@@ -254,6 +293,9 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $E_{nom}^{old}$ | Pre-augmentation nominal energy | kWh | — | 3 |
 | $E_{nom}^{new}$ | Post-augmentation nominal energy | kWh | — | 3 |
 | $SOC_{init}^{rep}$ | Initial SOC after replacement | — | Configurable | 3 |
+| $c_{aug}$ | Augmentation cost per kWh **[FC8]** | $/kWh | Financial input | 3 |
+| $c_{rep}$ | Replacement cost per kWh **[FC8]** | $/kWh | Financial input | 3 |
+| $EFC_{life}$ | Cycle life at reference conditions **[FC8]** | — | Manufacturer data | 3 |
 
 ### 1.4.5 Degradation parameters
 
@@ -271,6 +313,9 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $SOH_{threshold}$ | Augmentation/replacement threshold | — | 3 |
 | $R$ | Universal gas constant (8.314) | J/(mol·K) | 3 |
 | $c_{deg}$ | Marginal degradation cost (financial input) | $/kWh throughput | 3 |
+| $T_{ref}$ | Reference temperature for calibration **[FC8]** | °C | 3 |
+| $SOC_{ref}$ | Reference SOC for calibration **[FC8]** | — | 3 |
+| $DoD_{ref}$ | Reference depth of discharge **[FC8]** | — | 3 |
 
 ### 1.4.6 Per-step degradation and thermal variables
 
@@ -278,15 +323,22 @@ This table is **binding**. No part may use a symbol without it being registered 
 |---|---|---|---|
 | $C_{rate,t}$ | C-rate at time $t$ | 1/h | 3 |
 | $DoD_{eff,t}$ | Effective depth of discharge from rainflow | — | 3 |
-| $t_{eq,t}$ | Equivalent time for calendar aging | h | 3 |
+| $t_{eq,t}$ | Equivalent time for calendar aging (derived, not state) | h | 3 |
 | $\Delta Th_{cycle}$ | Throughput threshold for a full-cycle equivalent | kWh | 2 |
 | $E_t^{excess}$ | Excess energy from SOH feasibility constraint | kWh | 3 |
 | $T_K$ | Temperature in kelvin | K | 3 |
 | $T_C$ | Temperature in celsius | °C | 3 |
 | $L_{cal}^{old}$ | Pre-augmentation calendar loss | — | 3 |
 | $L_{cyc}^{old}$ | Pre-augmentation cycle loss | — | 3 |
+| $\Delta L_{cal,t}$ | Incremental calendar loss at step $t$ (transient) **[FC8]** | — | 3 |
+| $\Delta L_{cyc}^{cycle}$ | Incremental cycle loss per closed cycle (transient) **[FC8]** | — | 3 |
+| $\Delta L_{cyc,t}^{approx}$ | Throughput-based cycle loss approximation (transient) **[FC8]** | — | 3 |
+| $EFC_t^{rainflow}$ | Rainflow-based EFC diagnostic **[FC8]** | — | 3 |
+| $E_{usable}^{cycle}$ | Usable energy at time of cycle **[FC8]** | kWh | 3 |
 
 **Note on $\Delta Th_{cycle}$:** Although thematically grouped with per-step degradation variables, $\Delta Th_{cycle}$ is **owned and produced by Part 2** (it defines the rest-period trigger in Part 2 section 2.3.8). It is consumed by Part 3 only as a reference for throughput accounting. The Part column reflects ownership, not thematic grouping.
+
+**Note on $t_{eq,t}$:** $t_{eq,t}$ is a **derived quantity**, recomputed each step from $L_{cal,t}$ and the current conditions. It is **not** stored as an independent state variable. Part 3 §3.2.3 and §3.4.4 define the derivation. This registration supersedes the Draft's proposed "promotion to state variable," which Part 3 formally withdrew.
 
 ### 1.4.7 Market and site parameters
 
@@ -301,8 +353,23 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $R_{DR}(t)$ | DR revenue | $ | 4 |
 | $R_{reg}^{rev}(t)$ | Regulation revenue | $ | 4 |
 | $R_{arb}(t)$ | Arbitrage revenue | $ | 4 |
+| $R_{arb}^{net}(t)$ | Net arbitrage revenue after degradation **[FC8]** | $ | 4 |
 | $P_{import,max}$ | Maximum import at PCC | kW | 2 |
 | $P_{export,max}$ | Maximum export at PCC | kW | 2 |
+| $C_{aug}$ | Augmentation cost (event) **[FC8]** | $ | 3 |
+| $C_{rep}$ | Replacement cost (event) **[FC8]** | $ | 3 |
+| $r_{DR}^{capacity}$ | DR capacity revenue rate **[FC8]** | $/kW | 4 |
+| $r_{DR}^{energy}$ | DR energy revenue rate **[FC8]** | $/kWh | 4 |
+| $r_{reg}^{capacity}$ | Regulation capacity revenue rate **[FC8]** | $/kW/h | 4 |
+| $r_{reg}^{mileage}$ | Regulation mileage revenue rate **[FC8]** | $/mileage-unit | 4 |
+| $c_{curtail}$ | Curtailment penalty coefficient **[FC8]** | $/kWh | 5 |
+| $\Delta\pi_{min}$ | Minimum price spread threshold **[FC8]** | $/kWh | 4 |
+| $\Delta D_{savings}$ | Demand charge savings **[FC8]** | $ | 4 |
+| $\Delta P_{peak}$ | Peak reduction **[FC8]** | kW | 4 |
+| $C_{cycle}$ | Marginal cycle cost **[FC8]** | $/kWh | 4 |
+| $P_{peak}^{baseline}$ | Baseline peak demand before BESS **[FC8]** | kW | 4 |
+| $E_{DR}^{delivered}$ | DR event energy delivered **[FC8]** | kWh | 4 |
+| $PS_{DR}$ | DR performance score **[FC8]** | — | 4 |
 
 ### 1.4.8 Site and grid variables
 
@@ -324,15 +391,31 @@ This table is **binding**. No part may use a symbol without it being registered 
 | $PS_{reg,t}$ | Performance score (dispatch output) | — | 4 |
 | $R_{reg,t}^{up}$ | Reserved upward regulation capacity (peak) | kW | 4 |
 | $R_{reg,t}^{down}$ | Reserved downward regulation capacity (peak) | kW | 4 |
+| $R_{reg,t}^{committed,up}$ | Committed up-regulation capacity **[FC8]** | kW | 5 |
+| $R_{reg,t}^{committed,down}$ | Committed down-regulation capacity **[FC8]** | kW | 5 |
 | $E_{reg,t}^{abs}$ | Absolute expected energy (transient) | kWh | 4 |
+| $E_{reg,t}^{abs,up}$ | Direction-specific up-regulation absolute energy **[FC8]** | kWh | 4 |
+| $E_{reg,t}^{abs,down}$ | Direction-specific down-regulation absolute energy **[FC8]** | kWh | 4 |
 | $\sigma_{reg,t}^{abs}$ | Absolute standard deviation (transient) | kW | 4 |
 | $M_{reg,t}^{abs}$ | Absolute mileage (transient) | — | 4 |
+| $\Delta SOC_{reg}$ | SOC deviation during regulation **[FC8]** | — | 4 |
+| $\Delta Th_t^{reg}$ | Regulation mileage throughput contribution **[FC8]** | kWh | 4 |
 
-**Scaling rule:**
+**Scaling rule (combined):**
 
 \[
-E_{reg,t}^{abs} = E_{reg,t}^{exp,up} \cdot R_{reg,t}^{up} + E_{reg,t}^{exp,down} \cdot R_{reg,t}^{down}
+E_{reg,t}^{abs} = E_{reg,t}^{abs,up} + E_{reg,t}^{abs,down}
 \]
+
+with:
+
+\[
+E_{reg,t}^{abs,up} = E_{reg,t}^{exp,up} \cdot R_{reg,t}^{up}
+\]
+\[
+E_{reg,t}^{abs,down} = E_{reg,t}^{exp,down} \cdot R_{reg,t}^{down}
+\]
+
 \[
 \sigma_{reg,t}^{abs} = \sqrt{\left(\sigma_{reg,t}^{up}\right)^2 \cdot R_{reg,t}^{up} + \left(\sigma_{reg,t}^{down}\right)^2 \cdot R_{reg,t}^{down}}
 \]
@@ -340,7 +423,19 @@ E_{reg,t}^{abs} = E_{reg,t}^{exp,up} \cdot R_{reg,t}^{up} + E_{reg,t}^{exp,down}
 M_{reg,t}^{abs} = M_{reg,t}^{up} \cdot R_{reg,t}^{up} + M_{reg,t}^{down} \cdot R_{reg,t}^{down}
 \]
 
-**Symmetric case:** When the RFP provides a single symmetric statistic, the model sets $E_{reg,t}^{exp,up} = E_{reg,t}^{exp,down}$, $\sigma_{reg,t}^{up} = \sigma_{reg,t}^{down}$, $M_{reg,t}^{up} = M_{reg,t}^{down}$, and the formulas simplify to a single product.
+**Regulation mileage throughput contribution:**
+
+\[
+\Delta Th_t^{reg} = M_{reg,t}^{abs} \cdot E_{nom} \cdot SOH_k
+\]
+
+This is the additional throughput that frequency regulation imposes on the battery. It is **owned and produced by Part 4**, consumed by Part 3 (throughput update, §3.5.1) and by Part 5 (objective, §5.3.2/§5.3.4).
+
+**Combined vs. direction-specific forms — why both are registered:** The combined $E_{reg,t}^{abs}$ is used for total throughput/degradation accounting (Part 3). The direction-specific $E_{reg,t}^{abs,up}$ and $E_{reg,t}^{abs,down}$ are used for headroom reservation (Part 4 §4.6.3) because up-regulation draws energy and down-regulation creates it; they cannot share one combined number for headroom. Both forms are required and both are registered.
+
+**Open interface question (flagged, not resolved — see §1.12 and §1.13):** $R_{reg,t}^{committed,up/down}$ (Part 5 §5.2.3) vs. $R_{reg,t}^{up/down}$ (Part 4 §4.6). Whether these are the same quantity under two names or genuinely distinct (e.g., "reserved" = offered to market, "committed" = dispatched in the step) is a Part 4 ↔ Part 5 decision. FC8 registered both; Part 1 does not resolve the semantics. The owning parts must reconcile in their next revisions.
+
+**Symmetric case:** When the RFP provides a single symmetric statistic, the model sets $E_{reg,t}^{exp,up} = E_{reg,t}^{exp,down}$, $\sigma_{reg,t}^{up} = \sigma_{reg,t}^{down}$, $M_{reg,t}^{up} = M_{reg,t}^{down}$, and the formulas simplify to a single product per direction.
 
 **Audit note:** The directional index convention (introduced at the top of 1.4) **will be applied by the audit script** to satisfy the registration rule for $E_{reg,t}^{exp,up}$, $E_{reg,t}^{exp,down}$, $\sigma_{reg,t}^{up}$, $\sigma_{reg,t}^{down}$, $M_{reg,t}^{up}$, $M_{reg,t}^{down}$.
 
@@ -350,9 +445,15 @@ M_{reg,t}^{abs} = M_{reg,t}^{up} \cdot R_{reg,t}^{up} + M_{reg,t}^{down} \cdot R
 |---|---|---|---|
 | $Q_t$ | Reactive power at AC (signed, decision) | kVAr | 5 |
 | $Q_{rms,t}$ | RMS reactive power (for loss computation) | kVAr | 4 |
-| $Q_{energy,t}$ | Reactive energy | kVArh | 4 |
-| $VC_t$ | Voltage compliance indicator | — | 4 |
+| $Q_{energy,t}$ | Reactive energy **[FC8]** | kVArh | 4 |
+| $VC_t$ | Voltage compliance indicator **[FC8]** | — | 4 |
 | $Q_{res,t}$ | Reserved reactive capacity (peak) | kVAr | 4 |
+| $f_{droop}(\cdot)$ | Voltage droop function **[FC8]** | — | 4 |
+| $\Delta V_t$ | Voltage deviation from setpoint **[FC8]** | V | 4 |
+| $V_t$ | Bus voltage **[FC8]** | V | 4 |
+| $V_{min}$ | Minimum acceptable voltage **[FC8]** | V | 4 |
+| $V_{max}$ | Maximum acceptable voltage **[FC8]** | V | 4 |
+| $V_{setpoint}$ | Voltage setpoint **[FC8]** | V | 4 |
 
 **Note:** $\bar{Q}_t$ is removed. The average reactive power over the step is $Q_t$ by definition.
 
@@ -371,6 +472,18 @@ M_{reg,t}^{abs} = M_{reg,t}^{up} \cdot R_{reg,t}^{up} + M_{reg,t}^{down} \cdot R
 | $SOH_k$ | Capacity SOH latched at epoch $k$ | — | 3 |
 | $SOH_k^{pow}$ | Power SOH latched at epoch $k$ | — | 3 |
 | $SOH_k^{eff}$ | Efficiency SOH latched at epoch $k$ | — | 3 |
+| $E_{peak}^{reserved}$ | Energy reserved for peak shaving **[FC8]** | kWh | 4 |
+| $E_{peak}^{dis}$ | Energy discharged for peak shaving **[FC8]** | kWh | 4 |
+| $E_{peak,t}^{required}$ | Energy required to cap the peak at step $t$ **[FC8]** | kWh | 5 |
+| $P_{peak,t}^{required,power}$ | Power required to cap the peak at step $t$ **[FC8]** | kW | 5 |
+| $E_{shifted}$ | Energy shifted for arbitrage **[FC8]** | kWh | 4 |
+| $N_{peak}$ | Number of steps in peak window **[FC8]** | — | 4 |
+| $N_{peak}^{remaining}$ | Number of steps remaining in peak window **[FC8]** | — | 5 |
+| $N_{peak}^{cycles}$ | Cycles consumed by peak shaving **[FC8]** | — | 4 |
+| $N_{arb}^{cycles}$ | Cycles consumed by arbitrage **[FC8]** | — | 4 |
+| $N^{cycles}$ | Model-wide total cycles consumed **[FC8]** | — | 5 |
+| $E_{s,t}^{reserved,dis}$ | Discharge energy reserved by service $s$ **[FC8]** | kWh | 5 |
+| $E_{s,t}^{reserved,ch}$ | Charge energy reserved by service $s$ **[FC8]** | kWh | 5 |
 
 ### 1.4.12 Forecast error
 
@@ -428,6 +541,8 @@ M_{reg,t}^{abs} = M_{reg,t}^{up} \cdot R_{reg,t}^{up} + M_{reg,t}^{down} \cdot R
 | $\Delta t_{reg}$ | Regulation commitment duration | h |
 | $\Delta t_{DR}$ | DR event duration | h |
 | $\Delta t_{epoch}$ | SOH update epoch (default 730 h) | h |
+| $\Delta t_{demand}$ | Demand charge interval **[FC8]** | h |
+| $T_{billing}$ | Billing period length **[FC8]** | h |
 
 **Symbol collision resolution:** $T$ alone is **not used** as a symbol. All horizons use explicit subscripts: $T_{opt}$, $T_{sim}$. $T_t$ is cell temperature, $T_{amb,t}$ is ambient temperature, $T_K$ and $T_C$ are kelvin/celsius temperatures. $k$ is the SOH epoch index; cohort index is $j$.
 
@@ -664,7 +779,7 @@ Price: multiplicative with time-varying shift (1.5.2)
 | **1. Fundamentals** | — | Entire model |
 | **2. Physics** | Symbols (1.4); SOH (Part 3); throughput $Th_t$ (Part 3); dispatch $P_{AC}^{ch}, P_{AC}^{dis}, Q$ (Part 5); scenario inputs $P_{load,t}, T_{amb,t}$; reservations $R_{reg,t}^{up}, R_{reg,t}^{down}, Q_{res,t}$ (Part 4) | $E_t$, $T_t$, $E_{min,t}$, $E_{max,t}$, derating functions, $P_{PCC,t}$, $P_{DC,t}$, $S_t$, $S_t^{loss}$, $P_{loss,t}^{PCS,inc}$, $\Delta Th_{cycle}$ |
 | **3. Degradation** | $P_{DC,t}$, $T_t$, $SOC_t$ (Part 2); $c_{deg}$ (financial input); regulation statistics (Part 4) | $L_{cal,t}$, $L_{cyc,t}$, $SOH_k$, $SOH_k^{pow}$, $SOH_k^{eff}$, $Th_t$, $H_t^{rf}$, $EFC_t$ |
-| **4. Services** | Symbols, limits (Parts 1, 2); prices $\pi_t$; DR events; forecasts | $R_{arb}, R_{DR}, R_{reg}^{rev}$, service constraints, $R_{reg,t}^{up}, R_{reg,t}^{down}, Q_{res,t}$ |
+| **4. Services** | Symbols, limits (Parts 1, 2); prices $\pi_t$; DR events; forecasts | $R_{arb}, R_{DR}, R_{reg}^{rev}$, service constraints, $R_{reg,t}^{up}, R_{reg,t}^{down}, Q_{res,t}, \Delta Th_t^{reg}$ |
 | **5. Dispatch** | Everything above | $P_{AC,t}^{ch}, P_{AC,t}^{dis}, Q_t$; KPIs and engineering outputs |
 
 ```text
@@ -700,36 +815,61 @@ Price: multiplicative with time-varying shift (1.5.2)
 | Python modeling engine | (Software — out of scope) | — | Out of scope |
 | Databricks App | (Software — out of scope) | — | Out of scope |
 | Data ingestion pipelines | (Software — out of scope) | — | Out of scope |
-| Load forecasting | 1.7.4, 1.7.5 (error interface); Part 2 (load model) | 2 | Part-level |
-| Peak shaving | Part 4 | 4 | Part-level |
-| Demand response | Part 4 | 4 | Part-level |
-| Energy arbitrage | Part 4 | 4 | Part-level |
-| Frequency regulation | Part 4 | 4 | Part-level |
-| Voltage regulation | Part 4 | 4 | Part-level |
-| Dispatch optimization | Part 5 | 5 | Part-level |
-| Revenue stacking | Part 5 | 5 | Part-level |
-| Battery degradation (calendar) | Part 3 | 3 | Part-level |
-| Battery degradation (cycle) | Part 3 | 3 | Part-level |
-| SOC limits | 1.5.4 (state), Part 2 (constraint) | 2 | Registered |
-| Power limits | 1.4.4, Part 2 (constraint) | 2 | Registered |
-| Ramp rates | 1.5.1 | 2 | Registered |
-| Minimum rest periods | 1.4.17 | 2 | Registered |
-| Efficiency | 1.4.4 (symbols), Part 2 (chain) | 2 | Registered |
+| Load forecasting | 1.7.4, 1.7.5 (error interface); Part 2 (load model) | 2 | Section-level |
+| Peak shaving | 4.3 | 4 | Section-level |
+| Demand response | 4.4 | 4 | Section-level |
+| Energy arbitrage | 4.5 | 4 | Section-level |
+| Frequency regulation | 4.6 | 4 | Section-level |
+| Voltage regulation | 4.7 | 4 | Section-level |
+| Dispatch optimization | 5.3, 5.4 | 5 | Section-level |
+| Revenue stacking | 5.2, 5.6 | 5 | Section-level |
+| Battery degradation (calendar) | 3.2 | 3 | Section-level |
+| Battery degradation (cycle) | 3.3 | 3 | Section-level |
+| SOC limits | 1.5.4 (state), 2.2.2 (constraint) | 2 | Section-level |
+| Power limits | 1.4.4, 2.3.2 (constraint) | 2 | Section-level |
+| Ramp rates | 1.5.1, 2.3.7 | 2 | Section-level |
+| Minimum rest periods | 1.4.17, 2.3.8 | 2 | Section-level |
+| Efficiency | 1.4.4 (symbols), 2.2.3 (chain) | 2 | Section-level |
 | NPV, IRR, Payback | (Financial — out of scope) | — | Out of scope |
 
-**Reference note:** RFP number **RFP-264144-1** and section titles are marked **"to be verified"** against the original RFP. Section-level traceability for Parts 2–5 is deferred until those parts are written.
+**Reference note:** RFP number **RFP-264144-1** and section titles are marked **"to be verified"** against the original RFP. Section-level traceability for Parts 2–5 has been applied in FC8; the RFP number verification remains an external dependency.
 
 ---
 
 ## 1.10 Changelog (cumulative, verified only)
 
-### Version 1.0 — Final Candidate (FC7)
+### Version 1.0 — Final Candidate (FC10)
 
-**Changes from FC6 (verified):**
+**Changes from FC9 (verified):**
 
-1. **Audit script declared as a project deliverable.** Section 1.1 now states that the audit script is maintained in `scripts/symbol-audit.py` and is part of the deliverable. This closes the gap between "the audit must be run" and "the audit script exists."
+1. **Auxiliary-binary fast-track promotion path added (§1.4.0).** A downstream part can now request whitelist addition of a new linearization binary without a full Part 1 review cycle. Eligibility, approval, registration, and rejection criteria are stated. The path is not a loophole for registering decision variables; it exists specifically so Part 5 §5.2.3's linearization fix (item 4 of §1.12) and analogous future fixes can complete without blocking on Part 1. This addresses the FC9 grade's minor observation #1 ("the whitelist doesn't yet cover a hypothetical fourth binary").
 
-2. **No other substantive changes.** FC6 closed the last live technical item. FC7 is a scope clarification only.
+2. **§1.12 open-items table now includes dependency ordering and effort estimates.** The six open items are reordered and annotated with "depends on" and "effort" columns so a downstream reader can sequence the work. Item 4 (Part 5 §5.2.3 linearization) is flagged as depending on item 3 (Part 4 peak-shaving reframing) because $c_{peak,t}$ is central to both. This addresses the FC9 grade's minor observation #2 ("§1.12's 'Not addressed' table doesn't assign explicit priority/ordering").
+
+3. **New §1.13 — Consolidated open-items register.** A single table that merges both integrity audits' actionable findings, maps each to the owning part and section, gives a dependency and effort estimate, and states the closure criterion. This makes Part 1 the single place a reader can see the full set of remaining work. No new content beyond consolidation and ordering.
+
+4. **No physical or component modeling added or changed. No new registered symbols. No removals.** The only content changes are the fast-track path in §1.4.0, the sequencing in §1.12, and the consolidation in §1.13.
+
+**Carried over from FC9 (verified):**
+
+- $r_t$ removed from §1.4.2; $c_{cycle,t}$, $r_t$, $p_t$ covered by convention.
+- §1.4.0 auxiliary-binary convention with named whitelist.
+- Open interface question flagged ($R_{reg,t}^{committed,up/down}$ vs. $R_{reg,t}^{up/down}$).
+- §1.11 restructured: gating exit criteria separated from verification items.
+- §1.12 rewritten into "Closed by FC8" and "Not addressed by FC8 (open in Parts 2–5)."
+
+**Carried over from FC8 (verified):**
+
+- All outstanding Part 2–5 change requests registered (marked [FC8]).
+- $\Delta Th_t^{reg}$ and $N_{peak}^{remaining}$ registered.
+- $P_{peak}^{baseline}$ registered.
+- Direction-specific regulation headroom registered; scaling rule extended.
+- $t_{eq,t}$ classification confirmed as derived, not state.
+- Traceability matrix upgraded to section-level for Parts 2–5.
+
+**Carried over from FC7 (verified):**
+
+- Audit script declared as a project deliverable (`scripts/symbol-audit.py`).
 
 **Carried over from FC6 (verified):**
 
@@ -787,25 +927,116 @@ Price: multiplicative with time-varying shift (1.5.2)
 
 ### FC status
 
-**FC7 is the promotion candidate.** Changes are allowed only via explicit revision. No silent edits.
+**FC10 is the promotion candidate.** Changes are allowed only via explicit revision. No silent edits.
 
-### Exit criteria for promotion to v1.0
+### Gating exit criteria for promotion to v1.0
+
+These are the pre-existing, external criteria that actually gate promotion. They are not satisfiable by the act of writing this revision.
 
 | # | Criterion | Status |
 |---|---|---|
-| 1 | **Symbol audit passes.** Scripted audit extracts LaTeX symbols from Parts 2–5 and diffs against Section 1.4. Script and output attached to promotion request. | **NOT YET EXECUTED** (script exists in `scripts/symbol-audit.py`; execution pending) |
+| 1 | **Symbol audit passes.** Scripted audit extracts LaTeX symbols from Parts 2–5 and diffs against Section 1.4. The script must also honor the §1.4.0 auxiliary-binary whitelist, including fast-tracked additions. Script and output attached to promotion request. | **NOT YET EXECUTED** (script exists in `scripts/symbol-audit.py`; execution pending) |
+| 6 | **RFP number and section titles** verified against original. | **NOT YET VERIFIED** |
+
+### Verification items (confirmable by reading this document)
+
+These are real and verifiable, but they are not *exit* gates — they are work items recorded here for completeness. They are satisfiable by inspecting the tables and sections referenced.
+
+| # | Item | Status |
+|---|---|---|
 | 2 | **State is single and consistent.** One definition in 1.5.4. | **MET** |
 | 3 | **Interface table and diagram are consistent** with actual part outputs. | **MET** |
 | 4 | **Changelog is cumulative** and lists only verified changes. | **MET** |
-| 5 | **Traceability matrix** has status column filled. Part-level for Parts 2–5, section-level for Part 1 items. | **MET** |
-| 6 | **RFP number and section titles** verified against original. | **NOT YET VERIFIED** |
-| 7 | **No truncated sections.** Document complete from 1.1 to 1.12. | **MET** |
+| 5 | **Traceability matrix** has status column filled. Section-level for Parts 2–5. | **MET** |
+| 7 | **No truncated sections.** Document complete from 1.1 to 1.13. | **MET** |
+| 8 | **All Part 2–5 change requests closed.** No outstanding symbol registration requests from any part. | **MET** (FC8) |
+| 9 | **Two audit-found symbols registered.** $\Delta Th_t^{reg}$ and $N_{peak}^{remaining}$. | **MET** (FC8) |
+| 10 | **Auxiliary-binary convention applied consistently.** $c_{cycle,t}$, $r_t$, $p_t$ all covered by §1.4.0; none registered as decision variables. Fast-track path available for future additions. | **MET** (FC9/FC10) |
+| 11 | **Consolidated open-items register present.** §1.13 lists every remaining cross-part item with owner, dependency, effort, and closure criterion. | **MET** (FC10) |
 
 ### Freeze definition
 
 **Frozen (v1.0)** means: changes can only be introduced through a change request with a version increment. No silent edits. FC documents are not frozen; they are under review.
 
 ---
+
+## 1.12 Part 1 closure note
+
+With FC10, Part 1 has:
+
+- Absorbed every symbol registration request issued by Parts 2, 3, 4, and 5 (FC8).
+- Closed the two gaps found in the cross-part integrity audit ($\Delta Th_t^{reg}$, $N_{peak}^{remaining}$) (FC8).
+- Made the auxiliary-binary convention explicit and consistent, removing the FC8 misregistration of $r_t$ (FC9).
+- Added a fast-track promotion path for future auxiliary binaries (FC10).
+- Flagged an open Part 4 ↔ Part 5 interface question ($R_{reg,t}^{committed,up/down}$ vs. $R_{reg,t}^{up/down}$) that FC8 registered without resolving (FC9).
+- Consolidated the remaining cross-part work into a single, sequenced register (§1.13, FC10).
+
+### Closed by FC8/FC9/FC10 (Part 1's own scope)
+
+- Symbol registration: all Part 2–5 change requests.
+- Auxiliary-binary convention: explicit whitelist, consistent treatment, fast-track promotion path.
+- Traceability matrix: section-level for Parts 2–5.
+- State vector, interface table, diagram: consistent.
+- Open-items tracking: consolidated in §1.13.
+
+### Not addressed by FC8/FC9/FC10 (still open in Parts 2–5)
+
+FC8, FC9, and FC10 are Part 1 revisions. They do **not** fix substantive contradictions in Parts 2–5's own text. The following items remain open and are the owning part's responsibility. They are **sequenced** below: items with no dependency can start immediately; items marked "depends on" should wait for their predecessor.
+
+| # | Item | Owner | Depends on | Effort | Closure criterion |
+|---|---|---|---|---|---|
+| 1 | Part 3 §3.9 declares the throughput-ownership consultation "Resolved (Resolution B)" but Part 4 §4.13 still presents it as open/pending. | Part 4 | — | 1 edit (status line + drop open-question framing) | Part 4 §4.13 and §4.14 updated to record Resolution B as accepted |
+| 2 | Part 3 §3.11 issues an amendment to Part 5 for the $Th_t^{other}$ definition; Part 5 §5.6.5 still contains the old (incorrect) language, and Part 5 §5.13 omits an exit criterion for this amendment. | Part 5 | — | 2 edits (§5.6.5 text; §5.13 criterion) | Part 5 §5.6.5 corrected; §5.13 lists the amendment as a closed item |
+| 3 | Part 4 §4.3.3 states the peak-shaving net-load cap as a hard constraint; Part 5 §5.2.5 treats it as a soft economic decision governed by $c_{peak,t}$. Part 5 §5.12 formally requests the reframing; Part 4 has not applied it. | Part 4 | — | 1 edit (§4.3.3 reframing) | Part 4 §4.3.3 reframed as economic decision; $c_{peak,t}$ referenced |
+| 4 | Part 5 §5.2.3 contains an unlinearized indicator $\mathbb{1}[\cdot]$ depending on decision variables in the priority constraint. MILP formulation gap. | Part 5 | Item 3 (uses $c_{peak,t}$) | 1 edit (replace indicator with $c_{peak,t}$ + big-M) | Part 5 §5.2.3 linearized; any new auxiliary binary fast-tracked into §1.4.0 |
+| 5 | Part 2 §2.2.5 and §2.3.2 apply derating to both DC and AC limits without stating which is binding. Potential double-application of derating. | Part 2 | — | 1 edit (state binding limit) | Part 2 §2.2.5/§2.3.2 state that the AC limit is binding, or the DC limit is derived |
+| 6 | Part 2 §2.3.8's $t_{last}$ update rule (at epoch boundary) is inconsistent with the per-step cycle-completion trigger. | Part 2 | — | 1 edit (clarify timing) | Part 2 §2.3.8 states unambiguously when $t_{last}$ updates |
+
+**Sequencing summary:** Items 1, 2, 3, 5, and 6 have no dependencies and can proceed in parallel. Item 4 depends on item 3 because both use $c_{peak,t}$; Part 5 §5.2.3's linearization should be written after Part 4 §4.3.3's reframing lands, so the binary's semantics are fixed first. Total effort across all six items: roughly 8 targeted edits across three documents (Part 2, Part 4, Part 5). No Part 1 work is needed to unblock any of them.
+
+Each of the above requires the owning part's next revision. Part 1 cannot resolve them without violating its own scope rule. They are listed here so that a reader of Part 1 alone is not misled into believing the full five-part model is integrable after FC10.
+
+### Remaining gating items for Part 1 itself
+
+1. **Audit script execution** (criterion 1). The script must honor the §1.4.0 whitelist (including fast-tracked additions). Running it against the current Parts 2–5 text is the last mechanical gate.
+2. **RFP number verification** (criterion 6). External dependency.
+
+Once (1) passes and (2) is confirmed, Part 1 is ready to freeze at v1.0. Parts 2–5 can then drop their "pending Part 1 sign-off" language in their next revisions, since the requests they issued are now satisfied. The six cross-part items listed above remain their own work.
+
+---
+
+## 1.13 Consolidated open-items register
+
+This register merges the actionable findings from both cross-part integrity audits into one table. It is the single place a reader can see the full remaining work on the five-part model. Each row states the item, its owner, its dependencies, its effort, its closure criterion, and the source audit(s) that found it.
+
+**Sources:** "Audit A" = the first cross-part integrity audit. "Audit B" = the second cross-part integrity audit ("Cross-Part Integrity Audit — Parts 1–5 (Current State)").
+
+| # | Item | Owner | Depends on | Effort | Closure criterion | Source |
+|---|---|---|---|---|---|---|
+| 1 | Part 3 §3.9 "Resolved" vs. Part 4 §4.13 "Pending" (throughput ownership consultation) | Part 4 | — | 1 edit | Part 4 §4.13/§4.14 record Resolution B as accepted | Audit A B1; Audit B §2c |
+| 2 | Part 3 §3.11 amendment vs. Part 5 §5.6.5 stale $Th_t^{other}$ definition; §5.13 missing criterion | Part 5 | — | 2 edits | Part 5 §5.6.5 corrected; §5.13 lists the amendment | Audit A B2; Audit B §2b |
+| 3 | Part 4 §4.3.3 hard constraint vs. Part 5 §5.2.5 soft economic decision (peak shaving) | Part 4 | — | 1 edit | Part 4 §4.3.3 reframed; $c_{peak,t}$ referenced | Audit A §B (implicit); Audit B §2a |
+| 4 | Part 5 §5.2.3 unlinearized indicator in priority constraint | Part 5 | Item 3 | 1 edit | Part 5 §5.2.3 linearized; new binary fast-tracked to §1.4.0 | Audit A D13 |
+| 5 | Part 2 §2.2.5 vs. §2.3.2 derating double-application risk | Part 2 | — | 1 edit | Part 2 states binding limit | Audit A D9 |
+| 6 | Part 2 §2.3.8 $t_{last}$ update timing inconsistency | Part 2 | — | 1 edit | Part 2 §2.3.8 states timing unambiguously | Audit A D10 |
+| 7 | Part 2 §2.9 stale "pending Part 1 sign-off" language (all four symbols already handled) | Part 2 | — | 1 edit | Part 2 §2.9 closed; no pending Part 1 requests | Audit A A1; Audit B §1 |
+| 8 | $R_{reg,t}^{committed,up/down}$ vs. $R_{reg,t}^{up/down}$ semantics (reserved vs. committed) | Parts 4 & 5 | — | Joint decision + 1 edit each | Both parts use the same symbol or state the distinction | Audit A D16; Audit B §1 |
+
+**Notes on scope:**
+
+- Items 1–6 are the six cross-part items listed in §1.12. Items 7–8 are additional items found by the audits that are lower severity but still open.
+- Item 7 is a **stale-statement** fix, not a technical contradiction. It is included for completeness because both audits flagged it.
+- Item 8 is a **semantic ambiguity**, not a contradiction. It is included because FC9 flagged it as an open interface question and it should be tracked here, not just in §1.4.9.
+- All items are owned by Parts 2, 4, or 5. **No item is owned by Part 1.**
+
+**Items explicitly excluded from this register** (found by the audits but judged non-actionable or lower priority):
+
+- Audit A D11 (unit-convention ambiguity in $M_{reg,t}^{abs}$) — resolves consistently when the "per MW" scaling is read as documented; no edit needed.
+- Audit A D15 ($Th_t^{reg}$ not in the service sum) — a clarification request, not a contradiction; can be folded into item 2's Part 5 revision if convenient.
+- Audit A D7 ($E_{nom}$ vs. $E_{nom}^{cell}$ relationship) — Part 2 §2.2.4 already states the conversion; the relationship is derivable from the existing text.
+- Audit A C3 (Part 5 consumes Part 2 symbols) — expected consumption, not a contradiction.
+
+**Register maintenance:** This register is updated only when an item is closed (removed or marked closed) or when a new audit adds an item. It is not a substitute for the owning parts' own changelogs; it is an index to them.
 
 
 

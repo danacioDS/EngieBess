@@ -689,28 +689,3 @@ Part 4 §4.3.3 states the net load cap "must not exceed the target peak." Part 5
 
 ---
 
-## 5.14 Next steps
-
-Part 5 is **at FC1, pending two external sign-offs**:
-
-1. **Part 1 sign-off** on the change request (section 5.11).
-2. **Part 4 sign-off** on the peak-shaving clarification (section 5.12).
-
-Once both are resolved, Part 5 can be promoted to v1.0.
-
-**Recommended writing order:**
-
-1. **Part 1 FC8** — process Part 2, Part 4, and Part 5 change requests in one pass. **This is the highest-leverage single action** — it unblocks Parts 2, 4, and 5 simultaneously.
-2. **Part 4 FC2** — process the Part 5 change request on peak shaving.
-3. **Part 3** — Address the Part 4 consultation on throughput ownership.
-4. **Part 2** — Revision 3, pending Part 1 sign-off.
-5. **Part 5** — FC1, pending Part 1 and Part 4 sign-offs.
-
-**Options for the next response:**
-
-- **A)** Write **Part 1 FC8** — process all pending change requests (Part 2, Part 4, Part 5) in one pass.
-- **B)** Write **Part 4 FC2** — process the Part 5 change request on peak shaving.
-- **C)** Write **Part 3 — Degradation** — addressing the Part 4 consultation as a design decision.
-- **D)** Other.
-
-Which do you prefer?
