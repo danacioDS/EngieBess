@@ -1,16 +1,18 @@
-# M2 — Market Products and Participation
+# Parte 3 — Market Products and Participation
 
-**Version:** 1.2 — Development Draft
+**Version:** 1.3 — Development Draft
 **Status:** Under Engineering Development — Not Frozen
 **Date:** 2026-09-22
 **Parent Document:** Market Engineering Model — Introduction Document (v1.2)
 **Upstream Dependencies:**
-- M1 — Market Domain and Conventions (v1.2), specifically §8, §9, §11, §16, §19
-- BESS Engineering Part 1 — Fundamentals and Conventions (pinned per M1-O13)
-- M3a — Transversal Market Values (early baseline; see §2.3)
-- M3b — Full Rules, Signals, Commitments and Constraints
+- Parte 1 — Market Domain and Conventions (v1.3), specifically §8, §9, §11, §16, §19
+- Parte 2 — Transversal Market Values (v1.0), specifically §5–§11 (gate closure, registration, timing, data formats, minimum sizes, aggregation rules, transversal limits, temporal framework instance)
+- BESS Engineering Part 1 — Fundamentals and Conventions (pinned per P1-O13)
+**Downstream Consumers:**
+- Parte 4 — Market Rules, Signals, Commitments and Constraints (consumes the product catalogue)
+- Parte 5 — Delivery, Performance and Settlement (consumes Product-Mechanism records)
 
-**Document ID:** ME-M2-001 *(stable across versions)*
+**Document ID:** ME-P3-001 *(stable across versions)*
 
 ---
 
@@ -21,14 +23,15 @@
 | 1.0 | 2026-09-22 | Development Draft | Initial M2 baseline. |
 | 1.1 | 2026-09-22 | Development Draft | Introduced the Transversal Market Values early baseline; made the Product ↔ Mechanism relation many-to-many; removed strategies from the candidate list; added the static-vs-instantaneous rule; moved the eligibility time dimension to the assessment result; defined the identifier scheme; closed eligibility and qualification gaps. |
 | 1.2 | 2026-09-22 | Development Draft | Removed the "transversal product-specific" owner category and the residual full-M3 dependency from the eligibility path. Rekeyed path-dependent records to Product-Mechanism. Defined qualification states, aggregation, and validity. Moved the M3 split into Introduction v1.2 and stated the revised freeze order. Consolidated degradation to a single reference. Added the aggregate-validity rule. Moved market-level temporal attributes to the framework reference. Clarified ID uniqueness. Retied the pilot to a single in-scope product. Aligned §5.1 examples with the candidate list. |
+| 1.3 | 2026-09-22 | Development Draft | **Renamed from "M2" to "Parte 3" per project nomenclature.** **Updated all references from M1 → Parte 1, M3a → Parte 2, M3b → Parte 4, M4 → Parte 5.** **Updated Document ID from ME-M2-001 to ME-P3-001.** **Updated open item IDs from M2-Oxx to P3-Oxx.** **Updated Parent Document citation from Introduction v1.2 (already correct).** **Corrected all cross-references to the new nomenclature.** |
 
-**Change control note:** The product definition template and the "reference, do not redefine" rule are owned by the **Introduction Document v1.2**. The **M3 split into M3a (Transversal Market Values) and M3b (Full Rules)** is established by **Introduction v1.2**, not by M2. M2 references it. Where M2 and the Introduction differ, the Introduction governs.
+**Change control note:** The product definition template and the "reference, do not redefine" rule are owned by the **Introduction Document v1.2**. The **M3 split into M3a (Transversal Market Values) and M3b (Full Rules)** is established by **Introduction v1.2**, not by Parte 3. Parte 3 references it. Where Parte 3 and the Introduction differ, the Introduction governs.
 
 ---
 
 ## 1. Purpose and Scope
 
-M2 establishes the **product-level and participation-level semantic foundation** for Market Engineering.
+Parte 3 establishes the **product-level and participation-level semantic foundation** for Market Engineering.
 
 Its purpose is to define:
 
@@ -39,18 +42,19 @@ Its purpose is to define:
 - **the mapping** from each product's requirements to the physical capabilities of the BESS;
 - **the product-specific temporal requirements** that constrain participation.
 
-M2 does **not** define:
+Parte 3 does **not** define:
 
-- the detailed operational rules governing participation (M3b);
-- the detailed market signals and their timing (M3b);
-- the commitment semantics and operational obligations (M3b);
-- the delivery definition and performance measurement (M4);
-- the settlement mechanism and settlement quantities (M4);
-- the physical BESS model itself (BESS Engineering).
+- the detailed operational rules governing participation (Parte 4);
+- the detailed market signals and their timing (Parte 4);
+- the commitment semantics and operational obligations (Parte 4);
+- the delivery definition and performance measurement (Parte 5);
+- the settlement mechanism and settlement quantities (Parte 5);
+- the physical BESS model itself (BESS Engineering);
+- transversal market values on the eligibility path (Parte 2).
 
-M2 defines **what the BESS can participate in, under what conditions, and with what physical requirements** — and references M3b and M4 for how participation is governed and settled.
+Parte 3 defines **what the BESS can participate in, under what conditions, and with what physical requirements** — and references Parte 4 and Parte 5 for how participation is governed and settled.
 
-The primary question of M2 is:
+The primary question of Parte 3 is:
 
 > **Which specific products and participation mechanisms exist within the defined market environment, and under what eligibility and qualification conditions can the BESS participate?**
 
@@ -61,56 +65,58 @@ The primary question of M2 is:
 ### 2.1 Position in the Part Chain
 
 ```text
-       M1
+       PARTE 1
 Market Domain & Conventions
         │
         ▼
-      M3a
+      PARTE 2
 Transversal Market Values
 (early baseline)
         │
         ▼
-       M2
+      PARTE 3
 Market Products & Participation
         │
         ▼
-      M3b
+      PARTE 4
 Full Rules, Signals,
 Commitments & Constraints
         │
         ▼
-       M4
+      PARTE 5
 Delivery, Performance & Settlement
 ```
 
-**Freeze order (revised):** **M1 → M3a → M2 → M3b → M4.**
+**Freeze order (revised):** **Parte 1 → Parte 2 → Parte 3 → Parte 4 → Parte 5.**
 
-M3a is frozen before M2 because M2 references transversal market values (gate closure conventions, market-wide registration, market-wide timing) that it cannot own. M3b is frozen after M2 because it consumes M2's product catalogue and Product-Mechanism relations.
+Parte 2 is frozen before Parte 3 because Parte 3 references transversal market values (gate closure conventions, market-wide registration, market-wide timing) that it cannot own. Parte 4 is frozen after Parte 3 because it consumes Parte 3's product catalogue and Product-Mechanism relations.
 
 This is a **document-construction dependency**, not the market lifecycle.
 
 ### 2.2 Consumes and Provides
 
-**M2 consumes from M1:**
+**Parte 3 consumes from Parte 1:**
 
-- market environment definition and scope (M1 §6, §7);
-- participant-role model and Market Party model (M1 §5);
-- market semantic model, three participation branches (M1 §8);
-- market temporal mapping framework (M1 §11);
-- evidence model (M1 §16);
-- semantic ownership table (M1 §19);
-- price-influence assumption (M1 §15).
+- market environment definition and scope (Parte 1 §6, §7);
+- participant-role model and Market Party model (Parte 1 §5);
+- market semantic model, three participation branches (Parte 1 §8);
+- market temporal mapping framework (Parte 1 §11);
+- evidence model (Parte 1 §16);
+- semantic ownership table (Parte 1 §19);
+- price-influence assumption (Parte 1 §15).
 
-**M2 consumes from M3a:**
+**Parte 3 consumes from Parte 2:**
 
 - market-wide gate closure conventions;
 - market-wide registration requirements;
 - market-wide timing conventions;
 - market-wide data formats and telemetry requirements;
 - market-wide minimum participation sizes, where transversal;
-- market-wide aggregation rules, where transversal.
+- market-wide aggregation rules, where transversal;
+- eligibility-relevant transversal limits;
+- the temporal framework instance (time zone, interval labeling, DST handling, resolution).
 
-**M2 provides to M3b:**
+**Parte 3 provides to Parte 4:**
 
 - the product catalogue with product identifiers;
 - the Product-Mechanism records;
@@ -120,28 +126,34 @@ This is a **document-construction dependency**, not the market lifecycle.
 - the product-to-BESS capability mappings;
 - the product-specific risks and uncertainties.
 
-**M2 does not create an independent symbol registry.** Market-specific **symbols** are registered in the **BESS Engineering Part 1 master symbol registry** (M1 §20). **Identifiers** are governed by §4.5.
+**Parte 3 provides to Parte 5:**
+
+- product identifiers and Product-Mechanism records;
+- eligibility time dimension — validity windows, evaluation basis;
+- Product-Mechanism temporal requirements.
+
+**Parte 3 does not create an independent symbol registry.** Market-specific **symbols** are registered in the **BESS Engineering Part 1 master symbol registry** (Parte 1 §20). **Identifiers** are governed by §4.5.
 
 ### 2.3 Cycle-Breaking: Transversal Market Values Early Baseline
 
-M2 requires **transversal market values** that M3 owns. Referencing them from the full M3 would create an M2 → M3 → M2 loop.
+Parte 3 requires **transversal market values** that Parte 4 owns. Referencing them from the full Parte 4 would create a Parte 3 → Parte 4 → Parte 3 loop.
 
-To break the loop, **Introduction v1.2** splits M3 into two layers:
+To break the loop, **Introduction v1.2** splits the rules layer into two:
 
 | Layer | Contents | Drafted | Owner |
 | --- | --- | --- | --- |
-| **M3a — Transversal Market Values** | Market-wide values M2 needs to evaluate eligibility and participation. No product-specific content. | **Before M2 freeze.** | M3 Lead (role defined in Introduction v1.2) |
-| **M3b — Full Rules, Signals, Commitments and Constraints** | Product-specific rules, signals, commitments, operational constraints, stacking. | **After M2 freeze.** | M3 Lead |
+| **Parte 2 — Transversal Market Values** | Market-wide values Parte 3 needs to evaluate eligibility and participation. No product-specific content. | **Before Parte 3 freeze.** | Parte 2 Lead |
+| **Parte 4 — Full Rules, Signals, Commitments and Constraints** | Product-specific rules, signals, commitments, operational constraints, stacking. | **After Parte 3 freeze.** | Parte 4 Lead |
 
-**What belongs in M3a:** market-wide gate closure conventions; market-wide registration requirements; market-wide timing conventions; market-wide data formats and telemetry requirements; market-wide minimum participation sizes and aggregation rules, where transversal.
+**What belongs in Parte 2:** market-wide gate closure conventions; market-wide registration requirements; market-wide timing conventions; market-wide data formats and telemetry requirements; market-wide minimum participation sizes and aggregation rules, where transversal; eligibility-relevant transversal limits; the temporal framework instance.
 
-**What belongs in M3b:** product-specific signals, commitments, operational constraints, stacking/coexistence rules, and any rule value that depends on a product or a Product-Mechanism.
+**What belongs in Parte 4:** product-specific signals, commitments, operational constraints, stacking/coexistence rules, and any rule value that depends on a product or a Product-Mechanism.
 
-**What belongs in neither (it belongs to M2):** product-specific eligibility thresholds, qualification test parameters, product-specific temporal values, capability mappings.
+**What belongs in neither (it belongs to Parte 3):** product-specific eligibility thresholds, qualification test parameters, product-specific temporal values, capability mappings.
 
-**The residual full-M3 dependency is removed.** M2's eligibility path references **M1 + M3a + M2 itself + BESS Engineering**. It does not reference M3b. This is stated as a normative property of the boundary:
+**The residual full-Parte-4 dependency is removed.** Parte 3's eligibility path references **Parte 1 + Parte 2 + Parte 3 itself + BESS Engineering**. It does not reference Parte 4. This is stated as a normative property of the boundary:
 
-> **Eligibility-path rule.** No eligibility condition shall depend on a value owned by M3b. If an eligibility condition appears to require an M3b value, either the condition is product-specific and belongs to M2, or the value is transversal and belongs to M3a. The "transversal product-specific" case does not exist: a value is either specific to one Product-Mechanism (M2) or shared across products (M3a).
+> **Eligibility-path rule.** No eligibility condition shall depend on a value owned by Parte 4. If an eligibility condition appears to require a Parte 4 value, either the condition is product-specific and belongs to Parte 3, or the value is transversal and belongs to Parte 2. The "transversal product-specific" case does not exist: a value is either specific to one Product-Mechanism (Parte 3) or shared across products (Parte 2).
 
 ---
 
@@ -149,7 +161,7 @@ To break the loop, **Introduction v1.2** splits M3 into two layers:
 
 ### 3.1 WHAT
 
-M2 represents the product and participation layer as a structured catalogue containing:
+Parte 3 represents the product and participation layer as a structured catalogue containing:
 
 - **Market products** — standardized services or commodities;
 - **Participation mechanisms** — the ways a participant accesses a product, modelled via **Product-Mechanism records**;
@@ -169,7 +181,7 @@ The purpose is to prevent downstream engineering from treating market participat
 
 ### 3.3 FOR WHOM
 
-M2 provides the product and participation foundation for M3a (references), M3b (consumes the catalogue), M4 (delivery and settlement per Product-Mechanism), BESS Engineering (capability requirements), Forecasting Engineering (signal semantics via M3b), Operational/Optimization Engineering (eligibility, mechanisms, temporal requirements), Financial Engineering (asset-life valuation via the eligibility time dimension), and Software Engineering (catalogue, relation, eligibility logic).
+Parte 3 provides the product and participation foundation for Parte 2 (references), Parte 4 (consumes the catalogue), Parte 5 (delivery and settlement per Product-Mechanism), BESS Engineering (capability requirements), Forecasting Engineering (signal semantics via Parte 4), Operational/Optimization Engineering (eligibility, mechanisms, temporal requirements), Financial Engineering (asset-life valuation via the eligibility time dimension), and Software Engineering (catalogue, relation, eligibility logic).
 
 ---
 
@@ -179,11 +191,11 @@ M2 provides the product and participation foundation for M3a (references), M3b (
 
 | Axis | Values | Source |
 | --- | --- | --- |
-| **Market environment** | Wholesale / Behind-the-meter / Both | M1 §7 |
-| **Product class** | Energy / Capacity / Ancillary service / Flexibility / Tariff-based / Other | M1 §6, §7 |
+| **Market environment** | Wholesale / Behind-the-meter / Both | Parte 1 §7 |
+| **Product class** | Energy / Capacity / Ancillary service / Flexibility / Tariff-based / Other | Parte 1 §6, §7 |
 | **Direction** | Upward / Downward / Symmetric | Market-specific |
 | **Time scale** | Seconds / Minutes / Hours / Days / Months / Years | Market-specific |
-| **Settlement basis** | **Reference** to M4 settlement identifier | M4 |
+| **Settlement basis** | **Reference** to Parte 5 settlement identifier | Parte 5 |
 
 Participation mechanism and commitment type are **not** taxonomy axes. They belong to the **Product-Mechanism record** (§5), because they vary by access path.
 
@@ -201,14 +213,14 @@ Each product shall have:
 | **Product definition** | Short definition (§6) |
 | **Market purpose** | Why the market defines the product (§6) |
 | **Mechanisms** | Links to Product-Mechanism records (§5) |
-| **Evidence reference** | Linked Evidence Statement IDs (M1 §16.3) |
+| **Evidence reference** | Linked Evidence Statement IDs (Parte 1 §16.3) |
 | **Risk and uncertainty reference** | Links to §12 |
 
 **Path-dependent fields are not on the product.** Eligibility, qualification, capability mapping, temporal requirements, settlement references, and mechanism attributes live on the **Product-Mechanism record** (§5.3).
 
 ### 4.3 Candidate Product Universe
 
-Established from **M1-O05**. Until resolved, candidates carry status **Candidate**.
+Established from **P1-O05**. Until resolved, candidates carry status **Candidate**.
 
 **Wholesale candidates:** Energy, Wholesale capacity, Frequency containment reserve, Frequency restoration reserve (up and down), Replacement reserve (up and down), Fast frequency response, Voltage support / reactive power, Black start, Congestion management / flexibility.
 
@@ -231,12 +243,12 @@ Established from **M1-O05**. Until resolved, candidates carry status **Candidate
 | Property | Rule |
 | --- | --- |
 | **Format** | `<type>-<sequence>` — e.g., `PROD-001`, `PM-001`, `ELIG-001` |
-| **Namespace prefix** | Optional and **display-only**. May be used for readability (e.g., `M2-PROD-001`). |
+| **Namespace prefix** | Optional and **display-only**. May be used for readability (e.g., `P3-PROD-001`). |
 | **Uniqueness** | Defined on the **unprefixed ID**. The prefix is ignored for uniqueness. |
 | **Owner** | Recorded in a **field**, not in the identifier. Ownership may move under change control without changing the identifier. |
 | **Stability** | Identifiers are stable across versions. An identifier never changes. |
 | **Registry** | Cross-Part identifier registry, separate from the BESS Part 1 master symbol registry. |
-| **Symbols** | Mathematical quantities with units remain in the BESS Part 1 master symbol registry (M1 §20). |
+| **Symbols** | Mathematical quantities with units remain in the BESS Part 1 master symbol registry (Parte 1 §20). |
 
 ---
 
@@ -280,14 +292,14 @@ The practical effect is the same as many-to-many for the cases that matter: a pr
 | **Participation unit** | MW, MWh, MVar, block, portfolio, etc. |
 | **Minimum / maximum size** | Minimum and maximum participation size, if applicable |
 | **Aggregation permitted** | Yes / No / Conditional |
-| **Aggregation rules reference** | Reference to M3a (transversal) or M2 (product-specific) |
+| **Aggregation rules reference** | Reference to Parte 2 (transversal) or Parte 3 (product-specific) |
 | **Reversibility** | Whether the commitment can be withdrawn or adjusted, and under what conditions |
 | **Eligibility reference** | Links to eligibility conditions for this Product-Mechanism (§8) |
 | **Qualification reference** | Links to qualification requirements for this Product-Mechanism (§9) |
 | **Capability mapping reference** | Links to capability mappings for this Product-Mechanism (§10) |
 | **Temporal requirements reference** | Links to temporal requirements for this Product-Mechanism (§11) |
-| **M4 settlement reference** | Links to the M4 settlement identifier for this Product-Mechanism |
-| **M3b rule reference** | Link to M3b rules for this Product-Mechanism (to be populated) |
+| **Parte 5 settlement reference** | Links to the Parte 5 settlement identifier for this Product-Mechanism |
+| **Parte 4 rule reference** | Link to Parte 4 rules for this Product-Mechanism (to be populated) |
 
 **Commitment type is not stored** — it is derived from **Commitment created** and **Commitment trigger**.
 
@@ -297,38 +309,38 @@ Preserved:
 
 - **Bid-based vs. non-bid commitment** — the presence or absence of a bid does not determine the presence or absence of a commitment.
 - **Commitment vs. null commitment** — a null-commitment mechanism creates no market obligation.
-- **Aggregated vs. direct participation** — aggregation rules are owned by M3a (transversal) or M2 (product-specific); eligibility of the aggregation unit is owned by M2.
+- **Aggregated vs. direct participation** — aggregation rules are owned by Parte 2 (transversal) or Parte 3 (product-specific); eligibility of the aggregation unit is owned by Parte 3.
 
 ---
 
 ## 6. Product Definition
 
-M2 applies the **product definition template** owned by **Introduction v1.2** to every in-scope **Product-Mechanism**.
+Parte 3 applies the **product definition template** owned by **Introduction v1.2** to every in-scope **Product-Mechanism**.
 
 ### 6.1 Template Application Rule
 
-**Reference rule:** M2 references, but does not redefine, concepts owned by M3a, M3b, and M4.
+**Reference rule:** Parte 3 references, but does not redefine, concepts owned by Parte 2, Parte 4, and Parte 5.
 
-| Template item | Owner | M2 action |
+| Template item | Owner | Parte 3 action |
 | --- | --- | --- |
-| 1. Definition | M2 | Define (at product level) |
-| 2. Market Purpose | M2 | Define (at product level) |
-| 3. Eligibility | M2 | Define (per Product-Mechanism) |
-| 4. Required BESS Capability | M2 (mapping); BESS Engineering (physical model) | Map, referencing BESS symbols |
-| 5. Market Signal | M3b | Reference M3b identifier |
-| 6. Participation Mechanism | M2 | Define (via Product-Mechanism record) |
-| 7. Commitment | M3b | Reference M3b identifier |
-| 8. Delivery Requirement | M3b (obligation); M4 (definition and measurement) | Reference M3b and M4 identifiers directly |
-| 9. Temporal Requirements | M2 (Product-Mechanism-specific); M1 (framework); M3a (transversal values) | Define Product-Mechanism-specific; reference M1 framework and M3a values |
-| 10. Operational Constraints | M3b | Reference M3b identifier |
-| 11. Interaction with Other Products | M3b (stacking/coexistence) | Reference M3b identifier |
-| 12. Settlement Mechanism | M4 | Reference M4 identifier |
-| 13. Technical Outputs | M2 (Product-Mechanism outputs); downstream Parts | Define; reference downstream |
-| 14. Risks and Uncertainties | M2 (Product-Mechanism); owning Part (M1 §18) | Define; reference owning Part |
+| 1. Definition | Parte 3 | Define (at product level) |
+| 2. Market Purpose | Parte 3 | Define (at product level) |
+| 3. Eligibility | Parte 3 | Define (per Product-Mechanism) |
+| 4. Required BESS Capability | Parte 3 (mapping); BESS Engineering (physical model) | Map, referencing BESS symbols |
+| 5. Market Signal | Parte 4 | Reference Parte 4 identifier |
+| 6. Participation Mechanism | Parte 3 | Define (via Product-Mechanism record) |
+| 7. Commitment | Parte 4 | Reference Parte 4 identifier |
+| 8. Delivery Requirement | Parte 4 (obligation); Parte 5 (definition and measurement) | Reference Parte 4 and Parte 5 identifiers directly |
+| 9. Temporal Requirements | Parte 3 (Product-Mechanism-specific); Parte 1 (framework); Parte 2 (transversal values and temporal framework instance) | Define Product-Mechanism-specific; reference Parte 1 framework and Parte 2 values |
+| 10. Operational Constraints | Parte 4 | Reference Parte 4 identifier |
+| 11. Interaction with Other Products | Parte 4 (stacking/coexistence) | Reference Parte 4 identifier |
+| 12. Settlement Mechanism | Parte 5 | Reference Parte 5 identifier |
+| 13. Technical Outputs | Parte 3 (Product-Mechanism outputs); downstream Parts | Define; reference downstream |
+| 14. Risks and Uncertainties | Parte 3 (Product-Mechanism); owning Part (Parte 1 §18) | Define; reference owning Part |
 
 ### 6.2 Product Sheet
 
-For each in-scope **Product-Mechanism**, M2 produces a **Product-Mechanism sheet** covering all fourteen template items. The sheet is the authoritative participation-level record. It references but does not redefine M3a, M3b, and M4 content.
+For each in-scope **Product-Mechanism**, Parte 3 produces a **Product-Mechanism sheet** covering all fourteen template items. The sheet is the authoritative participation-level record. It references but does not redefine Parte 2, Parte 4, and Parte 5 content.
 
 ---
 
@@ -342,13 +354,13 @@ An **eligibility condition** is a requirement that must be satisfied for a resou
 
 | Category | Description | Owner of the condition | Source of the condition |
 | --- | --- | --- | --- |
-| **Market eligibility** | Registration, participation agreement, market party status, balance responsibility | M2 (Product-Mechanism-specific); M3a (transversal) | M3a, market documentation |
-| **Technical eligibility** | Response time, ramp rate, duration, accuracy, availability, telemetry | M2 | Market documentation |
-| **Physical eligibility** | Power, energy, SOC window, SOH, cycle limits | M2 (mapping); BESS Engineering (physical model) | BESS Engineering |
-| **Regulatory eligibility** | Jurisdictional authorization, environmental compliance, grid code compliance | M1 (scope); M2 (application) | Regulatory documentation |
-| **Contractual eligibility** | Binding contracts (e.g., aggregator agreement) | M2 (condition); owning Part (evidence) | Contractual documentation |
+| **Market eligibility** | Registration, participation agreement, market party status, balance responsibility | Parte 3 (Product-Mechanism-specific); Parte 2 (transversal) | Parte 2, market documentation |
+| **Technical eligibility** | Response time, ramp rate, duration, accuracy, availability, telemetry | Parte 3 | Market documentation |
+| **Physical eligibility** | Power, energy, SOC window, SOH, cycle limits | Parte 3 (mapping); BESS Engineering (physical model) | BESS Engineering |
+| **Regulatory eligibility** | Jurisdictional authorization, environmental compliance, grid code compliance | Parte 1 (scope); Parte 3 (application) | Regulatory documentation |
+| **Contractual eligibility** | Binding contracts (e.g., aggregator agreement) | Parte 3 (condition); owning Part (evidence) | Contractual documentation |
 
-**No "M3b" eligibility category exists.** If a condition is specific to a Product-Mechanism, it is M2's. If it is transversal, it is M3a's. The "transversal product-specific" case does not exist.
+**No "Parte 4" eligibility category exists.** If a condition is specific to a Product-Mechanism, it is Parte 3's. If it is transversal, it is Parte 2's. The "transversal product-specific" case does not exist.
 
 ### 7.3 Eligibility Assessment
 
@@ -414,11 +426,11 @@ For **Indeterminate** eligibility:
 | **Category** | Missing market evidence / Missing asset data / Missing regulatory clarification / Other |
 | **Description** | The specific gap |
 | **Owning Part** | Responsible Part |
-| **Reference** | If a market-evidence gap, the linked Unresolved Requirement statement ID (M1 §16.3) |
+| **Reference** | If a market-evidence gap, the linked Unresolved Requirement statement ID (Parte 1 §16.3) |
 
 ### 7.7 Static vs. Instantaneous Rule
 
-> **Eligibility shall be assessed against static or life-dependent capability** — the capability the asset can provide under defined conditions (e.g., SOC window, power capability at a given SOH). Eligibility shall **not** be assessed against instantaneous operational state (e.g., current SOC). Instantaneous state is an operational constraint owned by M3b and applied by Operational/Optimization Engineering.
+> **Eligibility shall be assessed against static or life-dependent capability** — the capability the asset can provide under defined conditions (e.g., SOC window, power capability at a given SOH). Eligibility shall **not** be assessed against instantaneous operational state (e.g., current SOC). Instantaneous state is an operational constraint owned by Parte 4 and applied by Operational/Optimization Engineering.
 
 ---
 
@@ -432,10 +444,10 @@ For **Indeterminate** eligibility:
 | **Product-Mechanism ID** | The Product-Mechanism to which the requirement applies |
 | **Category** | Market / Technical / Physical / Regulatory / Contractual (§7.2) |
 | **Condition** | The condition that must be satisfied |
-| **Threshold** | Quantitative threshold, if Product-Mechanism-specific. **Owned by M2.** |
+| **Threshold** | Quantitative threshold, if Product-Mechanism-specific. **Owned by Parte 3.** |
 | **Unit** | The unit of the threshold |
-| **Source** | Linked Evidence Statement ID (M1 §16.3) |
-| **Owner** | M2 for Product-Mechanism-specific conditions. Reference M3a for transversal conditions. |
+| **Source** | Linked Evidence Statement ID (Parte 1 §16.3) |
+| **Owner** | Parte 3 for Product-Mechanism-specific conditions. Reference Parte 2 for transversal conditions. |
 | **Assessment method** | How the condition is assessed |
 | **Assessment frequency** | One-time / Per participation / Periodic |
 | **Consequence of failure** | What happens if the condition is not satisfied |
@@ -444,7 +456,7 @@ For **Indeterminate** eligibility:
 
 | Category | Typical requirements |
 | --- | --- |
-| **Market** | Registration (per M3a), participation agreement, market party status, balance responsibility |
+| **Market** | Registration (per Parte 2), participation agreement, market party status, balance responsibility |
 | **Technical** | Response time, ramp rate, duration, accuracy, availability, telemetry |
 | **Physical** | Power capability, energy capability, SOC window (static), SOH, cycle limits |
 | **Regulatory** | Jurisdictional authorization, environmental compliance, grid code compliance |
@@ -474,10 +486,10 @@ A **qualification requirement** is a demonstration, test, or ongoing compliance 
 | **Requirement** | What must be demonstrated |
 | **Method** | How it is demonstrated |
 | **Frequency** | One-time / Periodic / Continuous |
-| **Threshold** | Quantitative threshold, if Product-Mechanism-specific. **Owned by M2.** |
+| **Threshold** | Quantitative threshold, if Product-Mechanism-specific. **Owned by Parte 3.** |
 | **Unit** | The unit of the threshold |
-| **Source** | Linked Evidence Statement ID (M1 §16.3) |
-| **Owner** | M2 for Product-Mechanism-specific requirements. Reference M3a for transversal requirements. |
+| **Source** | Linked Evidence Statement ID (Parte 1 §16.3) |
+| **Owner** | Parte 3 for Product-Mechanism-specific requirements. Reference Parte 2 for transversal requirements. |
 | **Consequence of failure** | What happens if qualification is not maintained |
 
 ### 9.3 Qualification States
@@ -550,7 +562,7 @@ A **capability mapping** is the correspondence between a Product-Mechanism requi
 | **Mapping type** | Direct / Derived / Conditional / Composite |
 | **Mapping rule** | The rule by which the capability satisfies the requirement |
 | **Margin** | Any required margin (e.g., degradation reserve). **May not be applied in addition to a degradation-curve evaluation at a specific SOH** — the choice shall be stated per mapping. |
-| **Source** | Linked Evidence Statement ID (M1 §16.3) |
+| **Source** | Linked Evidence Statement ID (Parte 1 §16.3) |
 
 **No degradation reference.** Degradation is referenced once, on the assessment result (§7.5).
 
@@ -565,9 +577,13 @@ A **capability mapping** is the correspondence between a Product-Mechanism requi
 | **Conditional** | The capability satisfies the requirement under specified conditions (e.g., at a given SOC window) |
 | **Composite** | The requirement is satisfied by a combination of capabilities |
 
-### 10.4 Upstream Propagation
+### 10.4 Site/Interconnection Capability
 
-Where a Product-Mechanism requirement cannot be satisfied by the current BESS physical model, it propagates upstream to BESS Engineering per M1 §22. M2 records the propagation status for each such requirement.
+Where a Product-Mechanism requirement depends on **site/interconnection capability**, the capability mapping references the site/interconnection capability entity defined by **P1-O14**. Until P1-O14 is resolved, this reference is pending.
+
+### 10.5 Upstream Propagation
+
+Where a Product-Mechanism requirement cannot be satisfied by the current BESS physical model, it propagates upstream to BESS Engineering per Parte 1 §22. Parte 3 records the propagation status for each such requirement.
 
 ---
 
@@ -581,13 +597,13 @@ Where a Product-Mechanism requirement cannot be satisfied by the current BESS ph
 | **Product-Mechanism ID** | The Product-Mechanism to which the requirement applies |
 | **Period type** | Bid window / Gate closure / Commitment period / Delivery period / Settlement period / Publication interval / Observation interval |
 | **Requirement** | The Product-Mechanism-specific temporal requirement |
-| **Rule value reference** | For transversal rule values (e.g., market-wide gate closure time), reference **M3a**. Not owned by M2. |
-| **Product-Mechanism-specific value** | For Product-Mechanism-specific temporal values (e.g., a product's fixed delivery block length), the value. **Owned by M2.** |
-| **Framework reference** | Reference to the **M1 temporal framework instance** that carries the market-level attributes: interval labeling, time zone, DST handling, resolution (M1 §11). |
-| **Source** | Linked Evidence Statement ID (M1 §16.3) |
-| **Owner** | M2 for Product-Mechanism-specific values. Reference M3a for transversal values. |
+| **Rule value reference** | For transversal rule values (e.g., market-wide gate closure time), reference **Parte 2**. Not owned by Parte 3. |
+| **Product-Mechanism-specific value** | For Product-Mechanism-specific temporal values (e.g., a product's fixed delivery block length), the value. **Owned by Parte 3.** |
+| **Framework reference** | Reference to the **Parte 2 temporal framework instance** that carries the market-level attributes: interval labeling, time zone, DST handling, resolution (Parte 2 §11). |
+| **Source** | Linked Evidence Statement ID (Parte 1 §16.3) |
+| **Owner** | Parte 3 for Product-Mechanism-specific values. Reference Parte 2 for transversal values. |
 
-**Market-level attributes are not duplicated on each temporal record.** Interval labeling, time zone, DST handling, and resolution are properties of the **market or its settlement system**. They are carried by the **M1 temporal framework instance** for the market, and referenced from each temporal record. This avoids the inconsistency that arises when the same attributes are recorded on every record.
+**Market-level attributes are not duplicated on each temporal record.** Interval labeling, time zone, DST handling, and resolution are properties of the **market or its settlement system**. They are carried by the **Parte 2 temporal framework instance** for the market, and referenced from each temporal record. This avoids the inconsistency that arises when the same attributes are recorded on every record.
 
 ### 11.2 Temporal Requirement Categories
 
@@ -603,7 +619,7 @@ Where a Product-Mechanism requirement cannot be satisfied by the current BESS ph
 
 ### 11.3 Temporal Mapping
 
-Product-Mechanism temporal requirements map onto the M1 temporal framework without redefining it. Each period is expressed as a relation to the project time axis, and references the framework instance for interval labeling, time zone, DST, and resolution.
+Product-Mechanism temporal requirements map onto the Parte 1 temporal framework without redefining it. Each period is expressed as a relation to the project time axis, and references the Parte 2 temporal framework instance for interval labeling, time zone, DST, and resolution.
 
 ---
 
@@ -617,20 +633,21 @@ Product-Mechanism temporal requirements map onto the M1 temporal framework witho
 | **Product-Mechanism ID** | The Product-Mechanism to which the risk applies |
 | **Type** | Eligibility-rule uncertainty / Qualification-rule uncertainty / Product-definition uncertainty / Capability-mapping uncertainty / Temporal-requirement uncertainty / Other |
 | **Description** | The risk or uncertainty |
-| **Owning Part** | M2 (Product-Mechanism-level); other Parts (M1 §18) |
+| **Owning Part** | Parte 3 (Product-Mechanism-level); other Parts (Parte 1 §18) |
 | **Impact** | Qualitative scale (Low / Medium / High) |
 | **Likelihood** | Qualitative scale (Low / Medium / High) |
 | **Mitigation** | How the risk is mitigated |
-| **Source** | Linked Evidence Statement ID (M1 §16.3) |
+| **Source** | Linked Evidence Statement ID (Parte 1 §16.3) |
 
 ### 12.2 Uncertainty Ownership
 
-- **M1** — domain-scope, role, structural, foundational assumption uncertainty
-- **M2** — product, qualification, eligibility-rule uncertainty
-- **M3a/M3b** — market-rule, signal, market-data, commitment, operational-constraint uncertainty
-- **M4** — delivery, performance, settlement uncertainty
+- **Parte 1** — domain-scope, role, structural, foundational assumption uncertainty
+- **Parte 2** — transversal value uncertainty
+- **Parte 3** — product, qualification, eligibility-rule uncertainty
+- **Parte 4** — market-rule, signal, market-data, commitment, operational-constraint uncertainty
+- **Parte 5** — delivery, performance, settlement uncertainty
 
-M2 records the owning Part for each uncertainty.
+Parte 3 records the owning Part for each uncertainty.
 
 ---
 
@@ -638,47 +655,47 @@ M2 records the owning Part for each uncertainty.
 
 ### 13.1 Ownership
 
-The product catalogue and the Product-Mechanism records are owned by M2.
+The product catalogue and the Product-Mechanism records are owned by Parte 3.
 
 ### 13.2 Change Control
 
-Changes follow project change control. Changes affecting M3a, M3b, or M4 propagate through controlled interfaces. Changes affecting BESS physical requirements propagate to BESS Engineering per M1 §22.
+Changes follow project change control. Changes affecting Parte 2, Parte 4, or Parte 5 propagate through controlled interfaces. Changes affecting BESS physical requirements propagate to BESS Engineering per Parte 1 §22.
 
 ### 13.3 Traceability
 
-Every catalogue entry and Product-Mechanism record traces to: originating evidence; eligibility requirements; qualification requirements; capability mappings; temporal requirements; risks; M3a references; M3b references (to be populated); M4 references (to be populated).
+Every catalogue entry and Product-Mechanism record traces to: originating evidence; eligibility requirements; qualification requirements; capability mappings; temporal requirements; risks; Parte 2 references; Parte 4 references (to be populated); Parte 5 references (to be populated).
 
 ---
 
 ## 14. Interfaces
 
-### 14.1 M1 — Market Domain and Conventions
+### 14.1 Parte 1 — Market Domain and Conventions
 
 **Consumes:** market environment and scope; participant-role model; semantic model with three branches; temporal framework; evidence model; ownership table; price-influence assumption.
 
 **Provides:** product-specific feedback; proposed changes via change control.
 
-### 14.2 M3a — Transversal Market Values (Early Baseline)
+### 14.2 Parte 2 — Transversal Market Values (Early Baseline)
 
-**Consumes from M3a:** market-wide gate closure conventions; market-wide registration requirements; market-wide timing conventions; market-wide data formats and telemetry; market-wide minimum participation sizes and aggregation rules, where transversal.
+**Consumes from Parte 2:** market-wide gate closure conventions; market-wide registration requirements; market-wide timing conventions; market-wide data formats and telemetry; market-wide minimum participation sizes and aggregation rules, where transversal; eligibility-relevant transversal limits; the temporal framework instance.
 
-**Provides to M3a:** feedback on transversal values encountered during product population; proposed additions via change control.
+**Provides to Parte 2:** feedback on transversal values encountered during product population; proposed additions via change control.
 
-### 14.3 M3b — Full Rules, Signals, Commitments and Constraints
+### 14.3 Parte 4 — Full Rules, Signals, Commitments and Constraints
 
-**Provides to M3b:** product identifiers; Product-Mechanism records; eligibility conditions per Product-Mechanism; qualification requirements per Product-Mechanism; temporal requirements; capability mappings; risks.
+**Provides to Parte 4:** product identifiers; Product-Mechanism records; eligibility conditions per Product-Mechanism; qualification requirements per Product-Mechanism; temporal requirements; capability mappings; risks.
 
-**Consumes from M3b:** product-specific rules; signal definitions; commitment definitions; operational constraints; stacking/coexistence rules.
+**Consumes from Parte 4:** product-specific rules; signal definitions; commitment definitions; operational constraints; stacking/coexistence rules.
 
-**Boundary rule:** A rule is owned by **M2** if it is specific to a Product-Mechanism. A rule is owned by **M3a** if it is transversal and needed before M2 freeze. A rule is owned by **M3b** if it is transversal or product-specific and **not** needed to evaluate eligibility.
+**Boundary rule:** A rule is owned by **Parte 3** if it is specific to a Product-Mechanism. A rule is owned by **Parte 2** if it is transversal and needed before Parte 3 freeze. A rule is owned by **Parte 4** if it is transversal or product-specific and **not** needed to evaluate eligibility.
 
-### 14.4 M4 — Delivery, Performance and Settlement
+### 14.4 Parte 5 — Delivery, Performance and Settlement
 
-**Provides to M4:** product identifiers; Product-Mechanism records.
+**Provides to Parte 5:** product identifiers; Product-Mechanism records; eligibility time dimension; temporal requirements.
 
-**Consumes from M4:** delivery definition and measurement; performance measurement; settlement mechanism; baseline/counterfactual; the authoritative settlement quantity per Product-Mechanism.
+**Consumes from Parte 5:** delivery definition and measurement; performance measurement; settlement mechanism; baseline/counterfactual; the authoritative settlement quantity per Product-Mechanism.
 
-**Direct reference:** M4 takes **delivery obligation** identifiers directly from **M3b**, not relayed through M2.
+**Direct reference:** Parte 5 takes **delivery obligation** identifiers directly from **Parte 4**, not relayed through Parte 3.
 
 ### 14.5 BESS Engineering
 
@@ -686,11 +703,11 @@ Every catalogue entry and Product-Mechanism record traces to: originating eviden
 
 **Provides to BESS:** market-derived capability requirements; response-time, duration, and qualification constraints; other requirements that may affect specification.
 
-Unmappable requirements propagate upstream per M1 §22.
+Unmappable requirements propagate upstream per Parte 1 §22.
 
 ### 14.6 Forecasting Engineering
 
-**Provides:** product identifiers; Product-Mechanism records; signal references (via M3b); temporal requirements; uncertainties relevant to forecasting.
+**Provides:** product identifiers; Product-Mechanism records; signal references (via Parte 4); temporal requirements; uncertainties relevant to forecasting.
 
 ### 14.7 Operational / Optimization Engineering
 
@@ -698,44 +715,49 @@ Unmappable requirements propagate upstream per M1 §22.
 
 ### 14.8 Financial Engineering
 
-**Provides:** product identifiers; Product-Mechanism records; settlement references (via M4); the eligibility time dimension (§7.5) — validity windows, evaluation basis, and the aggregate-validity intersection rule — required for asset-life valuation.
+**Provides:** product identifiers; Product-Mechanism records; settlement references (via Parte 5); the eligibility time dimension (§7.5) — validity windows, evaluation basis, and the aggregate-validity intersection rule — required for asset-life valuation.
 
 ### 14.9 Software Engineering
 
 **Provides:** catalogue structure; Product-Mechanism records; eligibility and qualification assessment logic; capability mapping structure; temporal requirement structure; identifier scheme.
 
+### 14.10 Network Engineering
+
+**Network Engineering** is defined in the **Introduction (v1.3)**. Parte 3 references it where capability mappings depend on network-side evidence. Until Introduction v1.3 is issued, the Network Operator role and BESS Engineering jointly perform these functions.
+
 ---
 
-## 15. M2 Open Items
+## 15. Parte 3 Open Items
 
 | ID | Open item | Required outcome | Owner | Priority | Blocking dependency | Target date |
 | --- | --- | --- | --- | --- | --- | --- |
-| M2-O01 | Product universe | Candidate product universe established | Market Engineering Lead | Critical | Depends on M1-O05 | TBD |
-| M2-O02 | Product taxonomy | Taxonomy axes finalized | Market Engineering Lead | High | Depends on M2-O01 | TBD |
-| M2-O03 | Eligibility conditions | Eligibility conditions defined per Product-Mechanism | Market Engineering Lead | High | Depends on M2-O01 | TBD |
-| M2-O04 | Qualification requirements | Qualification requirements defined per Product-Mechanism | Market Engineering Lead | High | Depends on M2-O01 | TBD |
-| M2-O05 | Capability mappings | Capability mappings completed per Product-Mechanism | Market Engineering Lead + BESS Engineering | High | Depends on M2-O01, M2-O03 | TBD |
-| M2-O06 | Temporal requirements | Product-Mechanism temporal requirements defined | Market Engineering Lead | High | Depends on M2-O01, M1-O06 | TBD |
-| M2-O07 | Product-Mechanism records | Product-Mechanism records defined for every product | Market Engineering Lead | High | Depends on M2-O01 | TBD |
-| M2-O08 | Product-Mechanism sheets | Sheets completed per in-scope Product-Mechanism | Market Engineering Lead | High | Depends on M2-O03–M2-O07 | TBD |
-| M2-O09 | Risks | Product-Mechanism risks identified | Market Engineering Lead | Medium | Depends on M2-O01 | TBD |
-| M2-O10 | M3a references | References to M3a established | Market Engineering Lead | High | Depends on M2-O13 | TBD |
-| M2-O11 | M4 settlement references | M4 settlement references established | Market Engineering Lead | Medium | Depends on M4 draft | TBD |
-| M2-O12 | BESS capability symbols | All required BESS capability symbols registered | BESS Engineering + Market Engineering Lead | High | Depends on M2-O05 | TBD |
-| M2-O13 | M3a frozen | M3a — Transversal Market Values frozen | M3 Lead (Introduction v1.2) | Critical | Blocks M2 freeze; independent of M2-O01 | TBD |
-| M2-O14 | Identifier scheme adopted | Cross-Part identifier scheme adopted by M1 | M1 Lead + Market Engineering Lead | Medium | Blocks M2 freeze; independent | TBD |
-| M2-O15 | Pilot Product-Mechanism sheet | One complete Product-Mechanism sheet piloted (energy, day-ahead or real-time) | Market Engineering Lead | High | Depends on M1-O01–O03 and **energy confirmed in scope** (a subset of M2-O01) | TBD |
+| P3-O01 | Product universe | Candidate product universe established | Market Engineering Lead | Critical | Depends on P1-O05 | TBD |
+| P3-O02 | Product taxonomy | Taxonomy axes finalized | Market Engineering Lead | High | Depends on P3-O01 | TBD |
+| P3-O03 | Eligibility conditions | Eligibility conditions defined per Product-Mechanism | Market Engineering Lead | High | Depends on P3-O01 | TBD |
+| P3-O04 | Qualification requirements | Qualification requirements defined per Product-Mechanism | Market Engineering Lead | High | Depends on P3-O01 | TBD |
+| P3-O05 | Capability mappings | Capability mappings completed per Product-Mechanism | Market Engineering Lead + BESS Engineering | High | Depends on P3-O01, P3-O03 | TBD |
+| P3-O06 | Temporal requirements | Product-Mechanism temporal requirements defined | Market Engineering Lead | High | Depends on P3-O01, P1-O06 | TBD |
+| P3-O07 | Product-Mechanism records | Product-Mechanism records defined for every product | Market Engineering Lead | High | Depends on P3-O01 | TBD |
+| P3-O08 | Product-Mechanism sheets | Sheets completed per in-scope Product-Mechanism | Market Engineering Lead | High | Depends on P3-O03–P3-O07 | TBD |
+| P3-O09 | Risks | Product-Mechanism risks identified | Market Engineering Lead | Medium | Depends on P3-O01 | TBD |
+| P3-O10 | Parte 2 references | References to Parte 2 established | Market Engineering Lead | High | Depends on P2 freeze | TBD |
+| P3-O11 | Parte 5 settlement references | Parte 5 settlement references established | Market Engineering Lead | Medium | Depends on Parte 5 draft | TBD |
+| P3-O12 | BESS capability symbols | All required BESS capability symbols registered | BESS Engineering + Market Engineering Lead | High | Depends on P3-O05 | TBD |
+| P3-O13 | Parte 2 frozen | Parte 2 — Transversal Market Values frozen | Parte 2 Lead | Critical | Blocks Parte 3 freeze; independent of P3-O01 | TBD |
+| P3-O14 | Identifier scheme adopted | Cross-Part identifier scheme adopted by Parte 1 | Parte 1 Lead + Market Engineering Lead | Medium | Blocks Parte 3 freeze; independent | TBD |
+| P3-O15 | Pilot Product-Mechanism sheet | One complete Product-Mechanism sheet piloted (energy, day-ahead or real-time) | Market Engineering Lead | High | Depends on P1-O01–O03 and **energy confirmed in scope** (a subset of P3-O01) | TBD |
+| **P3-O16** | **Site/interconnection capability** | **P1-O14 resolved; capability mapping consumes the entity** | **Parte 3 Lead + Network Engineering** | **High** | **Depends on P1-O14; blocks Parte 3 freeze** | **TBD** |
 
-**Critical path:** M2-O01 blocks most items. M2-O13 (M3a frozen) and M2-O14 (identifier scheme) block M2 freeze independently. M2-O15 (pilot) is the recommended next step and depends only on **energy being confirmed in scope**, not on the full product universe.
+**Critical path:** P3-O01 blocks most items. P3-O13 (Parte 2 frozen) and P3-O14 (identifier scheme) block Parte 3 freeze independently. P3-O15 (pilot) is the recommended next step and depends only on **energy being confirmed in scope**, not on the full product universe. P3-O16 (site/interconnection capability) blocks Parte 3 freeze.
 
 ---
 
-## 16. M2 Validation Criteria
+## 16. Parte 3 Validation Criteria
 
 ### Product Validation
 
 - **Method:** Comparison against authoritative market documentation and project requirements.
-- **Reference case:** The market environment and product universe established per M1-O05.
+- **Reference case:** The market environment and product universe established per P1-O05.
 - **Reviewer:** Market Engineering Lead + independent reviewer.
 - **Pass condition:** Every in-scope product has a complete set of Product-Mechanism sheets; no product is defined without an authoritative source; no strategy is listed as a product.
 
@@ -749,9 +771,9 @@ Unmappable requirements propagate upstream per M1 §22.
 ### Eligibility Validation
 
 - **Method:** Review of eligibility conditions per Product-Mechanism. Test the vacuous case, the indeterminate case, the participation-ready state, and the aggregate-validity intersection.
-- **Reference case:** Market documentation, M3a, and BESS Engineering Part 1.
+- **Reference case:** Market documentation, Parte 2, and BESS Engineering Part 1.
 - **Reviewer:** Market Engineering Lead + BESS Engineering.
-- **Pass condition:** Each condition is correctly categorized, has a source, has an assessment method, and has an owner that is M2 (Product-Mechanism-specific) or M3a (transversal). No eligibility condition depends on M3b. Aggregate eligibility, vacuous and indeterminate cases, participation-ready, and aggregate validity are correctly computed.
+- **Pass condition:** Each condition is correctly categorized, has a source, has an assessment method, and has an owner that is Parte 3 (Product-Mechanism-specific) or Parte 2 (transversal). No eligibility condition depends on Parte 4. Aggregate eligibility, vacuous and indeterminate cases, participation-ready, and aggregate validity are correctly computed.
 
 ### Qualification Validation
 
@@ -769,21 +791,21 @@ Unmappable requirements propagate upstream per M1 §22.
 
 ### Temporal Validation
 
-- **Method:** Test cases covering interval labeling, time-zone boundaries, and resolution mismatch, applied to **at least one temporal requirement from each in-scope Product-Mechanism**, plus at least one that exercises the M1 temporal framework reference.
-- **Reference case:** M1 temporal framework and M3a.
+- **Method:** Test cases covering interval labeling, time-zone boundaries, and resolution mismatch, applied to **at least one temporal requirement from each in-scope Product-Mechanism**, plus at least one that exercises the Parte 2 temporal framework instance reference.
+- **Reference case:** Parte 2 temporal framework instance and Parte 1 temporal framework.
 - **Reviewer:** Market Engineering Lead + BESS Engineering.
-- **Pass condition:** All applicable test cases produce the expected mapping; market-level attributes are referenced from the framework instance, not duplicated; Product-Mechanism-specific and transversal values are correctly distinguished.
+- **Pass condition:** All applicable test cases produce the expected mapping; market-level attributes are referenced from the Parte 2 framework instance, not duplicated; Product-Mechanism-specific and transversal values are correctly distinguished.
 
 ### Boundary Validation
 
-- **Method:** Interface review with M1, M3a, M3b, M4, BESS, Forecasting, Operational/Optimization, Financial, Software.
+- **Method:** Interface review with Parte 1, Parte 2, Parte 4, Parte 5, BESS, Forecasting, Operational/Optimization, Financial, Software, Network Engineering.
 - **Reference case:** Interface definitions in §14.
 - **Reviewer:** Cross-domain review board.
-- **Pass condition:** No responsibility is claimed by two domains; no responsibility is unowned; the eligibility path does not reference M3b; M4 takes delivery references directly from M3b.
+- **Pass condition:** No responsibility is claimed by two domains; no responsibility is unowned; the eligibility path does not reference Parte 4; Parte 5 takes delivery references directly from Parte 4.
 
 ### Evidence Validation
 
-- **Method:** Traceability audit (M1 §16.4).
+- **Method:** Traceability audit (Parte 1 §16.4).
 - **Reference case:** Critical-path evidence set.
 - **Reviewer:** Independent evidence reviewer.
 - **Pass condition:** Every material statement has a complete Statement Record and at least one complete Source Record. Tier-1 statements have at least one Verified Rule source.
@@ -791,21 +813,21 @@ Unmappable requirements propagate upstream per M1 §22.
 ### Consistency Validation
 
 - **Method:** Symbol, identifier, and convention audit.
-- **Reference case:** BESS Engineering Part 1 (pinned version), M1 v1.2, M3a, Introduction v1.2.
+- **Reference case:** BESS Engineering Part 1 (pinned version), Parte 1 v1.3, Parte 2, Introduction v1.2.
 - **Reviewer:** BESS Engineering + Market Engineering Lead.
-- **Pass condition:** No conflicting symbols, identifiers, units, state conventions, or temporal conventions; no M3a, M3b, or M4 concept is redefined in M2; identifiers are stable, unique on the unprefixed form, and owner is recorded separately.
+- **Pass condition:** No conflicting symbols, identifiers, units, state conventions, or temporal conventions; no Parte 2, Parte 4, or Parte 5 concept is redefined in Parte 3; identifiers are stable, unique on the unprefixed form, and owner is recorded separately.
 
 ---
 
-## 17. M2 Acceptance Criteria
+## 17. Parte 3 Acceptance Criteria
 
-M2 is ready for engineering freeze when:
+Parte 3 is ready for engineering freeze when:
 
 - the product universe is established and traceable to authoritative evidence;
 - the product taxonomy is finalized and applied consistently;
 - every in-scope product has a complete set of Product-Mechanism sheets;
 - Product-Mechanism records are defined for every product, and path-dependent records key on Product-Mechanism ID;
-- eligibility conditions are defined per Product-Mechanism, categorized, sourced, assessed, and **do not depend on M3b**;
+- eligibility conditions are defined per Product-Mechanism, categorized, sourced, assessed, and **do not depend on Parte 4**;
 - the vacuous, indeterminate, and participation-ready cases are computed correctly;
 - qualification states, aggregation, validity, and the time dimension are defined and computed correctly;
 - registration is assigned to market eligibility, not qualification;
@@ -813,41 +835,43 @@ M2 is ready for engineering freeze when:
 - degradation is referenced **once**, on the assessment result;
 - margin application is stated per mapping;
 - aggregate validity (intersection rule) is defined for both eligibility and qualification;
-- Product-Mechanism temporal requirements are defined and map correctly onto the M1 temporal framework; market-level attributes are referenced from the framework instance, not duplicated;
+- Product-Mechanism temporal requirements are defined and map correctly onto the Parte 1 temporal framework; market-level attributes are referenced from the Parte 2 framework instance, not duplicated;
 - product-level risks and uncertainties are identified, with owning Parts recorded;
-- **M3a is frozen** (M2-O13);
-- **the cross-Part identifier scheme is adopted** (M2-O14);
-- M4 settlement references are established or explicitly deferred;
+- **Parte 2 is frozen** (P3-O13);
+- **the cross-Part identifier scheme is adopted** (P3-O14);
+- **site/interconnection capability is resolved** (P3-O16, depends on P1-O14);
+- Parte 5 settlement references are established or explicitly deferred;
 - all required BESS capability symbols are registered through BESS Engineering Part 1;
 - no independent market symbol authority exists;
-- interfaces with M1, M3a, M3b, M4, BESS, Forecasting, Operational/Optimization, Financial, and Software Engineering are defined;
-- the **Introduction v1.2 change** establishing the M3 split and the revised freeze order is issued;
+- interfaces with Parte 1, Parte 2, Parte 4, Parte 5, BESS, Forecasting, Operational/Optimization, Financial, Software, and Network Engineering are defined;
 - open items have been resolved or explicitly accepted as controlled assumptions, with owners, priorities, dependencies, and dispositions recorded;
 - validation criteria have been satisfied with documented method, reference case, reviewer, and pass/fail result.
 
 ---
 
-## 18. M2 Maturity
+## 18. Parte 3 Maturity
 
-M2 follows the project-wide maturity ladder:
+Parte 3 follows the project-wide maturity ladder:
 
 **Semantic Definition → Internal Consistency → External Evidence → Engineering Validation → Frozen**
 
 Current status:
 
 - **Semantic Definition — established (framework)**
-- **Internal Consistency — ready for validation** *(revised from "established" in v1.1, pending independent review)*
-- **External Evidence — pending product universe identification (M2-O01)**
+- **Internal Consistency — ready for validation**
+- **External Evidence — pending product universe identification (P3-O01)**
 - **Engineering Validation — pending**
 - **Frozen — No**
 
-**Status note.** The M2 framework is complete as of v1.2. The remaining work is populating the catalogue with real products and Product-Mechanism records from authoritative market documentation. Further abstract iteration on the framework will add little. The next real gain is **External Evidence**, blocked on M1-O01 through M1-O05. The recommended next step is the **pilot Product-Mechanism sheet** (M2-O15) once M1-O01–O03 are resolved and energy is confirmed in scope.
+**Status note.** The Parte 3 framework is complete as of v1.3. The remaining work is populating the catalogue with real products and Product-Mechanism records from authoritative market documentation. Further abstract iteration on the framework will add little. The next real gain is **External Evidence**, blocked on P1-O01 through P1-O05. The recommended next step is the **pilot Product-Mechanism sheet** (P3-O15) once P1-O01–O03 are resolved and energy is confirmed in scope.
+
+**Roadmap note.** Parte 3 cannot be written until Parte 2 is frozen (P3-O13) and the market environment is defined (P1-O01–O03). Both are prerequisites for populating the catalogue.
 
 ---
 
-## 19. Output of M2
+## 19. Output of Parte 3
 
-The final output of M2 shall be a controlled **Market Product Specification** containing:
+The final output of Parte 3 shall be a controlled **Market Product Specification** containing:
 
 1. product taxonomy;
 2. product catalogue with lifecycle status;
@@ -856,19 +880,23 @@ The final output of M2 shall be a controlled **Market Product Specification** co
 5. eligibility requirements per Product-Mechanism, with assessment results carrying validity windows and evaluation basis, and the aggregate-validity intersection rule;
 6. qualification requirements per Product-Mechanism, with states, aggregation, validity windows, and the aggregate-validity intersection rule;
 7. product-to-BESS capability mappings, timeless, with no degradation reference (degradation referenced once, on the assessment result);
-8. Product-Mechanism temporal requirements, referencing the M1 temporal framework instance for market-level attributes;
+8. Product-Mechanism temporal requirements, referencing the Parte 2 temporal framework instance for market-level attributes;
 9. product-level risks and uncertainties;
-10. M3a references (populated);
-11. M3b references (to be populated);
-12. M4 settlement references (to be populated);
+10. Parte 2 references (populated);
+11. Parte 4 references (to be populated);
+12. Parte 5 settlement references (to be populated);
 13. registered BESS capability symbols through BESS Part 1;
-14. identifier scheme (adopted by M1);
+14. identifier scheme (adopted by Parte 1);
 15. resolved assumptions and open-item disposition.
 
 This output becomes the formal product foundation for:
 
-**M3b — Full Rules, Signals, Commitments and Constraints**
+**Parte 4 — Full Rules, Signals, Commitments and Constraints**
 
 which will then answer the next engineering question:
 
 > **What rules govern participation in each Product-Mechanism, what signals does the market publish, how are commitments formed and satisfied, and what constraints apply?**
+
+---
+
+*End of Parte 3 — Market Products and Participation (v1.3)*
