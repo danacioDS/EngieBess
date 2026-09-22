@@ -1,73 +1,33 @@
-# BESS Engineering Model
+# Market Engineering Model
 
-Technical specification for the operational and financial simulation of Battery Energy Storage Systems (BESS), prepared for ENGIE RFP-264144-1.
+Cadena de documentos para la ingeniería de mercados del BESS.
 
-## Documents (Markdown)
+## Secuencia de Congelamiento
 
-| Part | Title | Link |
-|---|---|---|
-| 0 | Introduction | [docs/part0-introduction.md](docs/part0-introduction.md) |
-| 1 | Fundamentals and Conventions | [docs/part1-fundamentals.md](docs/part1-fundamentals.md) |
-| 2 | Physical Asset Model | [docs/part2-physical-asset.md](docs/part2-physical-asset.md) |
-| 3 | Degradation and Useful Life | pending |
-| 4 | Services (Operating Modes) | [docs/part4-services.md](docs/part4-services.md) |
-| 5 | Dispatch, Stacking, and Outputs | pending |
+Parte 1 → Parte 2 → Parte 3 → Parte 4 → Parte 5
 
-Supplementary:
+## Documentos
 
-- [Financial Approach](docs/financial/financial-approach.md)
+| # | Documento | Versión | Document ID |
+|---|-----------|---------|-------------|
+| 1 | Parte 1 — Market Domain and Conventions | v1.3 | ME-P1-001 |
+| 2 | Parte 2 — Transversal Market Values | v1.0 | ME-P2-001 |
+| 3 | Parte 3 — Market Products and Participation | v1.3 | ME-P3-001 |
+| 4 | Parte 4 — Market Rules, Signals, Commitments and Constraints | v1.4 | ME-P4-001 |
+| 5 | Parte 5 — Delivery, Performance and Settlement | v1.2 | ME-P5-001 |
 
-## Formal PDF
+## Documento Gobernante
 
-The consolidated LaTeX document is built automatically on each push to main.
+Introduction Document v1.2 (v1.3 pending for Network Engineering).
 
-Download the latest PDF from the Actions tab of this repository.
+## Decisión Bloqueante Única
 
-## Local build
+P1-O01 a P1-O03: jurisdicción, operador, wholesale/BTM.
 
-Requirements:
+## Items Pendientes
 
-- pandoc
-- latexmk
-- A LaTeX distribution (TeX Live on Linux, MacTeX on macOS, MiKTeX on Windows)
-
-Build:
-
-    ./scripts/build.sh
-
-The PDF is generated at latex/build/main.pdf.
-
-## Repository structure
-
-    EngieBess/
-    |-- README.md
-    |-- docs/
-    |   |-- part0-introduction.md
-    |   |-- part1-fundamentals.md
-    |   |-- part2-physical-asset.md
-    |   |-- part4-services.md
-    |   `-- financial/
-    |       `-- financial-approach.md
-    |-- scripts/
-    |   |-- md2tex.sh
-    |   `-- build.sh
-    |-- latex/
-    |   |-- main.tex
-    |   |-- sections/
-    |   `-- build/
-    `-- .github/
-        `-- workflows/
-            `-- build-pdf.yml
-
-## Editing conventions
-
-- Source of truth: docs/*.md. Edit these.
-- Generated: latex/sections/*.tex. Do not edit manually.
-- Manual: latex/main.tex. Edit as needed.
-- Never committed: latex/build/ and LaTeX auxiliaries.
-
-# EngieBess
-git status
-git add .
-git commit -m "initial commits"
-git push origin main 
+- P1-O14 (site/interconnection capability)
+- Introduction v1.3 (Network Engineering)
+- P4-O17 (award simulation rule)
+- P5-O17 (null-path linkage confirmation)
+- P5-O18 (settlement statement ownership)
