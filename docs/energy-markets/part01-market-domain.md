@@ -16,7 +16,7 @@
 | 1.0 | 2026-09-22 | Development Draft | Initial M1 baseline. |
 | 1.1 | 2026-09-22 | Development Draft | Closed null-commitment path; corrected commitment-presupposing text; split evidence into source and statement records; resolved three split ownerships; separated price-influence axis from price-responsive participation mode; reclassified contracts in the evidence hierarchy; made validation criteria testable; added M1-O13; renamed entity/role overlap; removed duplicated text. |
 | 1.2 | 2026-09-22 | Development Draft | Fixed three-branch lifecycle diagram; corrected definition–instance rule and its examples; qualified every use of "dispatch"; relaxed null-path absolutes; cited Introduction v1.1 rather than restating its rules; stabilized Document ID; corrected open-items critical path; added materiality tiers; extended evidence record fields; resolved minor ownership and categorization gaps. |
-| 1.3 | 2026-09-22 | Development Draft | **Renamed from "M1" to "Parte 1" per project nomenclature.** **Updated Parent Document citation from Introduction v1.1 to v1.2.** **Updated all internal references to Introduction v1.2.** **Added the M3a/M3b split reference owned by Introduction v1.2.** **Renamed the M3a/M3b references to Parte 2/Parte 4.** **Renamed all M2 references to Parte 3.** **Renamed all M4 references to Parte 5.** **Updated Document ID from ME-M1-001 to ME-P1-001.** **Updated open item IDs from M1-Oxx to P1-Oxx.** **Added note that M3a/M3b split is owned by Introduction v1.2, not by Parte 1.** **Corrected all cross-references to the new nomenclature.** |
+| 1.3 | 2026-09-22 | Development Draft | **Renamed from "M1" to "Parte 1" per project nomenclature.** **Updated Parent Document citation from Introduction v1.1 to v1.2.** **Updated all internal references to Introduction v1.2.** **Added the M3a/M3b split reference owned by Introduction v1.2.** **Renamed the M3a/M3b references to Parte 2/Parte 4.** **Renamed all M2 references to Parte 3.** **Renamed all M4 references to Parte 5.** **Updated Document ID from ME-M1-001 to ME-P1-001.** **Updated open item IDs from M1-Oxx to P1-Oxx.** **Added note that M3a/M3b split is owned by Introduction v1.2, not by Parte 1.** **Added P1-O14 (site/interconnection capability).** **Added Network Engineering reference.** **Added identifier scheme reference.** **Corrected all cross-references to the new nomenclature.** |
 
 **Change control note:** The canonical lifecycle, the optional-node rule, the null-commitment path rule, the M2 template reference rule, and the M3 split into M3a (Transversal Market Values) and M3b (Full Rules) are owned by the **Introduction Document v1.2**. Parte 1 cites them and treats the corresponding text in §8, §10, and §27 as **informative**, not normative. Where Parte 1 and the Introduction differ, the Introduction governs.
 
@@ -770,7 +770,7 @@ The principal ownership structure is:
 | Stacking / coexistence | Parte 4 |
 | Transversal market constraints | Parte 4 |
 | Grid / network constraints (market-relevant) | Parte 4 |
-| Site/interconnection capability (definition and value ownership) | Parte 1 (pending P1-O14) |
+| Site/interconnection capability (definition and value ownership) | Parte 1 (definition); Network Engineering (value ownership, pending P1-O14) |
 | Site/interconnection capability (consumption) | Parte 3 (capability mapping) |
 | Temporal rule values (gate closure, delivery timing, settlement timing) | Parte 4 |
 | Temporal framework instance (time zone, interval labeling, resolution) | Parte 2 |
@@ -786,6 +786,7 @@ The principal ownership structure is:
 | Network Engineering | Introduction v1.3 (pending) |
 | Evidence Source | Owning Part (per record) |
 | Evidence Statement | Owning Part (per record) |
+| Network-side constraint evidence | Network Engineering (defined in Introduction v1.3; pending) |
 
 ### 19.1 Definition–Instance Rule
 
@@ -828,6 +829,8 @@ For each required market symbol, the engineering process shall ensure:
 The symbol itself is registered in the project-wide registry.
 
 Any change to a registered market symbol shall follow project change control.
+
+**Identifier scheme:** Market-specific **identifiers** (distinct from mathematical symbols) are governed by the cross-Part identifier scheme defined in **Parte 3 §4.5**. Identifiers use the format `<type>-<sequence>` (e.g., `PROD-001`, `PM-001`), are unique on the unprefixed form, and are stable across versions. The namespace prefix is optional and display-only. Ownership is recorded in a field, not in the identifier. The identifier registry is separate from the BESS Engineering Part 1 master symbol registry.
 
 ---
 
@@ -921,9 +924,19 @@ Software Engineering determines implementation architecture and technology.
 
 ### 21.7 Network Engineering
 
-**Network Engineering** is the engineering domain responsible for network-side analysis and evidence. It is distinct from the **Network Operator** (a role in §5, performed by an external party) and from **BESS Engineering** (which owns the physical BESS model).
+**Network Engineering** is the engineering domain responsible for network-side analysis and evidence that support grid and network constraints and site/interconnection capability. It is distinct from:
+- **Network Operator** (a role in §5, performed by an external party);
+- **BESS Engineering** (which owns the physical BESS model).
 
-Network Engineering is defined in the **Introduction (v1.3)**. Parte 1 references it. Until Introduction v1.3 is issued, the Network Operator role and BESS Engineering jointly perform these functions.
+**Network Engineering is defined in the Introduction (v1.3).** Parte 1 references it. Until Introduction v1.3 is issued, the Network Operator role and BESS Engineering jointly perform these functions.
+
+Network Engineering provides:
+- network constraint identification and analysis;
+- interconnection agreement technical obligations;
+- grid-connection requirement evidence;
+- network-operator requirement evidence;
+- site-specific network limitation evidence;
+- **site/interconnection capability evidence and value** (pending P1-O14).
 
 ---
 
@@ -971,11 +984,11 @@ The following items must be resolved before Parte 1 can be frozen.
 | P1-O11 | Regulatory horizon | Relevant long-horizon rule changes identified | Market Engineering Lead | Medium | Depends on P1-O09 | TBD |
 | P1-O12 | Commercial boundary | Any required separation from contractual/commercial modeling confirmed | Market Engineering Lead | Medium | Depends on P1-O03 | TBD |
 | P1-O13 | Pinned dependency | BESS Engineering Part 1 version pinned in Parte 1 header | BESS Engineering + Market Engineering Lead | Critical | Blocks freeze; independent of P1-O01–P1-O03 | TBD |
-| **P1-O14** | **Site/interconnection capability** | **Entity defined; value owner identified; consumed by Parte 3 capability mapping** | **Parte 1 Lead + Network Engineering** | **High** | **Blocks Parte 3 freeze; independent of P1-O01** | **TBD** |
+| **P1-O14** | **Site/interconnection capability** | **Entity definition and value ownership established; consumed by Parte 3's capability mapping** | **Parte 1 Lead + Network Engineering** | **High** | **Depends on Introduction v1.3; blocks Parte 3 and Parte 4 freeze** | **TBD** |
 
 These are **engineering open items**, not assumptions to be silently resolved by the model.
 
-**Critical path:** P1-O01 → P1-O02 → P1-O03 block nearly all other items and shall be resolved first. P1-O13 blocks freeze independently of the P1-O01–P1-O03 chain. P1-O14 blocks Parte 3 freeze independently.
+**Critical path:** P1-O01 → P1-O02 → P1-O03 block nearly all other items and shall be resolved first. P1-O13 blocks freeze independently of the P1-O01–P1-O03 chain. P1-O14 blocks Parte 3 and Parte 4 freeze independently.
 
 **Roadmap note:** P1-O01–P1-O03 are the **single blocking decision** for the entire Market Engineering sequence. Without jurisdiction, operator, and wholesale/BTM determination, Parte 2 cannot be written, and nothing downstream can proceed.
 
@@ -1036,6 +1049,13 @@ Each validation category shall specify **method**, **reference case**, **reviewe
 - **Reviewer:** BESS Engineering.
 - **Pass condition:** No conflicting symbols, units, state conventions, or temporal conventions.
 
+### Network Engineering Boundary Validation
+
+- **Method:** Interface review with Network Engineering (or, until Introduction v1.3, the Network Operator role and BESS Engineering).
+- **Reference case:** Interface definition in §21.7.
+- **Reviewer:** Cross-domain review board.
+- **Pass condition:** Site/interconnection capability evidence and value ownership are correctly assigned; no network-side constraint is recorded as a market rule.
+
 ---
 
 ## 25. Parte 1 Acceptance Criteria
@@ -1053,6 +1073,8 @@ Parte 1 is ready for engineering freeze when:
 - price-influence assumption is explicit and separated from participation mode;
 - grid/network constraints have an identified source and interface;
 - site/interconnection capability (P1-O14) is resolved or explicitly deferred with rationale;
+- site/interconnection capability definition and value ownership are established (P1-O14);
+- Network Engineering is defined in Introduction v1.3, or the provisional arrangement (Network Operator role + BESS Engineering) is documented;
 - evidence classification is applied through linked Source and Statement records;
 - materiality tiers are defined and applied;
 - uncertainty ownership is assigned;
@@ -1108,7 +1130,9 @@ The final output of Parte 1 shall be a controlled **Market Domain Specification*
 12. grid/network boundary;
 13. change-control relationships;
 14. registered market symbols through BESS Part 1;
-15. resolved assumptions and open-item disposition.
+15. resolved assumptions and open-item disposition;
+16. Network Engineering interface (or provisional arrangement);
+17. Identifier scheme reference (Parte 3 §4.5).
 
 This output becomes the formal semantic foundation for:
 
