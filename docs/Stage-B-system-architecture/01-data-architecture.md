@@ -4,7 +4,7 @@
 
 **Document ID:** STAGE-B-HLD-001
 
-**Version:** 0.1 — Draft
+**Version:** 0.2 — Draft for Review
 
 **Section:** §4 — B.1 Data Architecture
 
@@ -24,7 +24,7 @@
 - `STAGE-B-HLD-INDEX-001` — Stage B HLD Master Index and Scope Definition
 - `STAGE-B-HLD-001 §3` — B.0 Integrated System Architecture (v0.3.3 Baseline Frozen)
 
-**Note on versions.** Parent document versions are not restated here; they are as declared in each document.
+**Changes from v0.1:** 6 major corrections (see §13 Change Log).
 
 ---
 
@@ -32,15 +32,16 @@
 
 B.1 defines the **data architecture** of the system. It establishes:
 
-- What **logical data entities** exist
-- How data is organized into **families**
-- Who **owns** each data family
-- How data **flows** between families
+- How data is organized into **three architectural categories**
+- What **data entities** exist within each category
+- Who **owns** each data category (architectural vs semantic ownership)
+- How data **flows** between categories
 - What **transformation states** exist
-- What **data interfaces** exist between components
+- What **data interfaces** exist
 - What **data quality** requirements apply
 - How **lineage and versioning** are conceptually handled
 - How **scenario isolation** is conceptually achieved
+- What **logical data types** are recognized
 
 B.1 **does not** define:
 
@@ -51,8 +52,9 @@ B.1 **does not** define:
 - Databricks configuration
 - Storage technology
 - Physical partitioning
-- Validation rules (exact)
+- Exact validation rules
 - Pipeline implementation
+- Physical data types
 
 Those belong to Stage C (specification) and Stage D (implementation).
 
@@ -68,7 +70,7 @@ B.1 answers:
 
 B.1 sits **after B.0** (Integrated System Architecture) and **before B.2** (Model Architecture). It details the data dimension of the architecture defined in B.0.
 
-| View | Depends on B.0 | Detail Level |
+| View | Depends on | Detail Level |
 |---|---|---|
 | B.0 | — | Architectural contract |
 | **B.1 Data Architecture** | **B.0** | **Data details** |
@@ -80,93 +82,109 @@ B.1 sits **after B.0** (Integrated System Architecture) and **before B.2** (Mode
 
 **Rule:** B.1 constrains B.2–B.6 on data aspects. No view can contradict B.1's data model.
 
-**Rule:** B.1 does not redefine components, responsibilities, or interfaces already declared in B.0. It represents their data dimension.
+**Rule:** B.1 does not redefine components, responsibilities, or interfaces already declared in B.0.
 
 ---
 
 ### 3. Data Architecture View
 
-#### 3.1 Data Flow Overview
+#### 3.1 Three Architectural Categories
+
+Data in the system is organized into **three architectural categories**:
 
 ```
-        EXTERNAL DATA SOURCES
-                │
-                ▼
-        ┌───────────────┐
-        │   INGESTION   │
-        └───────┬───────┘
-                │
-                ▼
-        ┌───────────────┐
-        │     RAW       │
-        └───────┬───────┘
-                │
-                ▼
-        ┌───────────────┐
-        │  VALIDATED    │
-        └───────┬───────┘
-                │
-                ▼
-        ┌───────────────┐
-        │ MODEL-READY   │
-        └───────┬───────┘
-                │
-                ▼
-        ┌───────────────┐
-        │   EXECUTION   │
-        │     STATE     │
-        └───────┬───────┘
-                │
-                ▼
-        ┌───────────────┐
-        │    RESULTS    │
-        └───────┬───────┘
-                │
-                ▼
-        APPLICATION / REPORTING
+                    DATA ARCHITECTURE
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+ DATA LIFECYCLE      EXECUTION DATA     GOVERNANCE DATA
+        │                  │                  │
+        ▼                  ▼                  ▼
+ Source              Execution State     Lineage
+   ↓                 Runtime State       Validation Evidence
+ Ingested            State History       Version Metadata
+   ↓                 Run Metadata        Scenario/Run Identity
+ Validated           Results
+   ↓
+ Model-ready
 ```
 
-**Note:** This flow is **logical**, not physical. The physical implementation (storage, format, technology) is defined in B.6.
+These three categories are **parallel and orthogonal**. They are not a single taxonomy.
 
-#### 3.2 Data Families
-
-The system has **6 logical data families**:
-
-| # | Family | Description |
+| Category | What it represents | Nature |
 |---|---|---|
-| F1 | **Sources** | External data as received (raw, unprocessed) |
-| F2 | **Ingested** | Data loaded into the system (structured, timestamped) |
-| F3 | **Validated** | Data that has passed quality checks |
-| F4 | **Model-ready** | Data structured and aligned for the engineering components |
-| F5 | **Execution State** | State that persists across iterations (SOC, SOH, cash flow) |
-| F6 | **Results** | Operational and financial outputs |
+| **Data Lifecycle** | How data is progressively processed | Sequential transformation |
+| **Execution Data** | What the system produces and maintains during execution | Runtime state + outputs |
+| **Governance Data** | How the system tracks and audits | Cross-cutting metadata |
 
-Each family is **owned** by a data owner (see §5) and has **defined contracts** with adjacent families (see §7).
+#### 3.2 Data Lifecycle
 
-#### 3.3 Key Distinctions
+The **Data Lifecycle** represents the progressive processing of input data:
+
+```
+Source → Ingested → Validated → Model-ready
+```
+
+| Stage | Description |
+|---|---|
+| **Source** | External data as received (raw, unprocessed) |
+| **Ingested** | Data loaded into the system (structured, timestamped) |
+| **Validated** | Data that has passed quality checks |
+| **Model-ready** | Data structured and aligned for the engineering components |
+
+**Key distinction:** Each stage transforms the **same data entity** (e.g., meter data). A validated meter reading is the same entity as the source meter reading, just processed.
+
+#### 3.3 Execution Data
+
+The **Execution Data** represents what the system produces and maintains during execution:
+
+| Sub-category | Description |
+|---|---|
+| **Execution State** | State that persists across iterations |
+| **Runtime State** | State within a single execution |
+| **State History** | Historical record of state evolution |
+| **Run Metadata** | Information about each execution |
+| **Results** | Operational and financial outputs |
+
+**Key distinction:** Execution Data is **not** the next stage of the Data Lifecycle. It represents a different kind of data — the state and outputs of the system itself.
+
+#### 3.4 Governance Data
+
+The **Governance Data** represents cross-cutting metadata:
+
+| Sub-category | Description |
+|---|---|
+| **Lineage** | Data and decision traceability |
+| **Validation Evidence** | Validation results and evidence |
+| **Version Metadata** | Versions of data, parameters, code |
+| **Scenario/Run Identity** | Identity of scenarios and runs |
+
+**Key distinction:** Governance Data is **metadata about the system**, not part of the data transformation or execution itself.
+
+#### 3.5 Key Distinctions
 
 | Concept | Definition |
 |---|---|
-| **Data family** | A logical grouping of data with a defined purpose |
-| **Data entity** | A specific type of data within a family |
-| **Data owner** | The domain responsible for the data family |
-| **Data flow** | Movement of data between families |
-| **Data interface** | Contract between adjacent families |
-| **Data quality** | Requirements applied at validation |
+| **Architectural category** | One of the three parallel categories |
+| **Data lifecycle stage** | A stage in the sequential transformation |
+| **Execution data type** | A category of runtime/output data |
+| **Governance data type** | A category of metadata |
+| **Data entity** | A specific type of data |
 
 **Rule:** These are **different data concepts**. They are not layers, not components, and not domains.
 
 ---
 
-### 4. Data Families
+### 4. Data Lifecycle
 
-#### 4.1 Family F1 — Sources
+#### 4.1 Stage 1 — Source
 
 **Purpose:** Represent external data as received, before any processing.
 
 **Primary entities:**
 
-| Entity | Description | Owner |
+| Entity | Description | Semantic owner |
 |---|---|---|
 | **Meter data** | Historical site consumption | Domain 2 |
 | **Market prices** | DA/RT LMP, ancillary, capacity | Domain 2 |
@@ -177,23 +195,19 @@ Each family is **owned** by a data owner (see §5) and has **defined contracts**
 | **Financial assumptions** | Discount rate, escalation, tax | Domain 6 |
 | **Scenario definitions** | Scenario parameters | Scenario Management |
 
-**Boundary:**
+**Architectural owner:** Domain 7 (data infrastructure)
 
-| In scope | Out of scope |
-|---|---|
-| Raw external data | Processing or validation |
-| Source metadata (origin, timestamp) | Transformation |
-| Coverage of the simulation horizon | Physical storage format |
+**Semantic owner:** The domain that defines what the data means.
 
 **Note:** The exact list of sources depends on **PH-003 (Data availability)** — what ENGIE provides.
 
-#### 4.2 Family F2 — Ingested
+#### 4.2 Stage 2 — Ingested
 
 **Purpose:** Represent data loaded into the system, structured and timestamped.
 
 **Primary entities:**
 
-| Entity | Description | Owner |
+| Entity | Description | Semantic owner |
 |---|---|---|
 | **Ingested meter data** | Structured meter readings | Domain 2 |
 | **Ingested market prices** | Structured price curves | Domain 2 |
@@ -202,21 +216,17 @@ Each family is **owned** by a data owner (see §5) and has **defined contracts**
 | **Ingested battery data** | Structured vendor data | Domain 1 |
 | **Ingested financial assumptions** | Structured assumptions | Domain 6 |
 
-**Boundary:**
+**Architectural owner:** Domain 7
 
-| In scope | Out of scope |
-|---|---|
-| Structuring raw data | Validation |
-| Timestamping | Transformation |
-| Basic format normalization | Physical schema design |
+**Semantic owner:** The domain that defines the data.
 
-#### 4.3 Family F3 — Validated
+#### 4.3 Stage 3 — Validated
 
 **Purpose:** Represent data that has passed quality checks and is ready for transformation.
 
 **Primary entities:**
 
-| Entity | Description | Owner |
+| Entity | Description | Semantic owner |
 |---|---|---|
 | **Validated meter data** | Meter data passing quality checks | Domain 2 |
 | **Validated market prices** | Prices passing quality checks | Domain 2 |
@@ -225,21 +235,17 @@ Each family is **owned** by a data owner (see §5) and has **defined contracts**
 | **Validated battery data** | Battery data passing quality checks | Domain 1 |
 | **Validated financial assumptions** | Assumptions passing quality checks | Domain 6 |
 
-**Boundary:**
+**Architectural owner:** Domain 7
 
-| In scope | Out of scope |
-|---|---|
-| Quality checks (completeness, type, range) | Exact validation rules (Stage C) |
-| Structural consistency | Physical storage |
-| Cross-signal alignment | Remediation strategies |
+**Semantic owner:** The domain that defines the data.
 
-#### 4.4 Family F4 — Model-ready
+#### 4.4 Stage 4 — Model-ready
 
 **Purpose:** Represent data structured and aligned for the engineering components.
 
 **Primary entities:**
 
-| Entity | Description | Owner |
+| Entity | Description | Semantic owner |
 |---|---|---|
 | **BESS envelope** | Feasible operating envelope | Domain 1 |
 | **Load signals** | Short-horizon and multi-year load | Domain 2 |
@@ -247,9 +253,15 @@ Each family is **owned** by a data owner (see §5) and has **defined contracts**
 | **Program signals** | DR events, rules | Domain 2 |
 | **Context-derived signals** | Aggregated context | Domain 2 |
 | **Operational requirements** | Per value stream | Domain 3 |
-| **Dispatch inputs** | All inputs needed by Dispatch | Domain 4 |
+| **Physical capability inputs** | For Dispatch | Domain 1 |
 | **Degradation inputs** | Initial state, parameters | Domain 5 |
-| **Financial assumptions** | Structured financial inputs | Domain 6 |
+| **Financial inputs** | Structured financial assumptions | Domain 6 |
+
+**Architectural owner:** The producing domain
+
+**Semantic owner:** The producing domain
+
+**Note on Dispatch inputs.** In B.1, "Dispatch inputs" is not a single container. Dispatch consumes distinct inputs (physical capability, external/context signals, operational requirements, degradation state, financial inputs). B.2 and B.3 define how these inputs are composed.
 
 **Boundary:**
 
@@ -259,158 +271,283 @@ Each family is **owned** by a data owner (see §5) and has **defined contracts**
 | Aligning data in time | Physical representation |
 | Ensuring completeness | Exact algorithms |
 
-#### 4.5 Family F5 — Execution State
+---
+
+### 5. Execution Data
+
+#### 5.1 Execution State
 
 **Purpose:** Represent state that persists across iterations.
 
 **Primary entities:**
 
-| Entity | Description | Owner |
-|---|---|---|
-| **SOC trajectory** | SOC over time | BESS Model |
-| **SOH state** | Current state of health | BESS Model |
-| **Available capacity** | Derived from SOH | BESS Model |
-| **EFC / degradation history** | Cumulative throughput | Degradation Engine |
-| **Augmentation history** | Capacity addition events | Degradation Engine |
-| **Replacement history** | Full replacement events | Degradation Engine |
-| **Cash flow accumulator** | Annual cash flow | Financial Engine |
-| **Reserve capacity** | Reserved capacity per stream | Dispatch Engine |
+| Entity | Description | State owner | Evolution owner | Nature |
+|---|---|---|---|---|
+| **SOC state** | Current state of charge | BESS Model | Dispatch | State |
+| **SOH state** | Current state of health | BESS Model | Degradation | State |
+| **Available capacity** | Derived from SOH | BESS Model | Degradation | Derived state |
+| **EFC / degradation history** | Cumulative throughput | Degradation Engine | Degradation Engine | History |
+| **Augmentation history** | Capacity addition events | Degradation Engine | Degradation Engine | History |
+| **Replacement history** | Full replacement events | Degradation Engine | Degradation Engine | History |
+| **Cash flow accumulator** | Annual cash flow | Financial Engine | Financial Engine | State |
+| **Reserve capacity** | Reserved capacity per stream | Dispatch Engine | Dispatch Engine | State |
 
-**Boundary:**
+**Architectural owner:** Domain 7 (persistence infrastructure)
 
-| In scope | Out of scope |
-|---|---|
-| State representation | State evolution law |
-| Persistence requirements | Physical storage |
-| Cross-iteration continuity | Orchestration |
+**State owner:** The component that holds the state.
 
-#### 4.6 Family F6 — Results
+**Evolution owner:** The component that updates the state.
 
-**Purpose:** Represent operational and financial outputs.
+#### 5.2 Runtime State
+
+**Purpose:** Represent state within a single execution.
 
 **Primary entities:**
 
 | Entity | Description | Owner |
 |---|---|---|
-| **Dispatch schedule** | Charge/discharge/rest per interval | Domain 4 |
-| **Operational attribution basis** | Which stream owns which behavior | Domain 4 |
-| **Bill with/without BESS** | Customer bill by component | Domain 2 |
-| **Savings by component** | Demand, energy, export | Domain 2 |
-| **Augmentation events** | Physical events | Domain 5 |
-| **Replacement events** | Physical events | Domain 5 |
-| **Revenue by stream** | Annual revenue per stream | Domain 6 |
-| **Cash flow** | Annual net cash flow | Domain 6 |
-| **KPIs** | NPV, IRR, payback | Domain 6 |
-| **Validation evidence** | Validation results | Validation |
-| **Lineage records** | Data and decision traceability | Lineage |
+| **Current iteration state** | State of the current execution step | Execution Control |
+| **Current scenario parameters** | Parameters in use | Scenario Management |
+| **Current execution context** | Execution metadata | Execution Control |
 
-**Boundary:**
+#### 5.3 State History
 
-| In scope | Out of scope |
-|---|---|
-| Result representation | Result computation |
-| Aggregation levels | Presentation |
-| Traceability | Physical storage |
+**Purpose:** Represent historical record of state evolution.
+
+**Primary entities:**
+
+| Entity | Description | Owner |
+|---|---|---|
+| **SOC trajectory** | SOC over time | Dispatch Engine |
+| **SOH evolution** | SOH over time | Degradation Engine |
+| **Cash flow history** | Annual cash flows | Financial Engine |
+
+**Note:** State History is the **output** of execution over time, not runtime state. It is produced by components and persisted for analysis.
+
+#### 5.4 Run Metadata
+
+**Purpose:** Information about each execution.
+
+**Primary entities:**
+
+| Entity | Description | Owner |
+|---|---|---|
+| **Run identity** | Unique identifier for the run | Execution Control |
+| **Run timestamp** | When the run occurred | Execution Control |
+| **Run parameters** | Parameters used | Scenario Management |
+| **Run status** | Success/failure, warnings | Execution Control |
+
+#### 5.5 Results
+
+**Purpose:** Represent operational and financial outputs.
+
+**Primary entities:**
+
+| Entity | Description | Producing component |
+|---|---|---|
+| **Dispatch schedule** | Charge/discharge/rest per interval | Dispatch Engine |
+| **Operational attribution basis** | Which stream owns which behavior | Dispatch Engine |
+| **Bill with/without BESS** | Customer bill by component (BTM) | Tariff Engine |
+| **Savings by component** | Demand, energy, export (BTM) | Tariff Engine |
+| **Augmentation events** | Physical events | Degradation Engine |
+| **Replacement events** | Physical events | Degradation Engine |
+| **Revenue by stream** | Annual revenue per stream | Financial Engine |
+| **Cash flow** | Annual net cash flow | Financial Engine |
+| **KPIs** | NPV, IRR, payback | Financial Engine |
+
+**Architectural owner:** Domain 7 (storage infrastructure)
+
+**Producing owner:** The component that produces the results.
 
 ---
 
-### 5. Data Ownership
+### 6. Governance Data
 
-#### 5.1 Ownership Principle
+#### 6.1 Lineage
 
-**Rule:** Every data family has **exactly one owner**. The owner is responsible for:
+**Purpose:** Trace data from source through transformation to result.
 
-- Data correctness
-- Data availability
-- Data quality
-- Data lifecycle
+**Conceptual requirements:**
 
-**Rule:** Other components **consume** data; they do not own it.
+- Track which source data contributed to which input
+- Track which transformation produced which output
+- Track which input produced which result
+- Support retrieval of lineage for audit
 
-#### 5.2 Ownership Matrix
+**Owner:** Lineage capability.
 
-| Data Family | Primary Owner | Contributors |
+**Working default (PH-048):** Basic data lineage.
+
+#### 6.2 Validation Evidence
+
+**Purpose:** Represent validation results and evidence.
+
+**Conceptual requirements:**
+
+- Validation results per domain
+- Validation results per model
+- Validation results per system
+- Validation results per UAT
+
+**Owner:** Validation capability.
+
+#### 6.3 Version Metadata
+
+**Purpose:** Track versions of data, parameters, and code.
+
+**Conceptual requirements:**
+
+- Data versions
+- Parameter versions
+- Code versions
+- Support reproducibility
+
+**Owner:** Configuration capability + Lineage capability.
+
+#### 6.4 Scenario / Run Identity
+
+**Purpose:** Identity of scenarios and runs.
+
+**Conceptual requirements:**
+
+- Scenario identity
+- Run identity
+- Parent scenario (for inheritance)
+- Related runs
+
+**Owner:** Scenario Management capability.
+
+---
+
+### 7. Data Ownership
+
+#### 7.1 Ownership Principle
+
+**Rule:** Data ownership has **two dimensions**:
+
+| Dimension | Definition | Owner |
 |---|---|---|
-| **F1 — Sources** | Domain 2 (external) + Domain 1 (battery) + Domain 6 (financial) | Scenario Management |
-| **F2 — Ingested** | Domain 7 (Data Layer) | Domains 1, 2, 6 |
-| **F3 — Validated** | Domain 7 (Data Layer) | Domains 1, 2, 6 |
-| **F4 — Model-ready** | Each domain (their own model-ready data) | Domain 7 (orchestration) |
-| **F5 — Execution State** | Component owners (BESS, Degradation, Dispatch, Financial) | Domain 7 (persistence) |
-| **F6 — Results** | Component owners (Dispatch, Degradation, Financial, Validation) | Domain 7 (storage) |
+| **Architectural ownership** | Who provides the data infrastructure | Domain 7 (Data & Application Engineering) |
+| **Semantic ownership** | Who defines what the data means | The producing domain |
 
-#### 5.3 Domain 2 Ownership Note
+**Rule:** These are **not the same thing**. Architectural ownership is about infrastructure; semantic ownership is about meaning.
 
-Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**. This means:
+**Rule:** No data family has multiple architectural owners. Multiple domains may have semantic ownership over different entities within the same family.
 
-- Domain 2 owns external context data (Sources, Ingested, Validated, Model-ready)
+#### 7.2 Ownership Matrix
+
+| Category | Sub-category | Architectural owner | Semantic owner |
+|---|---|---|---|
+| **Data Lifecycle** | Source | Domain 7 | Producing domain |
+| **Data Lifecycle** | Ingested | Domain 7 | Producing domain |
+| **Data Lifecycle** | Validated | Domain 7 | Producing domain |
+| **Data Lifecycle** | Model-ready | Producing domain | Producing domain |
+| **Execution Data** | Execution State | Domain 7 (persistence) | State owner (component) |
+| **Execution Data** | Runtime State | Execution Control | Execution Control |
+| **Execution Data** | State History | Domain 7 (persistence) | Producing component |
+| **Execution Data** | Run Metadata | Execution Control | Execution Control |
+| **Execution Data** | Results | Domain 7 (storage) | Producing component |
+| **Governance Data** | Lineage | Lineage capability | Lineage capability |
+| **Governance Data** | Validation Evidence | Validation capability | Validation capability |
+| **Governance Data** | Version Metadata | Configuration capability | Configuration capability |
+| **Governance Data** | Scenario/Run Identity | Scenario Management | Scenario Management |
+
+#### 7.3 Domain 2 Ownership Note
+
+Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
+
+This means:
+
+- Domain 2 owns the **semantic definition** of external-context data
 - Domain 2 produces **context-derived signals** consumed by other components
 - No other component receives raw external context
 
+**Architectural clarification:**
+
+- Domain 7 manages the **common data lifecycle** (Source → Ingested → Validated) for all data
+- Domain 2 retains **semantic ownership** of external context data
+- Other domains retain semantic ownership of their domain-specific inputs (battery data → Domain 1, financial assumptions → Domain 6, etc.)
+
+This resolves the tension between **domain ownership** (semantic) and **data/application ownership** (architectural).
+
 ---
 
-### 6. Data Flows
+### 8. Data Flows
 
-#### 6.1 Primary Data Flows
+#### 8.1 Data Lifecycle Flows
 
 | From | To | Data |
 |---|---|---|
-| External Sources | F1 (Sources) | Raw external data |
-| F1 (Sources) | F2 (Ingested) | Structuring + timestamping |
-| F2 (Ingested) | F3 (Validated) | Quality checks |
-| F3 (Validated) | F4 (Model-ready) | Alignment + structuring |
-| F4 (Model-ready) | Components | Inputs for execution |
-| Components | F5 (Execution State) | State updates |
-| F5 (Execution State) | Components | State for next iteration |
-| Components | F6 (Results) | Outputs |
-| F6 (Results) | Application | Presentation |
+| External Sources | Source | Raw external data |
+| Source | Ingested | Structuring + timestamping |
+| Ingested | Validated | Quality checks |
+| Validated | Model-ready | Alignment + structuring |
 
-#### 6.2 Cross-Family Flows
+#### 8.2 Execution Data Flows
+
+| From | To | Data |
+|---|---|---|
+| Model-ready | Components | Inputs for execution |
+| Components | Execution State | State updates |
+| Execution State | Components | State for next iteration |
+| Components | State History | State snapshots |
+| Components | Results | Outputs |
+| Results | Application | Presentation |
+
+#### 8.3 Governance Data Flows
+
+**Note:** Governance Data is **metadata linked to other data**, not a separate data flow.
+
+| Link | Description |
+|---|---|
+| **Lineage metadata** | Links Results to upstream Source → Ingested → Validated → Model-ready records |
+| **Validation Evidence** | Attached to Validated data and Results |
+| **Version Metadata** | Attached to all data |
+| **Scenario/Run Identity** | Attached to all execution data |
+
+**Rule:** Governance Data is **linked** to the data it governs. It is not a data flow in the traditional sense.
+
+#### 8.4 Feedback Data Flows
 
 | Flow | Description |
 |---|---|
-| **F1 → F6** | Source metadata flows to results for lineage |
-| **F2 → F6** | Ingestion metadata flows to results for lineage |
-| **F3 → F6** | Validation evidence flows to results |
-| **F5 → F6** | Execution state snapshots flow to results for traceability |
-
-#### 6.3 Feedback Data Flows
-
-| Flow | Description |
-|---|---|
-| **Components → F5 → Components** | State persistence across iterations |
-| **Degradation → F5 → Dispatch** | SOH state feeds back to Dispatch |
-| **Dispatch → F5 → Degradation** | SOC trajectory feeds forward to Degradation |
+| **Components → Execution State → Components** | State persistence across iterations |
+| **Degradation → Execution State → Dispatch** | SOH state feeds back to Dispatch |
+| **Dispatch → Execution State → Degradation** | SOC trajectory feeds forward to Degradation |
 
 **Reference:** B.0 §14.3 (Physical-Operational Feedback Loop).
 
 ---
 
-### 7. Data Interfaces
+### 9. Data Interfaces
 
-#### 7.1 Interface Principles
+#### 9.1 Interface Principles
 
 | Principle | Description |
 |---|---|
 | **Explicit** | Every data interface is declared |
 | **Contract-based** | Interfaces have defined contracts |
 | **Directional** | Producer → Consumer |
-| **Idempotent** | Same inputs produce same outputs |
-| **Data, not logic** | Interfaces exchange data, not algorithms |
+| **Deterministic where applicable** | Same declared inputs and configuration produce reproducible outputs |
+| **Data, not logic** | Interfaces exchange data and state, not algorithms |
 
-#### 7.2 Data Interface Matrix
+**Note on "idempotent" vs "deterministic".** The principle is **determinism** (same inputs → same outputs given same configuration), not strict idempotency. Some operations (e.g., ingestion) may be idempotent; others (e.g., dispatch execution) are deterministic but not necessarily idempotent.
 
-| Producer Family | Consumer Family | Interface |
+#### 9.2 Data Interface Matrix
+
+| Producer | Consumer | Interface |
 |---|---|---|
-| F1 (Sources) | F2 (Ingested) | Ingestion contract |
-| F2 (Ingested) | F3 (Validated) | Validation contract |
-| F3 (Validated) | F4 (Model-ready) | Transformation contract |
-| F4 (Model-ready) | Components | Input contract |
-| Components | F5 (Execution State) | State update contract |
-| F5 (Execution State) | Components | State read contract |
-| Components | F6 (Results) | Output contract |
-| F6 (Results) | Application | Presentation contract |
+| Source | Ingested | Ingestion contract |
+| Ingested | Validated | Validation contract |
+| Validated | Model-ready | Transformation contract |
+| Model-ready | Components | Input contract |
+| Components | Execution State | State update contract |
+| Execution State | Components | State read contract |
+| Components | State History | History contract |
+| Components | Results | Output contract |
+| Results | Application | Presentation contract |
 
-#### 7.3 Inter-Component Data Interfaces
+#### 9.3 Inter-Component Data Interfaces
 
 | From Component | To Component | Data |
 |---|---|---|
@@ -418,8 +555,8 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 | BESS Model | Dispatch Engine | Feasible envelope |
 | BESS Model | Degradation Engine | Physical state |
 | Load & Market Model | Operational Model | External conditions |
-| Load & Market Model | Dispatch Engine | Signals, prices, load |
-| Operational Model | Dispatch Engine | Requirements |
+| Load & Market Model | Dispatch Engine | Context-derived signals, prices, load |
+| Operational Model | Dispatch Engine | Operational requirements |
 | Operational Model | Degradation Engine | Behavior declarations |
 | Dispatch Engine | Degradation Engine | Trajectories |
 | Dispatch Engine | Tariff Engine | Net load |
@@ -431,13 +568,11 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 | Scenario Management | All Components | Configuration |
 | Validation | All Components | Validation criteria |
 
-**Note:** These interfaces correspond to the B.0 §13.1 inter-component interfaces, expressed as **data**.
-
 ---
 
-### 8. Data Quality Requirements
+### 10. Data Quality Requirements
 
-#### 8.1 Quality Dimensions
+#### 10.1 Quality Dimensions
 
 | Dimension | Description |
 |---|---|
@@ -448,18 +583,19 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 | **Validity** | Data conforms to expected format and range |
 | **Uniqueness** | No unintended duplicates |
 
-#### 8.2 Quality Requirements per Family
+#### 10.2 Quality Requirements per Category
 
-| Family | Primary Quality Requirements |
+| Category | Primary Quality Requirements |
 |---|---|
-| **F1 — Sources** | Completeness, timeliness (as received) |
-| **F2 — Ingested** | Completeness, consistency, validity |
-| **F3 — Validated** | Accuracy, cross-signal alignment, structural consistency |
-| **F4 — Model-ready** | Completeness, alignment, coverage of horizon |
-| **F5 — Execution State** | Consistency, reproducibility |
-| **F6 — Results** | Accuracy, traceability, reproducibility |
+| **Data Lifecycle — Source** | Completeness, timeliness (as received) |
+| **Data Lifecycle — Ingested** | Completeness, consistency, validity |
+| **Data Lifecycle — Validated** | Accuracy, cross-signal alignment, structural consistency |
+| **Data Lifecycle — Model-ready** | Completeness, alignment, coverage of horizon |
+| **Execution Data — State** | Consistency, reproducibility |
+| **Execution Data — Results** | Accuracy, traceability, reproducibility |
+| **Governance Data** | Completeness, traceability |
 
-#### 8.3 Quality Enforcement
+#### 10.3 Quality Enforcement
 
 | Level | Responsibility |
 |---|---|
@@ -474,9 +610,9 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 
 ---
 
-### 9. Lineage and Versioning (Conceptual)
+### 11. Lineage and Versioning (Conceptual)
 
-#### 9.1 Lineage
+#### 11.1 Lineage
 
 **Purpose:** Trace data from source through transformation to result.
 
@@ -489,7 +625,7 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 
 **Working default (PH-048):** Basic data lineage.
 
-#### 9.2 Versioning
+#### 11.2 Versioning
 
 **Purpose:** Track versions of data, parameters, and code.
 
@@ -501,7 +637,7 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 - Support reproducibility
 - Support replay of historical runs
 
-#### 9.3 Reproducibility
+#### 11.3 Reproducibility
 
 **Purpose:** Ensure that the same inputs produce the same outputs.
 
@@ -514,13 +650,44 @@ Per `SYS-ENG-DEF-001` and B.0, **Domain 2 owns the External Context interface**.
 
 ---
 
-### 10. Scenario Isolation (Conceptual)
+### 12. Logical Data Types
 
-#### 10.1 Purpose
+#### 12.1 Recognized Logical Types
+
+B.1 recognizes the following **logical data types** (not physical types):
+
+| Logical Type | Description | Example |
+|---|---|---|
+| **Time series** | Data indexed by time | Meter data, prices, SOC trajectory |
+| **Scalar parameter** | Single value | Nominal capacity, discount rate |
+| **State vector** | Multi-dimensional state | BESS state (SOC, SOH) |
+| **Event** | Discrete occurrence with timestamp | Augmentation, replacement |
+| **Curve** | Function of a variable | Efficiency curve, degradation curve |
+| **Scenario parameter** | Parameter with scenario variants | Load growth rate, market prices |
+| **Financial assumption** | Financial input | CAPEX, OPEX, discount rate |
+| **Aggregate metric** | Summary quantity | NPV, IRR, peak reduction |
+
+**Rule:** Logical types are architectural. Physical types (integer, float, string, timestamp, etc.) are deferred to Stage C.
+
+#### 12.2 Deferred to Stage C
+
+| Deferred to Stage C |
+|---|
+| Physical data types |
+| Column definitions |
+| Data schemas |
+| Storage formats |
+| Serialization details |
+
+---
+
+### 13. Scenario Isolation (Conceptual)
+
+#### 13.1 Purpose
 
 Ensure that scenarios do not contaminate each other.
 
-#### 10.2 Conceptual Requirements
+#### 13.2 Conceptual Requirements
 
 | Requirement | Description |
 |---|---|
@@ -530,7 +697,7 @@ Ensure that scenarios do not contaminate each other.
 | **Result isolation** | Each scenario has its own results |
 | **No shared mutable state** | Scenarios do not share mutable state |
 
-#### 10.3 Isolation Mechanisms
+#### 13.3 Isolation Mechanisms
 
 | Mechanism | Description |
 |---|---|
@@ -543,7 +710,7 @@ Ensure that scenarios do not contaminate each other.
 
 ---
 
-### 11. What Is Deliberately NOT Defined Here
+### 14. What Is Deliberately NOT Defined Here
 
 | Not defined in B.1 | Belongs to |
 |---|---|
@@ -551,7 +718,7 @@ Ensure that scenarios do not contaminate each other.
 | Delta tables | Stage C |
 | SQL DDL | Stage C |
 | Column definitions | Stage C |
-| Data types | Stage C |
+| Physical data types | Stage C |
 | Partitioning strategy | Stage C / B.6 |
 | Storage technology | B.6 |
 | Databricks configuration | B.6 |
@@ -562,15 +729,17 @@ Ensure that scenarios do not contaminate each other.
 | Remediation strategies | Stage C |
 | Code | Stage D |
 
+**Note:** Logical data types are defined in §12 where required to establish architectural contracts. Physical data types are deferred to Stage C.
+
 ---
 
-### 12. Next Steps
+### 15. Next Steps
 
 **B.1 status:**
 
 | Aspect | Status |
 |---|---|
-| B.1 Data Architecture | ✅ Draft for Review (v0.1) |
+| B.1 Data Architecture | ✅ Draft for Review (v0.2) |
 | B.2 Model Architecture | ⏭ Next |
 | B.3 Optimization Architecture | ⏭ Pending |
 | B.4 Financial Architecture | ⏭ Pending |
@@ -580,12 +749,3 @@ Ensure that scenarios do not contaminate each other.
 
 ---
 
-**End of §4 — B.1 Data Architecture (v0.1)**
-
-**Status:** Draft for Review
-
-**Next:** B.2 Model Architecture
-
-**Prepared by:** BESS Operational & Financial Modeling Consultant
-
-**Engagement:** RFP-264144-1
