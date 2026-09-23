@@ -1,8 +1,3 @@
-# B.1 Data Architecture — §4 de STAGE-B-HLD-001
-
-Aquí está B.1 completo, con el nivel correcto (arquitectura, no especificación).
-
----
 
 # STAGE-B-HLD-001 — System Architecture (HLD)
 

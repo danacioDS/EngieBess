@@ -1,8 +1,3 @@
-
-# STAGE-B-HLD-001 — System Architecture (HLD)
-
-**Document ID:** STAGE-B-HLD-001
-
 **Version:** 0.3.3 — Baseline (Frozen)
 
 **Status:** Stage B — Baseline (Frozen)
