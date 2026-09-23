@@ -1,22 +1,20 @@
-
----
-
 # Load & Market Engineering
 ## Stage A.2.2 — Conceptual Engineering
 ### External Operating Environment of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.2-LOAD-MKT-ENG-001
 
-**Version:** 1.2 — Conceptual Engineering Baseline (Closed)
+**Version:** 1.3 — Conceptual Engineering Baseline (Closed)
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.6)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.4)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.1)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 2 — Load & Market Engineering
 
@@ -276,7 +274,7 @@ The baseline's actual computation for a given event is a program-adapter concern
 
 ### 6.1 Two Distinct Capabilities
 
-The A.1 v0.4 (§5, §6.2) separates **short-horizon forecasting** from **multi-year projection** as distinct capabilities. **The multi-year projection is the load forecasting capability required by the RFP**; under perfect foresight it is the primary load input to dispatch. The **short-horizon forecast extends this capability** for forecast-based dispatch, if ENGIE selects that mode.
+The A.1 v0.5 (§5, §6.2) separates **short-horizon forecasting** from **multi-year projection** as distinct capabilities. **The multi-year projection is the load forecasting capability required by the RFP**; under perfect foresight it is the primary load input to dispatch. The **short-horizon forecast extends this capability** for forecast-based dispatch, if ENGIE selects that mode.
 
 Both capabilities are treated below.
 
@@ -311,7 +309,7 @@ Projected Load Scenarios
 
 ### 6.3 Short-Horizon Forecast — Extension
 
-Under perfect foresight, the short-horizon forecast is not consumed by default dispatch. It becomes relevant if ENGIE chooses forecast-based dispatch (`SYS-STR-FRM-001` §12.2 D2).
+Under perfect foresight, the short-horizon forecast is not consumed by default dispatch. It becomes relevant if ENGIE chooses forecast-based dispatch (`SYS-STR-FRM-001` §12.2 D2 / **PH-033**).
 
 The domain declares the capability. Its consumption is decided in A.2.4.
 
@@ -333,7 +331,7 @@ Their **computational implementation** may use capabilities from Data & Applicat
 
 > **Conceptual ownership ≠ software implementation location.**
 
-This is the conceptual resolution of Phase 1 clarification **D7** (load forecasting home). Formal confirmation remains a Phase 1 decision, but the conceptual answer is: **Domain 2 owns it**.
+This is the conceptual resolution of Phase 1 clarification **PH-051** (load forecasting home). Formal confirmation remains a Phase 1 decision, but the conceptual answer is: **Domain 2 owns it**.
 
 ---
 
@@ -414,7 +412,7 @@ Settlement logic and market revenue computation are **not** part of this domain 
 
 ### 8.3 Frequency Regulation — Statistical Signal Characteristics
 
-`SYS-ENG-DEF-001` v0.4 §7.3 establishes that frequency regulation is represented as **capacity reservation plus a statistical energy-throughput and SOC-drift estimate**.
+`SYS-ENG-DEF-001` v0.5 §7.3 establishes that frequency regulation is represented as **capacity reservation plus a statistical energy-throughput and SOC-drift estimate**.
 
 Those statistical characteristics are **external signals**. This domain must provide them:
 
@@ -518,10 +516,13 @@ The tariff engine must be able to represent, conceptually:
 | 8 | Seasonal structures | Different rates or TOU windows by season |
 | 9 | Fixed and minimum charges | Customer charges and minimum-bill provisions |
 | 10 | Export compensation | Net metering, export tariff, or no compensation for exported energy |
+| 11 | Power factor penalties / kVAR charges | Where the tariff penalizes poor power factor or charges per kVAR |
 
 **Demand ratchets matter.** A ratchet can carry the cost of a single missed peak across many months. That makes the value of peak shaving highly sensitive to reliability.
 
-**Demand measurement interval matters.** If billed demand is measured over 15-minute intervals, computing the bill from hourly data understates the true peak and therefore the savings (see `SYS-STR-FRM-001` §12.2 D14).
+**Demand measurement interval matters.** If billed demand is measured over 15-minute intervals, computing the bill from hourly data understates the true peak and therefore the savings (see `SYS-STR-FRM-001` §12.2 D14 / **PH-054**).
+
+**Power factor penalties matter.** Where the tariff includes them, voltage regulation acquires a monetizable value in behind-the-meter configurations (see `A.2.3` §9.4).
 
 ### 9.5 Relationship to Dispatch
 
@@ -561,6 +562,7 @@ Component-level outputs let Financial Engineering and the application report **d
 | Demand charge savings | Tariff engine (this domain) |
 | Energy charge savings from TOU shifting behind the meter | Tariff engine (this domain) |
 | Export credits | Tariff engine (this domain) |
+| Power factor penalty avoidance / kVAR charge savings | Tariff engine (this domain) |
 | Wholesale market revenues (LMP arbitrage, regulation, reserves, capacity) | Dispatch attribution (Domain 4) via market adapters |
 | DR program payments | Dispatch attribution (Domain 4) via program adapters, **even if paid as a bill credit** |
 
@@ -582,9 +584,9 @@ Historical bill reconciliation is the **strongest available validation** for beh
 | # | Decision | Stage |
 |---|---|---|
 | 1 | Tariff representation format | B |
-| 2 | Which tariff elements are required for the target market's customers | Phase 1 (**B1**, **B2**) |
+| 2 | Which tariff elements are required for the target market's customers | **PH-001**, **PH-002** |
 | 3 | Treatment of coincident-peak uncertainty (known vs. forecast peak hours) | A.2.4 |
-| 4 | Reconciliation tolerance for historical bills | C (depends on **B5**) |
+| 4 | Reconciliation tolerance for historical bills | C (depends on **PH-006**) |
 | 5 | Handling of taxes, riders, and pass-through charges | B |
 
 ---
@@ -652,7 +654,7 @@ These belong to A.2.7 and Stage B.
 
 ### 12.1 Why Uncertainty Is Scenario-Based Here
 
-Under the **perfect-foresight default** (`SYS-STR-FRM-001` §12.2 D2), dispatch consumes a single load and price trajectory per scenario. There is no stochastic dispatch in the initial scope.
+Under the **perfect-foresight default** (`SYS-STR-FRM-001` §12.2 D2 / **PH-033**), dispatch consumes a single load and price trajectory per scenario. There is no stochastic dispatch in the initial scope.
 
 Uncertainty is therefore represented **as scenarios**: multiple load and price trajectories, each internally deterministic.
 
@@ -678,7 +680,7 @@ Scenarios are **declared** by this domain and **available to** Dispatch and Fina
 - Whether Dispatch runs a single scenario or multiple
 - Whether Financial performs sensitivity analysis beyond scenarios
 
-These belong to A.2.4, A.2.6, and Phase 1 clarification **D11** (scenario granularity).
+These belong to A.2.4, A.2.6, and Phase 1 clarification **PH-052** (scenario granularity).
 
 ---
 
@@ -728,7 +730,7 @@ This ensures:
 
 ### 13.6 What Is Not Decided Here
 
-- Which specific adapters must be delivered at handover beyond the target market (default **D13**)
+- Which specific adapters must be delivered at handover beyond the target market (default **PH-053**)
 - Adapter interface details (Stage B)
 - Adapter implementation (Stage C/D)
 - Adapter selection mechanism (Stage B)
@@ -796,7 +798,7 @@ The **precise list and format** of signals consumed by Dispatch is declared by D
 Financial Engineering (A.2.6) will require:
 
 - **Bill with and without BESS** (tariff engine output) — source of truth for behind-the-meter savings
-- **Savings by component** (demand charge, energy charge, export credit)
+- **Savings by component** (demand charge, energy charge, export credit, power factor / kVAR)
 - Market price signals (for market revenue attribution)
 - Market product definitions (to attribute revenue by stream)
 - DR program rules (to value DR participation)
@@ -816,7 +818,7 @@ This section lists the **categories of information** the domain conceptually req
 |---|---|---|
 | 1 | Historical load | Interval meter data (15-min or hourly), demand profiles |
 | 2 | Peak demand history | Historical peak demand per billing period |
-| 3 | Tariff structure | TOU periods, demand charges, energy charges, ratchets, coincident peak, export compensation |
+| 3 | Tariff structure | TOU periods, demand charges, energy charges, ratchets, coincident peak, export compensation, power factor penalties |
 | 4 | Historical customer bills | Bills corresponding to historical load (for tariff engine validation) |
 | 5 | Energy price data | Day-ahead and real-time price projections |
 | 6 | Ancillary price data | Regulation and reserve price signals |
@@ -835,7 +837,7 @@ This list connects A.2.2 directly to:
 
 - **Data & Application Engineering (A.2.7)** — ingestion, validation, storage
 - **Stage B (System Architecture)** — computational representation
-- **Phase 1 clarification items** — particularly **B1, B2, B3**
+- **Phase 1 clarification items** — particularly **PH-001**, **PH-002**, **PH-003**
 
 It is a **bridge**, not a specification.
 
@@ -868,32 +870,33 @@ These belong to A.2.7 and Stage B.
 
 | # | Uncertainty | Where It Must Be Resolved |
 |---|---|---|
-| 1 | Target market(s) | **B1** |
-| 2 | Load projection methodology | **D5** |
-| 3 | Market adapter scope at delivery | **D13** |
-| 4 | Scenario construction | Stage B / **D11** |
-| 5 | Data availability from ENGIE | **B3** |
-| 6 | Whether projection is ENGIE-provided or platform-computed | **D5** / **D7** |
-| 7 | Short-horizon forecast: needed or not (depends on foresight default) | **D2** |
-| 8 | Tariff engine: which elements are required for the target market | **B1** / **B2** |
-| 9 | Availability of historical customer bills for reconciliation | **B3** |
-| 10 | Reconciliation tolerance for historical bills | **B5** |
+| 1 | Target market(s) | **PH-001** |
+| 2 | Load projection methodology | **PH-050** |
+| 3 | Market adapter scope at delivery | **PH-053** |
+| 4 | Scenario construction | Stage B / **PH-052** |
+| 5 | Data availability from ENGIE | **PH-003** |
+| 6 | Whether projection is ENGIE-provided or platform-computed | **PH-050** / **PH-051** |
+| 7 | Short-horizon forecast: needed or not (depends on foresight default) | **PH-033** |
+| 8 | Tariff engine: which elements are required for the target market | **PH-001** / **PH-002** |
+| 9 | Availability of historical customer bills for reconciliation | **PH-003** |
+| 10 | Reconciliation tolerance for historical bills | **PH-006** |
 
 ### 19.3 Phase 1 Clarification Dependencies
 
-This domain depends on the following Phase 1 items from `SYS-STR-FRM-001` §12:
+This domain depends on the following Phase 1 items from `PH1-REG-001` v1.1:
 
-- **B1** — Target market(s)
-- **B2** — Behind-the-meter vs. front-of-the-meter scope
-- **B3** — Data availability
-- **B5** — Acceptance thresholds (affects tariff reconciliation tolerance)
-- **D2** — Perfect foresight vs. forecast-based dispatch
-- **D5** — Load forecasting method
-- **D7** — Load forecasting home (conceptually resolved here: **Domain 2 owns it**)
-- **D11** — Scenario granularity
-- **D13** — Market adapter scope
-- **D14** — Time resolution (affects demand measurement interval)
-- **New question to ENGIE** — Historical customer bills available for tariff engine reconciliation?
+- **PH-001** — Target market(s)
+- **PH-002** — Behind-the-meter vs. front-of-the-meter scope
+- **PH-003** — Data availability
+- **PH-006** — Acceptance thresholds (affects tariff reconciliation tolerance)
+- **PH-033** — Perfect foresight vs. forecast-based dispatch
+- **PH-050** — Load forecasting method
+- **PH-051** — Load forecasting home (conceptually resolved here: **Domain 2 owns it**)
+- **PH-052** — Scenario granularity
+- **PH-053** — Market adapter scope
+- **PH-054** — Time resolution (affects demand measurement interval)
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -916,7 +919,7 @@ The domain exposes the following **conceptual outputs** to the rest of the syste
 | Eligibility envelope | Participation conditions |
 | **Bill without BESS** | Per billing period, by component |
 | **Bill with BESS** | Per billing period, by component |
-| **Savings by component** | Demand charge, energy charge, export credit |
+| **Savings by component** | Demand charge, energy charge, export credit, power factor / kVAR |
 | **Billing determinants** | Billed demand, ratcheted demand, TOU energy |
 
 **Consumer mapping** — which downstream domain consumes which output — is declared by each downstream domain in its own document (A.2.3, A.2.4, A.2.6).
@@ -1054,9 +1057,10 @@ These belong to Stages B, C, and D, or to market adapters.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.6 | §1.1, §3.3 Market Scope, §5 Domain 2, §6.2 Causal Backbone, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
-| `SYS-ENG-DEF-001` v0.4 | §6 Domain 2 (including tariff engine), §4.1 Cross-cutting capabilities, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.1 | §7.3 Auxiliary consumption, boundary discipline pattern | Yes |
+| `SYS-STR-FRM-001` v0.8 | §1.1, §3.3 Market Scope, §5 Domain 2, §6.2 Causal Backbone, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
+| `SYS-ENG-DEF-001` v0.5 | §6 Domain 2 (including tariff engine), §4.1 Cross-cutting capabilities, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
+| `A.2.1-BESS-ENG-001` v1.2 | §7.3 Auxiliary consumption, §8.4 SOH ownership, boundary discipline pattern | Yes |
+| `PH1-REG-001` v1.1 | PH-001, PH-002, PH-003, PH-006, PH-033, PH-050, PH-051, PH-052, PH-053, PH-054 | Yes |
 | RFP-264144-1 | Load data + forecasting, LMP, TOU, ancillary, capacity, DR, grid constraints, eligibility, tariff-based savings | Yes |
 | RFP-264144-1 | "Load forecasting capability... primary input to dispatch optimization and financial modeling" | Yes — §6 |
 
@@ -1068,21 +1072,22 @@ This section consolidates all decisions that are **deliberately not made** in th
 
 | # | Decision | Stage | Rationale |
 |---|---|---|---|
-| 1 | Projection methodology | B / **D5** | Depends on data availability and ENGIE preference |
-| 2 | Scenario construction | B / **D11** | Depends on downstream requirements |
+| 1 | Projection methodology | B / **PH-050** | Depends on data availability and ENGIE preference |
+| 2 | Scenario construction | B / **PH-052** | Depends on downstream requirements |
 | 3 | Market adapter interface | B | Architecture decision |
-| 4 | Which adapters to deliver beyond target market | **D13** | Scope decision |
+| 4 | Which adapters to deliver beyond target market | **PH-053** | Scope decision |
 | 5 | Signal storage and time-indexing conventions | B | Architecture decision |
 | 6 | Validation tolerances for load and price signals | C | Detailed engineering |
 | 7 | Baseline methodology | Adapter / B | Program-specific |
 | 8 | Market-specific settlement rules | C / D | Adapter implementation |
 | 9 | Adapter selection mechanism | B | Architecture decision |
 | 10 | Tariff representation format | B | Architecture decision |
-| 11 | Which tariff elements are in scope | **B1** / **B2** | Scope decision |
+| 11 | Which tariff elements are in scope | **PH-001** / **PH-002** | Scope decision |
 | 12 | Coincident-peak uncertainty treatment | A.2.4 | Dispatch decision |
-| 13 | Reconciliation tolerance for historical bills | C / **B5** | Depends on acceptance thresholds |
+| 13 | Reconciliation tolerance for historical bills | C / **PH-006** | Depends on acceptance thresholds |
 | 14 | Handling of taxes, riders, pass-through charges | B | Architecture decision |
-| 15 | Short-horizon forecast: needed or not | **D2** | Depends on foresight default |
+| 15 | Short-horizon forecast: needed or not | **PH-033** | Depends on foresight default |
+| 16 | Power factor penalty and kVAR charge handling | B / **PH-001** / **PH-002** | Depends on target tariff |
 
 ---
 
@@ -1090,19 +1095,21 @@ This section consolidates all decisions that are **deliberately not made** in th
 
 This document establishes the **conceptual engineering baseline** for Domain 2 — Load & Market Engineering.
 
-The Stage A.2 chapters are developed in the priority order defined in `SYS-ENG-DEF-001` §19, prioritizing thin-slice blockers:
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.4 | Dispatch & Optimization Engineering | ⏭ Next |
-| 2 | A.2.5 | Degradation Engineering | ⏭ Next |
-| 3 | A.2.1 | BESS Engineering | ✅ Baselined (v1.1) |
-| 4 | A.2.2 | Load & Market Engineering | ✅ **This document** — Baselined |
-| 5 | A.2.3 | Operational Engineering | ⏭ Pending |
-| 6 | A.2.6 | Financial Engineering | ⏭ Pending |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 2 | A.2.2 | Load & Market Engineering | ✅ **This document** — Baselined (v1.3) |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.8) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
-Phase 1 clarification items are organized as **blocking (B1–B5)** and **defaultable (D1–D15)** in `SYS-STR-FRM-001` §12. This domain's dependencies are listed in §19.3.
+**Next:** Stage A consolidation and audit before Stage B (HLD).
+
+Phase 1 clarification items are organized in `PH1-REG-001` v1.1, the authoritative consolidated Register. This domain's dependencies are listed in §19.3.
 
 ---
 
@@ -1115,13 +1122,36 @@ Phase 1 clarification items are organized as **blocking (B1–B5)** and **defaul
 
 ---
 
-**BESS Operational & Financial Modeling (RFP-264144-1): Observations and Clarification Requests**
+## Addendum: ENGIE Clarification Requests Relevant to Load & Market Engineering
 
+The following clarification items are relevant to this domain. They are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), which is the authoritative consolidated list. This section lists only the items relevant to Load & Market Engineering, by their **Register ID**.
 
-1. Historical bills for tariff validation. Can ENGIE provide actual customer bills, together with the matching interval meter data, for at least one reference site? Reproducing historical bills is the strongest validation of behind-the-meter savings. Proposal: reconciliation within ±2–3% of the actual billed amount.
-2. Load projection over the contract term. What load growth assumptions should apply? Are site changes expected, such as expansions, electrification or EV charging? These can shift both peaks and savings materially over 10–15 years.
-3. Tariff evolution and tariff switching. How should tariff escalation be projected? Should the tool also evaluate tariff switching? A battery can make a customer eligible for a more favorable rate, and that is sometimes the largest source of value.
-4. Coincident-peak charges. Where tariffs or markets include coincident-peak charges (e.g. ERCOT 4CP, PJM 5CP), does ENGIE have a peak-prediction approach? If not, the proposal is to assume the peak hours are known, applying a configurable hit-rate factor.
-5. DR payments paid as bill credits. Which DR programs in scope are utility tariff riders paid as bill credits? The tool counts DR value in one place only, as program revenue, and needs to know which programs to exclude from the bill calculation.
-6. Price-taker assumption and ancillary saturation. The tool assumes the battery does not affect market prices. For large projects in small ancillary-service markets, prices tend to fall as storage capacity grows. Does ENGIE have ancillary price projections that already reflect this saturation, and should they be used as price scenarios?
-7. Regulation assumptions. If historical regulation signal data is unavailable (see item 7), does ENGIE have internal assumptions it would like to use for energy throughput per MW of regulation capacity, signal bias and expected performance score?
+| Register ID | Clarification / Data Request | Why Required |
+|---|---|---|
+| **PH-001** | **Target market(s).** Which electricity markets, tariff structures, and ancillary-service products are within the initial delivery scope? | Determines market rules, eligibility, dispatch logic, and settlement |
+| **PH-002** | **BTM vs. FTM scope.** Is the initial delivery expected to support both behind-the-meter (BTM) and front-of-the-meter (FTM) configurations, or is one the priority? | Determines which value streams and constraints apply |
+| **PH-003** | **Data availability.** What historical data will ENGIE provide — meter data, market prices, ancillary prices, regulation signals, customer bills — and at what resolution and horizon? | Determines what can be modeled and how ingestion is designed |
+| **PH-006** | **Acceptance thresholds.** What quantified accuracy, runtime, and usability criteria define acceptance? | Must be concrete before the thin slice is built |
+| **PH-033** | **Perfect foresight vs. forecast-based dispatch.** Which dispatch mode should be the default? | Determines whether the short-horizon forecast is consumed |
+| **PH-050** | **Load forecasting method.** What method should be used for load projection over the contract term? | Determines the projection methodology |
+| **PH-051** | **Load forecasting home.** Does load forecasting belong to Domain 2 conceptually, with implementation via Domain 7? | Determines ownership (conceptually resolved: Domain 2) |
+| **PH-052** | **Scenario granularity.** How many core scenarios should be delivered initially? | Determines scenario construction |
+| **PH-053** | **Market adapter scope.** How many market adapters should be delivered at handover? | Determines adapter architecture |
+| **PH-054** | **Time resolution.** What time resolution should the model use — 15-minute, hourly, or a mix? | Affects demand measurement interval and savings accuracy |
+
+### Additional clarification items from the domain
+
+| Topic | Clarification | Why Required |
+|---|---|---|
+| Historical bills for tariff validation | Can ENGIE provide actual customer bills, together with matching interval meter data, for at least one reference site? | Reproducing historical bills is the strongest validation of behind-the-meter savings |
+| Load projection over the contract term | What load growth assumptions should apply? Are site changes expected, such as expansions, electrification or EV charging? | These can shift both peaks and savings materially over 10–15 years |
+| Tariff evolution and tariff switching | How should tariff escalation be projected? Should the tool also evaluate tariff switching? | A battery can make a customer eligible for a more favorable rate |
+| Coincident-peak charges | Where tariffs or markets include coincident-peak charges (e.g. ERCOT 4CP, PJM 5CP), does ENGIE have a peak-prediction approach? | Determines whether peak hours are assumed known or forecast |
+| DR payments paid as bill credits | Which DR programs in scope are utility tariff riders paid as bill credits? | The tool counts DR value in one place only, as program revenue |
+| Price-taker assumption and ancillary saturation | The tool assumes the battery does not affect market prices. Does ENGIE have ancillary price projections that already reflect saturation? | Affects the realism of ancillary revenue estimates |
+| Regulation assumptions | If historical regulation signal data is unavailable, does ENGIE have internal assumptions for energy throughput per MW, signal bias, and expected performance score? | Provides the external statistics required by §8.3 |
+| Power factor and reactive charges | Do the customer tariffs in scope include power factor penalties or kVAR charges? | Determines the monetizable value of voltage regulation in BTM projects |
+
+**Note.** Items are assigned IDs in `PH1-REG-001`. The Register is the authoritative source; this section is a filtered view.
+
+---
