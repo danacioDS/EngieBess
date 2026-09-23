@@ -1,6 +1,6 @@
 # STAGE-B-HLD-001 — System Architecture (HLD)
 
-**Document ID:** STAGE-B-HLD-001
+**Document ID:** B.0-INTEGRATED-SYS-ARCH-001
 
 **Version:** 0.3.3 — Baseline (Frozen)
 
