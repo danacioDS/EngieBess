@@ -1,19 +1,26 @@
 
 ---
 
-# STAGE-B-HLD-001 — System Architecture (HLD)
+# B.3 Optimization Architecture v0.6 — Baseline Frozen
+
+Copia todo el contenido y pégalo en `docs/Stage-B-system-architecture/03-optimization-arch.md`.
+
+---
+
+## STAGE-B-HLD-001 — System Architecture (HLD)
 
 ## §6 — B.3 Optimization Architecture
 
 **Document ID:** B.3-OPT-ARCH-001
 
-**Version:** 0.5 — Baseline Candidate
+**Version:** 0.6 — Baseline (Frozen)
 
 **Section:** §6 — B.3 Optimization Architecture
 
-**Status:** Stage B — Baseline Candidate (pending B.2 freeze)
+**Status:** Stage B — Baseline (Frozen)
 
 **Parent Documents:**
+
 - `SYS-STR-FRM-001` — System Strategy & Delivery Framework
 - `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition
 - `A.2.1-BESS-ENG-001` — BESS Engineering
@@ -27,15 +34,13 @@
 - `STAGE-B-HLD-INDEX-001` — Stage B HLD Master Index and Scope Definition
 - `B.0-INTEGRATED-SYS-ARCH-001` — B.0 Integrated System Architecture (v0.3.3 Baseline Frozen)
 - `B.1-DATA-ARCH-001` — B.1 Data Architecture (v0.3 Baseline Frozen)
-- `B.2-MODEL-ARCH-001` — B.2 Model Architecture (v0.1 Draft)
+- `B.2-MODEL-ARCH-001` — B.2 Model Architecture (v0.5.1 Baseline Frozen)
 
 **Note on versions.** Parent document versions are not restated here; they are as declared in each document.
 
 **Change log.** See §15 for detailed changes across versions.
 
 **PH verification.** PH IDs cited: PH-033, PH-034, PH-036, PH-040, PH-054. Verified against `PH1-REG-001` v1.1. No PH IDs are created or reinterpreted in B.3.
-
-**Freeze dependency.** B.3 will be marked *Baseline (Frozen)* after B.2 is frozen. Until then, B.3 remains *Baseline Candidate*.
 
 ---
 
@@ -131,11 +136,11 @@ The **optimization architecture** is centered on the **Dispatch Engine**, which 
                          │
         ┌────────────────┼────────────────┐
         ▼                ▼                ▼
-   Post-processing   State Update      Net Load
-   / Attribution                        / Results
+   Post-processing   State Update   Battery power
+   / Attribution                     / Results
 ```
 
-**Key distinction:** The solver produces an **optimization solution**. The system then **applies** that solution to update state, produce net load, and generate results.
+**Key distinction:** The solver produces an **optimization solution**. The system then **applies** that solution to update state, produce battery power trajectory, and generate results. Net load is composed by the Tariff Engine, not by Dispatch (B.2 §4.3).
 
 #### 3.2 Optimization Layers
 
@@ -187,7 +192,7 @@ Tariff Engine
      ▼
 Dispatch Engine
      │
-     │ dispatch / net load
+     │ battery power trajectory
      ▼
 Tariff Engine
      │
@@ -196,7 +201,7 @@ Tariff Engine
 Financial Engine
 ```
 
-This preserves the **single source of truth** established in B.0/B.1.
+This preserves the **single source of truth** established in B.0/B.1. The Tariff Engine composes the net load (base load + battery power + auxiliary consumption, per B.2 §4.3).
 
 **Note on energy losses.** Physical efficiency losses are **implicitly valued** by the optimization: the LP charges energy at the charging price and discharges at the discharging price, so the round-trip loss is reflected in the objective without an additional penalty term. B.3 does **not** add a separate "energy losses" category, to avoid double counting.
 
@@ -239,6 +244,8 @@ Under **scenario-based dispatch** (extension), the objective may be computed acr
 - Monthly billed peak (non-coincident demand charge).
 - Coincident-peak hours, treated as known.
 - **Net load during regulation reserve** — regulation charging enters the same peak constraint as any other load, and may create or worsen the billed peak (BTM).
+
+**Net-load composition rule within optimization.** Within the optimization, the net load used in the billing-peak constraint shall follow the **same composition rule as the Tariff Engine** (base load + battery power + auxiliary consumption, per B.2 §4.3), so that the dispatch peak and the billed peak are computed on the **same basis**. Without this rule, Dispatch could optimize a peak without auxiliary consumption while the bill charges it with auxiliary consumption.
 
 **Note on ratchets.** Ratchets are **evaluated by the Tariff Engine, not by Dispatch** (A.2.4 §16.1). This preserves **month decoupling** within a year: with ratchets removed from the dispatch constraints, the terminal SOC condition is sufficient to make months independent for optimization purposes. Where ratchets apply, all 12 months are still simulated (PH-040), but each month remains an **independent optimization**.
 
@@ -358,6 +365,8 @@ Multiple value streams may compete for the same physical resources. The optimiza
 
 **Working default:** **Single objective** (co-optimization under LP).
 
+**Note on "single objective".** A single objective does not imply **equal weighting** of value streams. The objective is a single aggregate function; the relative weighting, normalization, and any internal structure of that aggregate are **Stage C** decisions. B.3 declares only that the streams are co-optimized into one aggregate objective.
+
 #### 7.3 Coordination Scenarios
 
 | Scenario | Description |
@@ -376,7 +385,7 @@ The system distinguishes **four concepts**:
 
 | Concept | Description | Working default |
 |---|---|---|
-| **Project horizon** | Full contract term | 15 years (Strategy D14) |
+| **Project horizon** | Full project / modeling horizon | 15 years (Strategy D14) |
 | **Simulation / representative-period framework** | How the project horizon is represented computationally | Monthly representative periods (PH-040) |
 | **Optimization horizon** | Horizon covered by a single optimization run | See §8.4 |
 | **Time resolution** | Interval-level temporal resolution | 15-min or 1-h (PH-054) |
@@ -384,6 +393,8 @@ The system distinguishes **four concepts**:
 **Rule:** These are **different concepts**. B.3 does not collapse them. The simulation / representative-period framework is a **simulation structure**, not a horizon.
 
 **Note on the 15-year project term.** The 15-year project term is declared in `SYS-STR-FRM-001` §12.2 D14. PH-054 is the Register item for time resolution, not for the project term. B.3 cites the Strategy for the project term.
+
+**Mapping between project years and representative periods.** The simulation framework shall define the **mapping between the project horizon (15 years) and the representative periods** so that annual state transitions, degradation updates, and financial aggregation remain **traceable across the project horizon**. The exact representative-period weighting, replication, and calendar mapping (e.g., whether a representative period is a specific month of a specific year, or a statistical representative repeated across years) are **deferred to Stage C**. B.3 declares that the mapping must exist and be traceable; it does not prescribe the mapping mechanism.
 
 #### 8.2 State-Update Cycle
 
@@ -411,6 +422,8 @@ Project horizon (15 years)
 
 **Rule:** The optimization horizon operates within the selected simulation and representative-period framework.
 
+**Rule:** The simulation framework shall define a **traceable mapping** between project years and representative periods, so that annual state transitions (SOH), degradation updates, and financial aggregation can be reconstructed across the project horizon. The exact mapping is a **Stage C** decision.
+
 #### 8.4 Optimization Horizon and State Carry-Forward
 
 | Aspect | Description |
@@ -428,6 +441,8 @@ Project horizon (15 years)
 | **Within a year** | Nothing — months are **decoupled** by the terminal SOC condition | SOC does **not** carry forward between months |
 | **Between years** | SOH carries forward | SOC does **not** carry forward between years |
 
+**Annual sequencing ownership.** B.3 defines the **semantics** of the annual SOH carry-forward: the state-update cycle chains the years together through the SOH evolution law. B.5 **orchestrates** the dependency (i.e., `execution_control` ensures that the annual sequence is respected), and B.6 **realizes** the orchestration on the platform. B.3 owns the semantic rule; B.5 and B.6 own the realization.
+
 **Consequence for parallelization.** Because terminal SOC = initial SOC decouples the months within a year, the months of a given year are **independently parallelizable** with PySpark (per `SYS-STR-FRM-001` §9.3). Only the annual SOH update chains the years together.
 
 **Working implementation assumption for the initial thin slice:** monthly optimization aligned with the billing period for peak-shaving use cases. This is an **implementation assumption for the thin slice**, not a final architectural decision.
@@ -441,6 +456,8 @@ Project horizon (15 years)
 - Months within a year are **decoupled** (no SOC carry-forward between months).
 - Months within a year are **independently parallelizable**.
 - SOH still carries forward between years.
+
+**Initial SOC per independent optimization.** Each independently optimized representative period shall receive an **explicit initial SOC state** from the BESS Model or from the declared scenario/state-initialization mechanism. The terminal SOC condition applies **within** that optimization horizon and does **not** create SOC carry-forward between representative periods. The value and mechanism of the initial SOC (e.g., default, configurable, or derived) are **Stage C** decisions; B.3 declares only that an explicit initial SOC is required per independent optimization.
 
 **Note:** Terminal SOC treatment is a **working assumption for the thin slice**, subject to validation against applicable use cases. In general, terminal SOC treatment may be:
 
@@ -467,6 +484,8 @@ Before optimization, the Dispatch Engine reads:
 | **Available capacity** | BESS Model (state owner) |
 | **Marginal degradation cost** | Degradation Engine (signal) |
 
+**Note on initial SOC per independent optimization.** Where representative periods are optimized independently (per §8.4 / §8.5), the **initial SOC of each optimization horizon** is an explicit input. The Dispatch Engine does not infer or carry it across horizons. The specific mechanism (default, configurable, or derived) is a Stage C decision.
+
 #### 9.2 Optimization Solution
 
 The solver produces an **optimization solution**:
@@ -488,13 +507,15 @@ The system applies the solution to produce:
 |---|---|
 | **SOC trajectory** | Degradation Engine (cycle extraction is performed there) **and** State History (persisted by Domain 7) |
 | **Battery power trajectory** | Degradation Engine (cycle extraction is performed there) **and** State History (persisted by Domain 7) |
+| **Battery power trajectory** | Tariff Engine (net load composed there, per B.2 §4.3) |
 | **Operational attribution basis** | Financial Engine |
-| **Net load** | Tariff Engine |
 | **Reserved capacity** | Dispatch Engine (state) |
 
 **Rule:** The **state update** is a separate step from the **optimization** step.
 
 **Note on Degradation Engine.** The battery power and SOC trajectories are the **primary inputs** to the annual degradation update (see §9.5). Cycle extraction is performed inside the Degradation Engine. Without this interface, the annual state-update cycle has no input.
+
+**Note on Tariff Engine.** Dispatch delivers the **battery power trajectory** to the Tariff Engine; the Tariff Engine composes the net load (base load + battery power + auxiliary consumption, per B.2 §4.3). Dispatch does not deliver net load.
 
 **Note on Financial Engine.** The operational attribution basis is routed to the Financial Engine for valuation. The Dispatch Engine produces the **basis**, not the valuation.
 
@@ -516,6 +537,8 @@ Per B.0 §14.1 and B.1 §5:
 | **Horizon transition** | With terminal SOC = initial SOC, months within a year are decoupled; nothing carries forward |
 | **Year transition** | SOH updated at the end of each state-update cycle (via Degradation Engine) |
 
+**Rule on annual sequencing.** The year-to-year carry-forward is a **semantic rule owned by B.3**: the SOH evolution law chains the years together. B.3 does not prescribe the orchestration mechanism; orchestration is a **B.5** concern (via `execution_control`) and realization is a **B.6** concern.
+
 ---
 
 ### 10. Degradation Signal Integration
@@ -527,6 +550,8 @@ The **marginal degradation cost** is a per-MWh signal representing the economic 
 **Source:** Degradation Engine.
 
 **Consumer:** Dispatch Engine (objective).
+
+**Boundary rule.** B.3 **consumes** the degradation signal and the updated SOH; B.3 **does not define** degradation mechanics. Degradation mechanics (calendar aging, cycle aging, throughput aggregation, depth-of-discharge effects, cohort behavior, augmentation/replacement policy evaluation) are owned by `A.2.5` and represented by the Degradation Engine in B.2 §4.6.
 
 #### 10.2 Signal Characteristics
 
@@ -558,15 +583,17 @@ The signal enters the optimization through the **objective**.
 B.3 defines:
 
 - **That** the Dispatch Engine uses a solver
-- **What class** of solver is expected (LP, MILP, heuristic, hybrid)
+- **Which logical optimization formulation types** the architecture supports (LP, MILP, heuristic, hybrid)
 - **What the boundary** between the optimization architecture and the solver is
 - **What inputs/outputs** cross the solver boundary
+
+**Note on terminology.** B.3 declares **logical optimization formulation types**, not a concrete solver software choice. Solver software selection, configuration, and numerical tolerances are **Stage C** decisions.
 
 #### 11.2 What B.3 Does Not Define
 
 B.3 does **not** define:
 
-- **Which** solver is used
+- **Which** solver software is used
 - **How** the solver is configured
 - **What** numerical tolerances are used
 - **What** solver-specific parameters are used
@@ -643,7 +670,7 @@ B.3 declares that the system must conceptually support:
 
 #### 13.1 Recognized Types
 
-B.3 recognizes the following **logical optimization types**:
+B.3 recognizes the following **logical optimization formulation types**:
 
 | Logical Type | Description | Working default |
 |---|---|---|
@@ -652,6 +679,8 @@ B.3 recognizes the following **logical optimization types**:
 | **Rule-based** | Deterministic rules | Extension |
 | **Hybrid** | Combination | Extension |
 
+**Note.** B.3 declares the logical formulation types the architecture supports. Solver software selection is Stage C.
+
 #### 13.2 Deferred to Stage C
 
 | Deferred to Stage C |
@@ -659,7 +688,7 @@ B.3 recognizes the following **logical optimization types**:
 | Exact objective function form |
 | Exact constraint formulations |
 | Linearization strategies |
-| Solver selection |
+| Solver software selection |
 | Solver configuration |
 | Numerical tolerances |
 
@@ -672,9 +701,12 @@ B.3 recognizes the following **logical optimization types**:
 | Exact objective function | Stage C |
 | Exact constraint formulations | Stage C |
 | Linearization strategies | Stage C |
-| Solver selection | Stage C |
+| Solver software selection | Stage C |
 | Solver configuration | Stage C |
 | Numerical tolerances | Stage C |
+| Degradation mechanics | A.2.5 / B.2 |
+| Representative-period mapping mechanism | Stage C |
+| Initial SOC value and mechanism | Stage C |
 | Class structures | Stage C |
 | Method signatures | Stage C |
 | Code | Stage D |
@@ -731,7 +763,31 @@ B.3 recognizes the following **logical optimization types**:
 | 3 | §5.2: simultaneous charge/discharge reframed as "Not enforced under LP default; mitigation if negative prices (Stage C)" | LP cannot forbid simultaneity; MILP required |
 | 4 | §9.3: SOC trajectory added as destination to Degradation Engine | SOC is the primary input for cycle extraction |
 
-#### 15.5 Version History
+#### 15.5 Changes from v0.5 to v0.6
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | §8.1: added mapping rule between project horizon (15 years) and representative periods; deferred weighting/replication/calendar mapping to Stage C | Close blocker: traceable mapping across the project horizon |
+| 2 | §8.3: added traceable mapping rule consistent with §8.1 | Consistency |
+| 3 | §8.4: added "Annual sequencing ownership" note — B.3 owns the semantic rule, B.5 orchestrates, B.6 realizes | Prevent B.5 from appropriating B.3's annual-sequence semantics |
+| 4 | §8.5: added "Initial SOC per independent optimization" rule — explicit initial SOC per horizon; value/mechanism deferred to Stage C | Close blocker: parallelizable months require explicit initial SOC |
+| 5 | §9.1: added "Note on initial SOC per independent optimization" | Consistency with §8.5 |
+| 6 | §9.5: added "Rule on annual sequencing" — B.3 owns semantics, B.5 orchestrates, B.6 realizes | Consistency with §8.4 |
+| 7 | §10.1: added "Boundary rule" — B.3 consumes the degradation signal and SOH; B.3 does not define degradation mechanics | Clarify boundary with A.2.5 / B.2 |
+| 8 | §7.2: added "Note on single objective" — single objective does not imply equal weighting; weighting/normalization are Stage C | Avoid misinterpretation |
+| 9 | §11.1: "what class of solver" reframed as "logical optimization formulation types" | Avoid confusion with concrete solver software |
+| 10 | §13.1: title and content reframed as "logical optimization formulation types"; solver software selection deferred to Stage C | Consistency with §11.1 |
+| 11 | §14: added degradation mechanics, representative-period mapping mechanism, initial SOC value/mechanism to "not defined here" | Explicit non-scope |
+| 12 | Header: B.2 cited as **v0.5.1 Baseline Frozen** (was v0.1 Draft in earlier versions) | Correct parent version |
+| 13 | Header: status set to **Freeze Candidate**; freeze dependency note updated | Freeze preparation |
+| 14 | §8.1: 15-year project term cites **Strategy D14** | Consistency with v0.4 |
+| 15 | §3.1: diagram label "Net Load / Results" → "Battery power / Results" | Align with B.2 v0.5.1 §4.3 (net load composed by Tariff Engine) |
+| 16 | §4.1: BTM diagram label "dispatch / net load" → "battery power trajectory" | Align with B.2 v0.5.1 §4.3 |
+| 17 | §5.1: added "Net-load composition rule within optimization" — same composition rule as Tariff Engine (base load + battery power + auxiliary consumption, B.2 §4.3) | Ensure dispatch peak and billed peak are computed on the same basis |
+| 18 | §9.3: changed "Net load → Tariff Engine" to "Battery power trajectory → Tariff Engine (net load composed there, per B.2 §4.3)" | Align with B.2 v0.5.1 §4.3 |
+| 19 | §8.1: "Full contract term" → "Full project / modeling horizon" | Avoid contractual ambiguity (contract is 12 weeks, project is 15 years) |
+
+#### 15.6 Version History
 
 | Version | Date | Changes | Status |
 |---|---|---|---|
@@ -739,9 +795,10 @@ B.3 recognizes the following **logical optimization types**:
 | 0.2 | Stage B correction | 8 corrections | Superseded |
 | 0.3 | Stage B final | 6 corrections | Superseded |
 | 0.4 | Stage B closure | 10 corrections | Superseded |
-| 0.5 | Stage B closure | 4 corrections | **Baseline Candidate (pending B.2 freeze)** |
+| 0.5 | Stage B closure | 4 corrections | Superseded |
+| 0.6 | Stage B freeze audit | 19 corrections (mapping, annual sequencing ownership, initial SOC, degradation boundary, single objective, solver terminology, parent version, net-load composition) | **Baseline (Frozen)** |
 
-#### 15.6 PH Traceability
+#### 15.7 PH Traceability
 
 **PH IDs cited in B.3:** PH-033, PH-034, PH-036, PH-040, PH-054.
 
@@ -767,25 +824,42 @@ B.3 recognizes the following **logical optimization types**:
 
 | Aspect | Status |
 |---|---|
-| B.3 Optimization Architecture | 🔄 Baseline Candidate (v0.5) — pending B.2 freeze |
-| B.2 Model Architecture | 🔄 Draft (v0.1) — to be frozen |
-| B.4 Financial Architecture | ⏭ Next |
-| B.5 Software Architecture | ⏭ Pending |
-| B.6 Databricks Architecture | ⏭ Pending |
+| B.3 Optimization Architecture | ✅ Baseline (Frozen) (v0.6) |
+| B.2 Model Architecture | ✅ Baseline Frozen (v0.5.1) |
+| B.4 Financial Architecture | ✅ Baseline Frozen (v0.4) |
+| B.5 Software Architecture | 🔄 Baseline Candidate (v0.4) — pending update to cite B.3 Frozen |
+| B.6 Databricks Architecture | ⏭ Next |
 | Stage B → Stage C Handoff | ⏭ Pending |
 
-**Freeze dependency.** B.3 will be marked *Baseline (Frozen)* after B.2 is frozen. Until then, B.3 remains *Baseline Candidate*.
+**Immediate next action.**
 
-**Immediate next action.** Freeze B.2, then freeze B.3, then proceed to B.4.
+1. Update B.5 to cite B.3 v0.6 Frozen and to reflect B.3's semantic ownership of the annual sequence (minimal revision).
+2. Freeze B.5.
+3. Proceed to B.6 Databricks Architecture.
 
 ---
 
-**End of §6 — B.3 Optimization Architecture (v0.5 — Baseline Candidate)**
+**End of §6 — B.3 Optimization Architecture (v0.6 — Baseline Frozen)**
 
-**Status:** Baseline Candidate (pending B.2 freeze)
+**Status:** Baseline (Frozen)
 
-**Next:** B.2 freeze → B.3 freeze → B.4 Financial Architecture
+**Next:** B.5 update → B.6 Databricks Architecture
 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 
 **Engagement:** RFP-264144-1
+
+---
+
+## 📋 Resumen de los 5 cambios aplicados en este cierre de v0.6
+
+| # | Punto | Cambio aplicado |
+|---|-------|-----------------|
+| 1 | Net load en §9.3 | "Net load → Tariff Engine" → "Battery power trajectory → Tariff Engine (net load composed there, per B.2 §4.3)" |
+| 2 | Diagrama §3.1 | "Net Load / Results" → "Battery power / Results" |
+| 3 | Diagrama §4.1 | "dispatch / net load" → "battery power trajectory" |
+| 4 | Regla de composición de carga neta en §5.1 | Añadida "Net-load composition rule within optimization" |
+| 5 | "Full contract term" en §8.1 | "Full contract term" → "Full project / modeling horizon" |
+
+---
+
