@@ -1,6 +1,3 @@
-# B.2 Model Architecture v0.5 — Baseline (Frozen) — Documento Completo
-
-Aplico los 4 retoques. Copia todo el contenido y pégalo en `docs/Stage-B-system-architecture/02-model-arch.md`.
 
 ---
 
@@ -10,7 +7,7 @@ Aplico los 4 retoques. Copia todo el contenido y pégalo en `docs/Stage-B-system
 
 **Document ID:** B.2-MODEL-ARCH-001
 
-**Version:** 0.5 — Baseline (Frozen)
+**Version:** 0.5.1 — Baseline (Frozen)
 
 **Section:** §5 — B.2 Model Architecture
 
@@ -227,13 +224,17 @@ Each object has:
 | **Output** | Operational Model | External conditions |
 | **Output** | Dispatch Engine | Context-derived signals, prices, load |
 | **Output** | Tariff Engine | **Reference / baseline load** (for bill-without-BESS calculation) |
+| **Input** | Dispatch Engine | Attribution basis (for market / program settlement) |
+| **Output** | Financial Engine | Settlement basis |
+
+**Note on dual role.** The Load & Market Model has two roles: (1) **signal provider** upstream of Dispatch, and (2) **settlement executor** downstream of Dispatch, where it executes the market/program adapters (A.2.2 §13.5) on the attribution basis. Both roles are stateless; settlement is a pure function of attribution basis + adapter rules + prices. Where program rules depend on cumulative quantities within a season (e.g., maximum number of DR events), the full season's attribution basis is required, and settlement is parallelizable across scenarios only.
 
 **Lifecycle:**
 
 | Phase | Description |
 |---|---|
 | **Initialization** | Load signals for scenario |
-| **Execution** | Provide signals on demand |
+| **Execution** | Provide signals on demand; execute market/program adapters on attribution basis |
 | **Termination** | No state to persist |
 
 **Parallelization:**
@@ -383,7 +384,8 @@ This resolves the architectural question left open by `A.2.4` §14.2.
 | **Output** | BESS Model | Charge/discharge trajectory (adopted as authoritative SOC trajectory) |
 | **Output** | Degradation Engine | Trajectories (power and SOC) |
 | **Output** | Tariff Engine | **Battery power trajectory** |
-| **Output** | Financial Engine | Attribution basis |
+| **Output** | Load & Market Model | Attribution basis (for settlement) |
+| **Output** | Financial Engine | Attribution basis (streams not requiring market settlement, if any) |
 
 **Lifecycle:**
 
@@ -484,7 +486,8 @@ This resolves the architectural question left open by `A.2.4` §14.2.
 
 | Direction | To | Data |
 |---|---|---|
-| **Input** | Dispatch Engine | Attribution basis |
+| **Input** | Dispatch Engine | Attribution basis (streams not requiring market settlement, if any) |
+| **Input** | Load & Market Model | Settlement basis |
 | **Input** | Degradation Engine | Physical events |
 | **Input** | Tariff Engine | Bill and savings outputs (BTM) |
 | **Input** | Scenario Management | Financial assumptions |
@@ -515,7 +518,7 @@ This resolves the architectural question left open by `A.2.4` §14.2.
 | Object | Stateful? | Reason |
 |---|---|---|
 | **BESS Model** | ✅ Yes | SOC, SOH |
-| **Load & Market Model** | ❌ No | Signals are inputs |
+| **Load & Market Model** | ❌ No | Signals are inputs; settlement is a pure function |
 | **Tariff Engine** | ❌ No | Pure function |
 | **Operational Model** | ❌ No | Pure function |
 | **Dispatch Engine** | ✅ Yes (coordinating) | Operational coordination state |
@@ -635,12 +638,14 @@ This representation describes **temporal dependencies among model states and out
 | Load & Market Model | Operational Model | External conditions |
 | Load & Market Model | Dispatch Engine | Context-derived signals, prices, load |
 | Load & Market Model | Tariff Engine | Reference / baseline load |
+| Load & Market Model | Financial Engine | Settlement basis |
 | Operational Model | Dispatch Engine | Operational requirements |
 | Operational Model | Degradation Engine | Behavior declarations |
 | Dispatch Engine | BESS Model | Charge/discharge trajectory (adopted as authoritative SOC trajectory) |
 | Dispatch Engine | Degradation Engine | Trajectories (power and SOC) |
 | Dispatch Engine | Tariff Engine | **Battery power trajectory** |
-| Dispatch Engine | Financial Engine | Attribution basis |
+| Dispatch Engine | Load & Market Model | Attribution basis (for settlement) |
+| Dispatch Engine | Financial Engine | Attribution basis (streams not requiring market settlement, if any) |
 | Degradation Engine | BESS Model | Updated SOH, available capacity, **augmentation events**, **replacement events** |
 | Degradation Engine | Dispatch Engine | **Marginal degradation signal** |
 | Degradation Engine | Financial Engine | Physical events |
@@ -655,10 +660,12 @@ This representation describes **temporal dependencies among model states and out
 | BESS → Tariff | Auxiliary consumption | Per interval |
 | Load & Market → Dispatch | Signals | Per scenario |
 | Load & Market → Tariff | Reference load | Per billing period |
+| Load & Market → Financial | Settlement basis | Per settlement period |
 | Operational → Dispatch | Requirements | Per scenario |
 | Dispatch → BESS | Charge/discharge trajectory (authoritative SOC) | Per interval |
 | Dispatch → Degradation | Trajectories (power and SOC) | Per state-update cycle |
 | Dispatch → Tariff | Battery power trajectory | Per interval |
+| Dispatch → Load & Market (settlement) | Attribution basis | Per settlement period |
 | Degradation → BESS | Updated SOH, augmentation/replacement events | Per state-update cycle |
 | Degradation → Dispatch | Marginal signal | Per state-update cycle |
 | Tariff → Financial | Savings | Per billing period |
@@ -687,7 +694,7 @@ Initialization → Execution → State Transition → Termination
 | Object | Initialization | Execution | State Transition | Termination |
 |---|---|---|---|---|
 | **BESS Model** | Load physical params, initial state | Adopt authoritative SOC trajectory; validate energy balance | Receive updated SOH and augmentation/replacement events | Persist final state |
-| **Load & Market Model** | Load signals | Provide signals | None | None |
+| **Load & Market Model** | Load signals | Provide signals; execute market/program adapters | None | None |
 | **Tariff Engine** | Load tariff | Compose net load; compute bill | None | None |
 | **Operational Model** | Load value streams | Derive requirements | None | None |
 | **Dispatch Engine** | Load inputs | Optimize dispatch | Update operational coordination state | Persist state history |
@@ -800,14 +807,14 @@ B.2 recognizes the following **logical model types**:
 
 | Aspect | Status |
 |---|---|
-| B.2 Model Architecture | ✅ Baseline (Frozen) (v0.5) |
+| B.2 Model Architecture | ✅ Baseline (Frozen) (v0.5.1) |
 | B.3 Optimization Architecture | ✅ Baseline (Frozen) (v0.6) |
-| B.4 Financial Architecture | ⏭ Next |
-| B.5 Software Architecture | ⏭ Pending |
-| B.6 Databricks Architecture | ⏭ Pending |
+| B.4 Financial Architecture | ✅ Baseline (Frozen) (v0.4) |
+| B.5 Software Architecture | ✅ Baseline (Frozen) (v0.4) |
+| B.6 Databricks Architecture | ⏭ Next |
 | Stage B → Stage C Handoff | ⏭ Pending |
 
-**Immediate next action.** Proceed to B.4 Financial Architecture.
+**Immediate next action.** Proceed to B.6 Databricks Architecture.
 
 ---
 
@@ -822,7 +829,22 @@ B.2 recognizes the following **logical model types**:
 | 3 | §12: B.3 status updated to **Baseline (Frozen) (v0.6)** | Consistency |
 | 4 | §9.1: BESS Model "Within horizon" column changed from "—" to "❌ Sequential (intervals)" | Align with §9.2 |
 
-#### 13.2 Version History
+#### 13.2 Changes from v0.5 to v0.5.1
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | §4.2: added Input row "Dispatch Engine → Attribution basis (for market / program settlement)" and Output row "Financial Engine → Settlement basis"; added "Note on dual role" | Required by B.4 §4.4 (adapter ownership and settlement flow) |
+| 2 | §4.2 Lifecycle: "Execution" now includes "execute market/program adapters on attribution basis"; Parallelization note on seasonal program rules | Consistency with dual role |
+| 3 | §4.5: added Output row "Load & Market Model → Attribution basis (for settlement)"; reformulated existing Financial row to "Attribution basis (streams not requiring market settlement, if any)" | Declare the new settlement interface |
+| 4 | §4.7: added Input row "Load & Market Model → Settlement basis" | Complete the settlement interface chain |
+| 5 | §7.2 Interface Matrix: added two rows — Dispatch Engine → Load & Market Model (Attribution basis, for settlement) and Load & Market Model → Financial Engine (Settlement basis) | Declare the new settlement interfaces |
+| 6 | §7.3 Interface Timing: added two rows — Dispatch → Load & Market (settlement), Load & Market → Financial | Declare timing of the new settlement interfaces |
+| 7 | §5.1: Load & Market Model reason updated to "Signals are inputs; settlement is a pure function" | Consistency with dual role |
+| 8 | §8.2 Lifecycle per Object: Load & Market Model Execution now includes "execute market/program adapters" | Consistency with dual role |
+| 9 | §12: B.4 and B.5 statuses updated to Baseline (Frozen) | Consistency with the frozen tree |
+| 10 | Header: version updated from v0.5 to v0.5.1 | Traceable interface patch |
+
+#### 13.3 Version History
 
 | Version | Date | Changes | Status |
 |---|---|---|---|
@@ -830,16 +852,20 @@ B.2 recognizes the following **logical model types**:
 | 0.2 | Stage B correction | Document ID + clarifications | Superseded |
 | 0.3 | Stage B correction | 9 corrections | Superseded |
 | 0.4 | Stage B closure | 6 corrections | Superseded |
-| 0.5 | Stage B closure | 11 corrections + 4 retoques | **Baseline (Frozen)** |
+| 0.5 | Stage B closure | 11 corrections + 4 retoques | Superseded |
+| 0.5.1 | Stage B closure | 10 corrections (settlement interface patch) | **Baseline (Frozen)** |
 
 ---
 
-**End of §5 — B.2 Model Architecture (v0.5 — Baseline Frozen)**
+**End of §5 — B.2 Model Architecture (v0.5.1 — Baseline Frozen)**
 
 **Status:** Baseline (Frozen)
 
-**Next:** B.4 Financial Architecture
+**Next:** B.6 Databricks Architecture
 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 
 **Engagement:** RFP-264144-1
+
+---
+
