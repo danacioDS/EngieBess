@@ -7,15 +7,15 @@
 
 **Document ID:** A.2.1-BESS-ENG-001
 
-**Version:** 1.0 — Conceptual Engineering Baseline (Closed)
+**Version:** 1.1 — Conceptual Engineering Baseline (Closed)
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.3)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.3)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.6)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.4)
 
 **Domain:** Domain 1 — BESS Engineering
 
@@ -25,7 +25,7 @@
 
 ## 1. Purpose of This Document
 
-This document constitutes **Stage A.2.1 — Conceptual Engineering** of the BESS Engineering domain, the first of seven domain documents defined in `SYS-ENG-DEF-001` §1.1.
+This document constitutes **Stage A.2.1 — Conceptual Engineering** of the BESS Engineering domain, one of seven domain chapters defined in `SYS-ENG-DEF-001` §1.1.
 
 Its purpose is to establish the **conceptual engineering definition** of the physical BESS representation that underpins the entire BESS Operational & Financial Modeling System.
 
@@ -57,9 +57,9 @@ Stage A is delivered in two levels:
 | Level | Name | Deliverable |
 |---|---|---|
 | A.1 | System Component Definition | `SYS-ENG-DEF-001` — eagle-eye view of the seven domains |
-| A.2 | Conceptual Engineering per Domain | Seven domain documents, of which this is the first |
+| A.2 | Conceptual Engineering per Domain | Seven domain chapters |
 
-This document refines **Domain 1** of `SYS-ENG-DEF-001` §5 from an eagle-eye definition into a conceptual engineering baseline.
+Per `SYS-STR-FRM-001` §4.3, the A.2 chapters may be consolidated into a single document. This chapter refines **Domain 1** of `SYS-ENG-DEF-001` §5 into a conceptual engineering baseline.
 
 ### 1.2 Scope Boundary of A.2.1
 
@@ -119,9 +119,9 @@ The domain must conceptually represent the following physical aspects of a BESS:
 
 | # | Aspect | Description |
 |---|---|---|
-| 1 | Energy capacity | Nominal, usable, and currently available energy |
+| 1 | Energy capacity | Nominal, available, and usable energy |
 | 2 | Power capability | Charge and discharge power rating, and available power at a given moment |
-| 3 | State of Charge (SOC) | Current stored energy as a fraction of usable capacity |
+| 3 | State of Charge (SOC) | Current stored energy as a fraction of available capacity |
 | 4 | State of Health (SOH) | Remaining capability relative to beginning-of-life |
 | 5 | Round-trip efficiency | Energy losses across a full charge/discharge cycle |
 | 6 | Conversion efficiency | AC↔DC and internal conversion losses |
@@ -129,11 +129,12 @@ The domain must conceptually represent the following physical aspects of a BESS:
 | 8 | Ramp rate | Maximum rate of change of power |
 | 9 | Operating limits | SOC bounds, power bounds, ramp bounds, C-rate bounds |
 | 10 | Inverter capability | AC/DC conversion, apparent power rating, reactive power envelope |
-| 11 | Thermal environment | Assumed or supplied thermal conditions affecting performance |
+| 11 | Thermal environment | Temperature treated as an input assumption (see §13) |
 | 12 | Availability | Physical availability and required rest/idle periods |
 | 13 | Augmentation | Addition of capacity over lifetime (as a capability interface) |
 | 14 | Replacement | Full replacement events (as a capability interface) |
 | 15 | Interface to degradation | Explicit boundary where capability degradation is applied |
+| 16 | Duration | Energy/power ratio — derived characteristic that determines whether the BESS can satisfy minimum-duration requirements (e.g. DR event duration) |
 
 The domain does **not** compute degradation itself — it defines the physical surface on which degradation acts (see §8).
 
@@ -169,7 +170,7 @@ Each stage imposes efficiency losses and physical limits. The BESS domain must b
 | PCS / Inverter | Converts DC↔AC; has apparent power rating, reactive capability, efficiency curve |
 | AC interface | Couples to site/grid; subject to site or grid limits (declared, enforced elsewhere) |
 | Thermal system | Represents temperature environment affecting capability |
-| Auxiliary systems | Parasitic consumption and availability considerations |
+| Auxiliary systems | Parasitic consumption and availability considerations; contributes to site load in behind-the-meter configurations |
 
 The domain is defined by **capability and constraint per element**, not by hardware selection.
 
@@ -192,18 +193,20 @@ The domain is defined by **capability and constraint per element**, not by hardw
 
 | Concept | Meaning |
 |---|---|
-| Nominal capacity | Nameplate energy capacity of the battery |
-| Usable capacity | Energy actually accessible within SOC operating bounds |
-| Available capacity | Usable capacity corrected by current SOH |
-| SOC | Fraction of usable capacity currently stored |
-| SOC bounds | Minimum and maximum SOC permitted by policy or warranty |
+| Nominal capacity | Nameplate energy capacity of the battery (beginning-of-life) |
+| Available capacity | Nominal capacity × current SOH — the energy accessible within SOC limits at the current state of health |
+| SOC | Fraction of available capacity currently stored |
+| SOC bounds | Minimum and maximum SOC (as fraction of available capacity) |
+| Usable capacity | Available capacity × (SOC_max − SOC_min) — the energy that can actually be cycled |
 | Energy balance | Conservation of energy across charge/discharge/rest |
+
+The definition order is: **nominal → SOH → available → SOC → usable**. SOC is defined on available capacity; usable capacity is a derived quantity.
 
 ### 5.2 Conceptual Requirements
 
 The domain must be able to represent:
 
-1. A distinction between **nominal**, **usable**, and **available** capacity
+1. A distinction between **nominal**, **available**, and **usable** capacity
 2. An **SOC state** that evolves over time under dispatch
 3. **SOC bounds** that constrain feasible operation
 4. The effect of **SOH** on available capacity (as an input from Degradation)
@@ -216,14 +219,13 @@ This range is a **physical constraint of the system** — determined by battery 
 
 **Dispatch must respect that range**, but does not redefine it. Dispatch selects an operating point **within** the feasible SOC envelope defined here.
 
-### 5.4 What Is Not Decided Here
+**SOC window behavior under degradation.** Whether the SOC window narrows proportionally as SOH declines (bounds as percentage of available capacity) or is preserved in absolute kWh (bounds as fixed energy reserves) is an explicit engineering uncertainty — see §15.2. The two options yield materially different usable energy in later project years.
 
-- Exact SOC formulation (absolute energy vs. normalized fraction)
-- Time discretization (sub-hourly, hourly, sub-daily)
-- How SOC is corrected for temperature
-- How SOC bounds are numerically enforced in the dispatch formulation
+### 5.4 Duration — Derived Characteristic
 
-These belong to Stage B/C.
+**Duration** (energy/power ratio) is a derived characteristic exposed by this domain.
+
+It determines whether the BESS can satisfy minimum-duration requirements such as DR event duration, and it changes over the project lifetime as SOH declines.
 
 ---
 
@@ -246,7 +248,7 @@ These belong to Stage B/C.
 The domain must be able to represent:
 
 1. Separate **charge** and **discharge** power capabilities
-2. **Available power** as a function of SOC, SOH, and thermal state
+2. **Available power** as a function of SOC, SOH, and thermal assumption
 3. **C-rate limits** that constrain sustained operation
 4. **Ramp limits** that constrain transient operation
 5. **Inverter envelope** including reactive power capability (as an interface to Operational Engineering)
@@ -257,7 +259,7 @@ Charge and discharge capability are **not constant**. They depend on:
 
 - Current SOC (limits near SOC bounds)
 - Current SOH (available capacity)
-- Thermal environment
+- Thermal conditions
 - Inverter state
 
 The domain must expose these dependencies as a **capability surface**, not as a fixed constant.
@@ -274,15 +276,6 @@ Reactive power capability is **distributed across three domains**, and this spli
 
 BESS Engineering **never** decides how reactive power is prioritized against active power. That is an operational and dispatch decision.
 
-### 6.5 What Is Not Decided Here
-
-- Whether power limits are hard or soft
-- Whether inverter efficiency is modeled as a curve or a constant
-- Whether ramp is applied per interval or as a continuous limit
-- How reactive power is prioritized against active power (Operational Engineering)
-
-These belong to Stage B/C.
-
 ---
 
 ## 7. Efficiency Model (Conceptual)
@@ -295,7 +288,7 @@ These belong to Stage B/C.
 | Charge efficiency | Losses incurred while charging |
 | Discharge efficiency | Losses incurred while discharging |
 | Conversion losses | DC↔AC and internal losses |
-| Auxiliary consumption | Parasitic load |
+| Auxiliary consumption | Parasitic load (HVAC, control systems, standby) |
 
 ### 7.2 Conceptual Requirements
 
@@ -306,13 +299,13 @@ The domain must be able to represent:
 3. **Auxiliary consumption** as a separate conceptual category
 4. Efficiency as a **function** of operating point, not a single constant
 
-### 7.3 What Is Not Decided Here
+### 7.3 Auxiliary Consumption — Interface to the Tariff Engine
 
-- Whether efficiency is a scalar, a table, or a curve
-- Whether auxiliary consumption is temperature-dependent
-- How efficiency interacts with degradation
+Auxiliary consumption (HVAC, control systems, standby) adds load to the site.
 
-These belong to Stage B/C.
+In **behind-the-meter configurations**, this auxiliary load is **billed**, and therefore contributes to the customer's bill. The BESS domain must expose auxiliary consumption so that it can be included in the **net load** delivered to the tariff engine (Domain 2, per `SYS-ENG-DEF-001` §6.3).
+
+This interface is declared conceptually here and formalized in Stage B.
 
 ---
 
@@ -331,7 +324,7 @@ Physical state:
   - SOC trajectory
   - Power trajectory
   - Throughput
-  - Thermal environment
+  - Thermal conditions (input assumption)
         │
         └────────────────────────────► Consumes as input
                                         │
@@ -396,6 +389,7 @@ Dispatch requires a **feasible operating envelope** at each point in time, consi
 | Ramp limits | Maximum rate of change |
 | Minimum rest requirements | Idle time constraints |
 | Availability | Whether the system is available at all |
+| Duration | Energy/power ratio, for minimum-duration service requirements |
 | Reactive power capability | For voltage regulation value streams |
 
 ### 9.2 What This Domain Needs From Dispatch
@@ -429,7 +423,7 @@ Operational Engineering defines the **value streams** the BESS may serve. Each v
 | Value Stream | Physical Requirement on BESS |
 |---|---|
 | Peak Shaving | Sustained discharge capability during peak windows |
-| Demand Response | Minimum sustained discharge duration per event |
+| Demand Response | Minimum sustained discharge duration per event (uses duration characteristic, §5.4) |
 | Energy Arbitrage | Full cycle capability within SOC bounds |
 | Frequency Regulation | Fast symmetric charge/discharge around a setpoint; ramp-sensitive |
 | Voltage Regulation | Reactive power capability from inverter envelope |
@@ -445,26 +439,15 @@ The domain maintains, conceptually, the following state over time:
 | State Variable | Nature | Ownership |
 |---|---|---|
 | SOC | Continuous, bounded | BESS owns state; evolves under Dispatch |
-| SOH | Continuous, non-increasing (except at augmentation) | BESS owns state; **evolution determined by Degradation** |
-| Available capacity | Derived from usable capacity × SOH | BESS exposes; consumed by Dispatch |
-| Available charge power | Function of SOC, SOH, thermal state | BESS exposes; consumed by Dispatch |
-| Available discharge power | Function of SOC, SOH, thermal state | BESS exposes; consumed by Dispatch |
-| Thermal state | Environmental or modeled | BESS declares |
+| SOH | Continuous, non-increasing between augmentation/replacement events | BESS owns state; **evolution determined by Degradation** |
+| Available capacity | Derived from nominal capacity × SOH | BESS exposes; consumed by Dispatch |
+| Usable capacity | Derived from available capacity × (SOC_max − SOC_min) | BESS exposes; consumed by Dispatch |
+| Available charge power | Function of SOC, SOH, thermal assumption | BESS exposes; consumed by Dispatch |
+| Available discharge power | Function of SOC, SOH, thermal assumption | BESS exposes; consumed by Dispatch |
+| Duration | Derived energy/power ratio | BESS exposes; consumed by Operational (min-duration requirements) |
 | Availability | Time-dependent capability condition | BESS declares; consumed by Dispatch |
 
-### 11.1 State Disciplines
-
-- SOC is **stateful within a simulation horizon**.
-- SOH is **stateful across the full project lifetime**; its evolution law is owned by Degradation Engineering.
-- Available power is **derived**, not stored independently.
-- Thermal state may be **supplied** or **modeled** — this choice is deferred to Stage B/C.
-
-### 11.2 What Is Not Decided Here
-
-- Storage representation (in-memory vs. persisted)
-- Time indexing convention
-- Interpolation strategy between intervals
-- Whether thermal state is a full model or an input assumption
+**Note on thermal state.** Temperature is an **input assumption**, not a dynamic state — see §13 and `SYS-ENG-DEF-001` §5.2.
 
 ---
 
@@ -512,24 +495,21 @@ Thermal conditions affect:
 - Efficiency
 - (Indirectly, through Degradation) aging rate
 
-### 13.2 Conceptual Options
+### 13.2 Temperature as an Input Assumption
 
-The domain may conceptually represent thermal state as:
+Per `SYS-ENG-DEF-001` §5.2, **temperature is treated as an input assumption**, not as a dynamic state variable.
 
-| Option | Description |
-|---|---|
-| **Assumed constant** | Ambient temperature is a fixed assumption |
-| **Externally supplied** | A temperature time series is provided as input |
-| **Internally modeled** | Thermal dynamics are modeled from operation and environment |
+The domain receives a **temperature profile** (ambient or cell) as an input and exposes its effect on capability. It does **not** model thermal dynamics internally.
 
-The choice between these options is a **Stage B/C decision**, not a Stage A.2 decision.
+Internal thermal modeling (cell-level thermal dynamics, cooling system behavior) is a **possible future extension**, but it is out of scope for this engagement and not required by the RFP for a planning-grade tool.
 
-### 13.3 Boundary
+### 13.3 Interface
 
-Whatever option is chosen, the domain exposes:
+The domain exposes:
 
-- Thermal state (or thermal assumption)
-- Effect of thermal state on capability
+- The temperature profile it consumed (for traceability)
+- Effect of temperature on available power, available capacity, and efficiency
+- Temperature conditions passed to Degradation Engineering as part of the operating history
 
 ---
 
@@ -545,16 +525,17 @@ The purpose here is to make explicit **what must be knowable about a BESS** befo
 |---|---|---|
 | 1 | Rated energy capacity | Nameplate energy storage capability |
 | 2 | Rated charge/discharge power | Nameplate power capability |
-| 3 | SOC operating limits | Minimum and maximum admissible SOC |
+| 3 | SOC operating limits | Minimum and maximum admissible SOC, and their behavior under degradation |
 | 4 | Efficiency characteristics | Round-trip, charge, discharge efficiency representation |
 | 5 | C-rate limits | Sustained and peak C-rate bounds |
 | 6 | Ramp limits | Maximum rate of change of power |
 | 7 | PCS / inverter characteristics | Apparent power rating, reactive capability, conversion envelope |
 | 8 | Thermal operating limits | Permitted operating temperature range |
-| 9 | Availability assumptions | Expected availability and derating conditions |
-| 10 | Auxiliary consumption | Parasitic load and standby consumption |
-| 11 | Warranty / operating restrictions | Contractual constraints on cycling, SOC, temperature |
-| 12 | Augmentation / replacement assumptions | Policy for capacity addition or replacement |
+| 9 | Temperature profile | Ambient or cell temperature time series (input assumption) |
+| 10 | Availability assumptions | Expected availability and derating conditions |
+| 11 | Auxiliary consumption | Parasitic load and standby consumption |
+| 12 | Warranty / operating restrictions | Contractual constraints on cycling, SOC, temperature; SOC window behavior under degradation |
+| 13 | Augmentation / replacement assumptions | Policy for capacity addition or replacement; multi-cohort aggregation rule |
 
 ### 14.2 Why This List Exists
 
@@ -562,7 +543,7 @@ This list connects A.2.1 directly to:
 
 - **Data & Application Engineering (A.2.7)** — which will define how this information is ingested, validated, and stored
 - **Stage B (System Architecture)** — which will define how this information is represented computationally
-- **Phase 1 clarification items** — particularly item 8 (data availability), which determines what ENGIE can actually provide
+- **Phase 1 clarification items** — particularly **B3 (Data availability)**, which determines what ENGIE can actually provide
 
 It is a **bridge**, not a specification.
 
@@ -583,30 +564,35 @@ These belong to A.2.7 and Stage B.
 
 | # | Assumption | Rationale | Impact if Wrong |
 |---|---|---|---|
-| 1 | Battery is a single aggregate unit | Simplifies conceptual modeling | Multi-stack configurations would need explicit representation |
+| 1 | Battery is a single aggregate unit | Simplifies conceptual modeling | Multi-stack or mixed-cohort configurations (e.g. after augmentation) would need explicit representation; aggregation rule must be defined (see §15.2) |
 | 2 | Efficiency is representable at a single conceptual level | Keeps interface simple at Stage A.2 | Sub-level losses (cell, module, string) would be lost |
-| 3 | Thermal state is interfaceable but not necessarily modeled | Defers thermal modeling decision | Accuracy of available power may degrade |
+| 3 | Temperature is an input assumption, not a modeled state | Consistent with A.1 v0.4; matches planning-tool scope | Accuracy of available power in extreme climates may be limited |
 | 4 | Reactive capability is part of the inverter envelope | Supports Voltage Regulation value stream | Requires inverter-level detail |
 | 5 | Availability is represented as a declared time-dependent capability condition rather than derived from maintenance or reliability models | Avoids premature commitment to a reliability framework | Availability realism may be limited |
+| 6 | SOC is defined on available capacity (nominal × SOH) | Avoids circular definition; standard formulation | Requires explicit SOC-window behavior decision (see §15.2) |
 
 ### 15.2 Engineering Uncertainties
 
 | # | Uncertainty | Where It Must Be Resolved |
 |---|---|---|
-| 1 | Thermal modeling fidelity | Stage B |
+| 1 | Thermal modeling fidelity | Stage B (extension only; not in initial scope) |
 | 2 | Reactive power priority vs. active power | Operational Engineering (A.2.3) |
 | 3 | Whether augmentation is a state event or a capability curve | Interface with Degradation (A.2.5) |
 | 4 | Whether SOC bounds are warranty-driven or policy-driven | Phase 1 clarification |
 | 5 | Whether efficiency is scalar, curve, or table | Stage B/C |
 | 6 | Deterministic vs. probabilistic availability treatment | Stage B |
+| 7 | **SOC window behavior under degradation** — proportional narrowing (bounds as %) or preserved kWh reserves | Phase 1 clarification (B4-related) and A.2.5 |
+| 8 | **Multi-cohort aggregation rule** after augmentation — weighted SOH, per-cohort tracking, or simplified aggregate | A.2.5 |
 
 ### 15.3 Phase 1 Clarification Dependencies
 
 This domain depends on the following Phase 1 items from `SYS-STR-FRM-001` §12:
 
-- **Item 3** — Degradation model fidelity (affects interface in §8)
-- **Item 8** — Data availability (affects parameter sourcing in §14)
-- **Item 10** — Acceptance thresholds (affects validation scope in §17)
+- **B3** — Data availability (affects parameter sourcing in §14)
+- **B4** — Benchmark data (affects validation scope in §17)
+- **B5** — Acceptance thresholds (affects validation tolerances)
+- **D3** — Degradation feedback loop time scale (affects interface in §8)
+- **New question to ENGIE** — SOC window behavior under degradation (see §15.2 #7)
 
 ---
 
@@ -619,18 +605,21 @@ The domain exposes the following **conceptual outputs** to the rest of the syste
 | SOC trajectory | Dispatch, Degradation, Financial (indirect) | Time series |
 | SOH state | Dispatch, Degradation, Financial | Time series |
 | Available capacity | Dispatch, Financial | Time series |
+| Usable capacity | Dispatch, Financial | Time series |
 | Available charge/discharge power | Dispatch | Time series (envelope) |
 | Ramp limits | Dispatch | Scalar or time series |
+| Duration | Operational, Dispatch | Derived scalar or time series |
 | Reactive power capability | Operational (Voltage Regulation) | Envelope |
-| Thermal state | Degradation | Time series or assumption |
+| Auxiliary consumption | **Load & Market (tariff engine)** via net load | Time series |
 | Availability | Dispatch | Time-dependent capability condition |
 | Physical feasibility conditions | Dispatch | Constraints |
+| Temperature effect on capability | Degradation | Derived from input profile |
 
 ---
 
 ## 17. Validation Requirements (Conceptual)
 
-Following the Validation cross-cutting capability in `SYS-ENG-DEF-001` §13.2, this domain must define validation at the **domain level** and provide evidence to **model** and **system** validation.
+Following the Validation cross-cutting capability in `SYS-ENG-DEF-001` §4.1, this domain must define validation at the **domain level** and provide evidence to **model** and **system** validation.
 
 ### 17.1 Domain-Level Validation
 
@@ -642,14 +631,16 @@ Following the Validation cross-cutting capability in `SYS-ENG-DEF-001` §13.2, t
 | Ramp limits | Rate of change respects declared limits |
 | Efficiency consistency | Round-trip efficiency matches declared assumptions |
 | Availability consistency | No operation during declared unavailable periods |
+| Duration consistency | Exposed duration matches available energy / available power |
 
 ### 17.2 Interface Validation
 
 | Check | Nature |
 |---|---|
 | Envelope completeness | Dispatch never receives an incomplete envelope |
-| SOH evolution integrity | SOH evolution is non-increasing during normal operation; capability restoration events such as augmentation or replacement are represented explicitly rather than treated as ordinary SOH evolution |
+| SOH evolution integrity | SOH is monotonically non-increasing **between augmentation/replacement events**; capability restoration events are represented explicitly |
 | Availability propagation | Unavailability is respected by Dispatch |
+| Auxiliary consumption propagation | Auxiliary consumption reaches the tariff engine via net load |
 
 ### 17.3 Validation Evidence
 
@@ -680,103 +671,65 @@ Each of these belongs to another domain, as declared in `SYS-ENG-DEF-001` §12.
 
 | From | To | Main Information |
 |---|---|---|
-| BESS Engineering | Operational | Physical capabilities and constraints |
-| BESS Engineering | Dispatch | Feasible operating envelope |
-| BESS Engineering | Degradation | Physical state and operating history |
+| BESS Engineering | Operational | Physical capabilities and constraints; duration |
+| BESS Engineering | Dispatch | Feasible operating envelope; duration |
+| BESS Engineering | Degradation | Physical state and operating history; temperature conditions |
+| BESS Engineering | Load & Market | **Auxiliary consumption** (via net load, for tariff engine) |
 | Degradation | BESS Engineering | Updated SOH, available capacity, efficiency characteristics |
 
 ---
 
-## 19. What Is Deliberately NOT Defined Here
-
-This document intentionally does **not** freeze:
-
-### Mathematical Formulation
-- SOC evolution equation
-- Efficiency curves
-- Thermal dynamics
-- SOC bound behavior
-- Ramp constraint form
-
-### Software Structure
-- Classes, functions, APIs
-- Data structures
-- Storage representation
-- Time indexing convention
-- Interpolation strategy
-
-### Numerical Methods
-- Integration scheme
-- Time step selection
-- Solver coupling with Dispatch
-- Numerical tolerance
-
-### Data Contracts
-- Parameter schemas
-- Units convention
-- Missing data handling
-
-### Integration Details
-- How SOC trajectory is passed to Degradation
-- How envelope is passed to Dispatch
-- How augmentation events are propagated
-
-### Availability Treatment
-- Whether availability is deterministic or probabilistic
-- How unavailability is represented numerically
-
-These belong to Stages B, C, and D.
-
----
-
-## 20. Traceability to Upstream Documents
+## 19. Traceability to Upstream Documents
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.3 | §1.1, §5 Domain 1, §6.2 Causal Backbone, §8.2 Validation | Yes |
-| `SYS-ENG-DEF-001` v0.3 | §5 Domain 1, §12 Inter-Domain Contract, §13.2 Validation | Yes |
+| `SYS-STR-FRM-001` v0.6 | §1.1, §5 Domain 1, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
+| `SYS-ENG-DEF-001` v0.4 | §5 Domain 1, §4.1 Cross-cutting capabilities, §12 Inter-Domain Contract | Yes |
 | RFP-264144-1 | Technical system parameters, SOC/SOH, efficiency, power, C-rate, ramp, thermal, augmentation/replacement | Yes |
 | RFP-264144-1 | "Feedback loop: degradation impacts available energy in future periods" | Yes — §8 |
 
 ---
 
-## 21. Engineering Decisions Deferred to Later Stages
+## 20. Engineering Decisions Deferred to Later Stages
+
+This section consolidates all decisions that are **deliberately not made** in this document. Where earlier sections mention deferred items, they refer here.
 
 | # | Decision | Stage | Rationale |
 |---|---|---|---|
-| 1 | SOC formulation | B | Requires architectural context |
+| 1 | SOC formulation (absolute energy vs. normalized fraction) | B | Requires architectural context |
 | 2 | Efficiency representation (scalar / curve / table) | B | Requires data availability clarity |
-| 3 | Thermal modeling fidelity | B | Depends on Phase 1 item 3 and data |
+| 3 | Thermal modeling fidelity (internal dynamics) | B | Extension only; not in initial scope |
 | 4 | Reactive power priority model | A.2.3 / B | Belongs conceptually to Operational Engineering |
-| 5 | Augmentation interface details | A.2.5 / B | Belongs conceptually to Degradation Engineering |
+| 5 | Augmentation interface details and multi-cohort aggregation | A.2.5 / B | Belongs conceptually to Degradation Engineering |
 | 6 | Storage and time-indexing conventions | B | Architecture decision |
-| 7 | Numerical integration scheme | C | Detailed engineering |
-| 8 | Validation tolerances | C | Depends on Phase 1 item 10 |
-| 9 | Deterministic vs. probabilistic availability | B | Depends on RFP reliability scope and data |
+| 7 | Interpolation strategy between intervals | B | Architecture decision |
+| 8 | Numerical integration scheme | C | Detailed engineering |
+| 9 | Validation tolerances | C | Depends on **B5** |
+| 10 | Deterministic vs. probabilistic availability treatment | B | Depends on RFP reliability scope and data |
+| 11 | SOC window behavior under degradation | Phase 1 + A.2.5 | Affects usable energy in later years |
+| 12 | Multi-cohort aggregation rule after augmentation | A.2.5 / B | Affects SOH representation |
+| 13 | Auxiliary consumption thermal dependency | B | Affects accuracy in extreme climates |
+| 14 | Parameter schemas, units, missing-data handling | B / A.2.7 | Data contracts |
 
 ---
 
-## 22. Next Steps
+## 21. Next Steps
 
 This document establishes the **conceptual engineering baseline** for Domain 1 — BESS Engineering.
 
-The next documents in Stage A.2, in dependency order, are:
+The Stage A.2 chapters are developed in the priority order defined in `SYS-ENG-DEF-001` §19, prioritizing thin-slice blockers:
 
-| Order | Document ID | Domain | Rationale |
+| Order | Document ID | Domain | Status |
 |---|---|---|---|
-| ✅ | A.2.1 | BESS Engineering | **This document** — physical foundation — **Baselined** |
-| ⏭ | A.2.2 | Load & Market Engineering | External environment |
-| ⏭ | A.2.3 | Operational Engineering | Value stream behavior |
-| ⏭ | A.2.4 | Dispatch & Optimization Engineering | Coordination logic |
-| ⏭ | A.2.5 | Degradation Engineering | Dynamic state evolution |
-| ⏭ | A.2.6 | Financial Engineering | Economic translation |
-| ⏭ | A.2.7 | Data & Application Engineering | Execution and delivery |
+| 1 | A.2.4 | Dispatch & Optimization Engineering | ⏭ Next |
+| 2 | A.2.5 | Degradation Engineering | ⏭ Next |
+| 3 | A.2.1 | BESS Engineering | ✅ **This document** — Baselined |
+| 4 | A.2.2 | Load & Market Engineering | ⏭ Pending |
+| 5 | A.2.3 | Operational Engineering | ⏭ Pending |
+| 6 | A.2.6 | Financial Engineering | ⏭ Pending |
+| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
 
-Phase 1 clarification items **11 (audit / lineage / traceability scope)** and **12 (load forecasting home)** will be addressed **organically within A.2.2 and A.2.7**, not resolved administratively beforehand. This follows the principle:
-
-> **Conceptual ownership ≠ software implementation location.**
-
-A.2.2 is the appropriate place to determine conceptually what the load, the forecast, and the external market environment actually *are* before deciding where the forecasting capability lives architecturally.
+Phase 1 clarification items are organized as **blocking (B1–B5)** and **defaultable (D1–D15)** in `SYS-STR-FRM-001` §12. This domain's dependencies are listed in §15.3.
 
 ---
 
@@ -786,6 +739,8 @@ A.2.2 is the appropriate place to determine conceptually what the load, the fore
 **Status:** Conceptual Engineering Baseline — **CLOSED**
 **Duration:** 12 Weeks
 **Language:** English
-
 ---
 
+**BESS Operational & Financial Modeling (RFP-264144-1): Observations and Clarification Requests**
+
+1. SOC window under degradation. As the battery ages, does the operating SOC window scale proportionally with remaining capacity, or does the integrator preserve fixed energy reserves in kWh? The two approaches produce materially different usable energy in later project years. Vendor warranty terms usually define this.
