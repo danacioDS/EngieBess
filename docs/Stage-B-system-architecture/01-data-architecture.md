@@ -4,11 +4,11 @@
 
 **Document ID:** STAGE-B-HLD-001
 
-**Version:** 0.2 — Draft for Review
+**Version:** 0.3 — Baseline Candidate
 
 **Section:** §4 — B.1 Data Architecture
 
-**Status:** Stage B — Draft for Review
+**Status:** Stage B — Baseline Candidate
 
 **Parent Documents:**
 - `SYS-STR-FRM-001` — System Strategy & Delivery Framework
@@ -257,9 +257,9 @@ The **Governance Data** represents cross-cutting metadata:
 | **Degradation inputs** | Initial state, parameters | Domain 5 |
 | **Financial inputs** | Structured financial assumptions | Domain 6 |
 
-**Architectural owner:** The producing domain
+**Data product owner:** The producing domain
 
-**Semantic owner:** The producing domain
+**Persistence / infrastructure owner:** Domain 7
 
 **Note on Dispatch inputs.** In B.1, "Dispatch inputs" is not a single container. Dispatch consumes distinct inputs (physical capability, external/context signals, operational requirements, degradation state, financial inputs). B.2 and B.3 define how these inputs are composed.
 
@@ -292,11 +292,11 @@ The **Governance Data** represents cross-cutting metadata:
 | **Cash flow accumulator** | Annual cash flow | Financial Engine | Financial Engine | State |
 | **Reserve capacity** | Reserved capacity per stream | Dispatch Engine | Dispatch Engine | State |
 
-**Architectural owner:** Domain 7 (persistence infrastructure)
+**Persistence owner:** Domain 7 (persistence infrastructure)
 
-**State owner:** The component that holds the state.
+**State owner:** The component that owns the operational state.
 
-**Evolution owner:** The component that updates the state.
+**Evolution owner:** The component that updates the state according to its governing model.
 
 #### 5.2 Runtime State
 
@@ -639,11 +639,11 @@ This resolves the tension between **domain ownership** (semantic) and **data/app
 
 #### 11.3 Reproducibility
 
-**Purpose:** Ensure that the same inputs produce the same outputs.
+**Purpose:** Ensure reproducibility of results given equivalent execution conditions.
 
 **Conceptual requirements:**
 
-- Same inputs → same outputs
+- Same declared inputs, configuration, state initialization, and execution version → reproducible results
 - Same parameters → same behavior
 - Same code version → same results
 - Support comparison across runs
@@ -739,7 +739,7 @@ Ensure that scenarios do not contaminate each other.
 
 | Aspect | Status |
 |---|---|
-| B.1 Data Architecture | ✅ Draft for Review (v0.2) |
+| B.1 Data Architecture | ✅ Baseline Candidate (v0.3) |
 | B.2 Model Architecture | ⏭ Next |
 | B.3 Optimization Architecture | ⏭ Pending |
 | B.4 Financial Architecture | ⏭ Pending |
