@@ -4,15 +4,15 @@
 
 **Document ID:** A.2.1-BESS-ENG-001
 
-**Version:** 1.2 — Conceptual Engineering Baseline (Closed)
+**Version:** 1.3 — Conceptual Engineering Baseline (Closed)
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 1 — BESS Engineering
@@ -566,7 +566,7 @@ These belong to A.2.7 and Stage B.
 |---|---|---|---|
 | 1 | Battery is a single aggregate unit | Simplifies conceptual modeling | Multi-stack or mixed-cohort configurations (e.g. after augmentation) would need explicit representation; aggregation rule must be defined (see §15.2) |
 | 2 | Efficiency is representable at a single conceptual level | Keeps interface simple at Stage A.2 | Sub-level losses (cell, module, string) would be lost |
-| 3 | Temperature is an input assumption, not a modeled state | Consistent with A.1 v0.5; matches planning-tool scope | Accuracy of available power in extreme climates may be limited |
+| 3 | Temperature is an input assumption, not a modeled state | Consistent with A.1 v0.6; matches planning-tool scope | Accuracy of available power in extreme climates may be limited |
 | 4 | Reactive capability is part of the inverter envelope | Supports Voltage Regulation value stream | Requires inverter-level detail |
 | 5 | Availability is represented as a declared time-dependent capability condition rather than derived from maintenance or reliability models | Avoids premature commitment to a reliability framework | Availability realism may be limited |
 | 6 | SOC is defined on available capacity (nominal × SOH) | Avoids circular definition; standard formulation | Requires explicit SOC-window behavior decision (see §15.2) |
@@ -686,8 +686,8 @@ Each of these belongs to another domain, as declared in `SYS-ENG-DEF-001` §12.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §1.1, §5 Domain 1, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
-| `SYS-ENG-DEF-001` v0.5 | §5 Domain 1, §4.1 Cross-cutting capabilities, §12 Inter-Domain Contract | Yes |
+| `SYS-STR-FRM-001` v0.9 | §1.1, §5 Domain 1, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
+| `SYS-ENG-DEF-001` v0.6 | §5 Domain 1, §4.1 Cross-cutting capabilities, §12 Inter-Domain Contract | Yes |
 | `PH1-REG-001` v1.1 | PH-003, PH-005, PH-006, PH-017, PH-018, PH-036 | Yes |
 | RFP-264144-1 | Technical system parameters, SOC/SOH, efficiency, power, C-rate, ramp, thermal, augmentation/replacement | Yes |
 | RFP-264144-1 | "Feedback loop: degradation impacts available energy in future periods" | Yes — §8 |
@@ -725,11 +725,11 @@ This document establishes the **conceptual engineering baseline** for Domain 1 �
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ **This document** — Baselined (v1.2) |
+| 1 | A.2.1 | BESS Engineering | ✅ **This document** — Baselined (v1.3) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
 | 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.8) |
-| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
 | 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
 | 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 

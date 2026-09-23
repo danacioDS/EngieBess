@@ -1,26 +1,23 @@
-
----
-
 # Financial Engineering
 ## Stage A.2.6 — Conceptual Engineering
 ### Economic Translation of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.6-FIN-ENG-001
 
-**Version:** 0.2 — Development Draft
+**Version:** 0.3 — Development Baseline
 
-**Status:** Stage A.2 — Conceptual Engineering (Domain Level)
+**Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Development Baseline
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
-- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
-- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.8)
-- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.2)
+- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
+- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v1.0)
+- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.4)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 6 — Financial Engineering
@@ -77,10 +74,10 @@ Those belong to Stage B (architecture and formulation) and Stage C (detailed for
 
 | Default | Source | Value |
 |---|---|---|
-| Financing structure | Strategy D8 | Project IRR primary; equity IRR computed with default debt parameters, configurable |
-| Tax treatment | Strategy D9 | Pre-tax initially; ITC / depreciation flagged as extension |
+| Financing structure | **PH-042** | Project IRR primary; equity IRR computed with default debt parameters, configurable |
+| Tax treatment | **PH-043** | Pre-tax initially; ITC / depreciation flagged as extension |
 | Nominal vs. real | This document | **Nominal cash flows with explicit inflation, discounted at a nominal rate** |
-| Representative-period effect | Strategy D19 | Savings from representative months are **weighted** when annualized |
+| Representative-period effect | **PH-040** | Savings from representative months are **weighted** when annualized |
 | Realization factor | **PH-035** | Applied per stream; magnitude configurable per scenario |
 
 ### 1.3 Position Within Stage A
@@ -434,7 +431,7 @@ Savings from demand charge reduction, energy charge reduction, and export credit
 
 **Source of truth:** **Domain 2 — Tariff engine.**
 
-**Annualization.** Under representative-period simulation (Strategy D19), savings computed for representative months must be **weighted by the number of months they represent** when annualized. Calendar-year savings reflect the full 12 months, not only the simulated ones.
+**Annualization.** Under representative-period simulation (**PH-040**), savings computed for representative months must be **weighted by the number of months they represent** when annualized. Calendar-year savings reflect the full 12 months, not only the simulated ones.
 
 ### 8.2 Market Revenues
 
@@ -552,8 +549,8 @@ At the end of the contract term, the cash flow may include:
 
 | IRR type | Treatment |
 |---|---|
-| **Project IRR** | Computed on total project cash flows — **primary KPI** (D8) |
-| **Equity IRR** | Computed on equity cash flows — requires debt structure, **computed with default debt parameters, configurable** (D8) |
+| **Project IRR** | Computed on total project cash flows — **primary KPI** (**PH-042**) |
+| **Equity IRR** | Computed on equity cash flows — requires debt structure, **computed with default debt parameters, configurable** (**PH-042**) |
 
 **Note on multiple IRRs.** When replacements occur mid-life, cash flows may change sign multiple times, potentially producing **multiple IRRs**. The KPI must acknowledge this risk. Where multiple IRRs exist, the appropriate return is reported, and the ambiguity is flagged.
 
@@ -598,7 +595,7 @@ For equity IRR, Financial Engineering requires:
 - Repayment schedule
 - Grace period (if applicable)
 
-**Working default (D8):** Default debt parameters provided, configurable by the user.
+**Working default (PH-042):** Default debt parameters provided, configurable by the user.
 
 ### 11.2 What Financial Engineering Does Not Do With Financing
 
@@ -616,7 +613,7 @@ The exact financing structure (debt service calculation, coverage ratios, distri
 
 ### 12.1 Tax Treatment
 
-**Working default (D9):** **Pre-tax** initially. ITC / depreciation flagged as extension if US market confirmed (**PH-043**).
+**Working default (PH-043):** **Pre-tax** initially. ITC / depreciation flagged as extension if US market confirmed.
 
 | Tax element | Treatment |
 |---|---|
@@ -711,7 +708,7 @@ Financial Engineering produces **per-scenario outputs**. Scenario Management pro
 | **Realization factor misapplication** | Applying the realization factor uniformly to all streams conflates forecast-risk streams with tariff-risk streams | Realization factor applied per stream (§8.3) |
 | **Project IRR vs. equity IRR confusion** | Project IRR uses total project cash flows; equity IRR uses equity cash flows after debt service | Both computed, distinguished clearly |
 | **Multiple IRRs** | Mid-life replacements change cash-flow sign multiple times | Acknowledge the risk; report the appropriate return; flag the ambiguity |
-| **Pre-tax vs. post-tax confusion** | Pre-tax and post-tax KPIs differ materially | Working default is pre-tax (D9) |
+| **Pre-tax vs. post-tax confusion** | Pre-tax and post-tax KPIs differ materially | Working default is pre-tax (**PH-043**) |
 | **Nominal vs. real confusion** | Nominal and real values differ when inflation is non-trivial; the real trap is a rate/flows mismatch | Working default: nominal cash flows with explicit inflation, nominal discount rate |
 | **Perspective confusion** | Owner and client perspectives differ when shared-savings or service-fee contracts are in scope | Both supported; owner primary |
 | **Escalation of one-time events** | Augmentation and replacement are one-time events, not recurring | Events escalated to their year, not annually |
@@ -866,8 +863,8 @@ Scenario Management provides **assumptions and comparison infrastructure**. Fina
 | 5 | Realization factor applied per stream | Consistent with `A.2.4` §11.1 | Would conflate risk types |
 | 6 | Tariff escalation applied once, in the tariff engine | Consistent with `A.2.2` §9.6 | Would double-escalate savings |
 | 7 | Market revenue is settled by adapters, not by quantity × price | Consistent with `A.2.2` §13.5 | Would misstate market revenue |
-| 8 | Project IRR is primary; equity IRR computed with default debt parameters | Working default **D8** | Would change KPI set |
-| 9 | Pre-tax initially; ITC / depreciation flagged as extension | Working default **D9** | Would change tax treatment |
+| 8 | Project IRR is primary; equity IRR computed with default debt parameters | Working default **PH-042** | Would change KPI set |
+| 9 | Pre-tax initially; ITC / depreciation flagged as extension | Working default **PH-043** | Would change tax treatment |
 | 10 | Nominal cash flows with explicit inflation, nominal discount rate | Consistent rate/flows | Would risk rate/flows mismatch |
 | 11 | Cost assumptions come from Scenario Management, not BESS Engineering | Consistent with A.2.1 principle | Would blur ownership |
 | 12 | Terminal value is representable | A battery at 85% SOH has value | Would understate project value |
@@ -892,7 +889,7 @@ Scenario Management provides **assumptions and comparison infrastructure**. Fina
 
 ### 23.3 Phase 1 Clarification Dependencies
 
-This domain depends on the following Phase 1 items from `PH1-REG-001`:
+This domain depends on the following Phase 1 items from `PH1-REG-001` v1.1:
 
 - **PH-005** — Benchmark data and tools
 - **PH-007** — Commercial perspective
@@ -901,6 +898,8 @@ This domain depends on the following Phase 1 items from `PH1-REG-001`:
 - **PH-043** — Tax, incentives, and conventions
 - **PH-047** — Reporting requirements
 - **PH-055** — Presentation of value
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -1036,13 +1035,13 @@ These belong to Stage B, Stage C, Stage D, or to Scenario Management.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §5 Domain 6, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §12.2 D8, D9 | Yes |
-| `SYS-ENG-DEF-001` v0.5 | §11 Domain 6, §11.4 Single source of truth, §11.5 Degradation cost double-counting rule, §13 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.2 | §2.4 Guiding Principle (capability and constraint, never value) | Yes |
+| `SYS-STR-FRM-001` v0.9 | §5 Domain 6, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §12.2 defaults | Yes |
+| `SYS-ENG-DEF-001` v0.6 | §11 Domain 6, §11.4 Single source of truth, §11.5 Degradation cost double-counting rule, §13 Inter-Domain Contract | Yes |
+| `A.2.1-BESS-ENG-001` v1.3 | §2.4 Guiding Principle (capability and constraint, never value) | Yes |
 | `A.2.2-LOAD-MKT-ENG-001` v1.3 | §9 Tariff engine, §9.8 Single source of truth, §13.5 Adapters own settlement | Yes |
-| `A.2.3-OPS-ENG-001` v1.3 | §15 Interface with Financial Engineering, §15.2 Mapping convention | Yes |
-| `A.2.4-DISPATCH-ENG-001` v0.8 | §13 Operational Attribution Basis, §22 Interface with Financial | Yes |
-| `A.2.5-DEG-ENG-001` v0.2 | §2.3 Three concepts, §13 Interface with Financial | Yes |
+| `A.2.3-OPS-ENG-001` v1.4 | §15 Interface with Financial Engineering, §15.2 Mapping convention | Yes |
+| `A.2.4-DISPATCH-ENG-001` v1.0 | §13 Operational Attribution Basis, §22 Interface with Financial | Yes |
+| `A.2.5-DEG-ENG-001` v0.4 | §2.3 Three concepts, §13 Interface with Financial | Yes |
 | `PH1-REG-001` v1.1 | Register IDs | Yes |
 
 ---
@@ -1072,21 +1071,25 @@ These belong to Stage B, Stage C, Stage D, or to Scenario Management.
 
 ## 30. Next Steps
 
-This document establishes the **conceptual engineering definition** for Domain 6 — Financial Engineering. It closes the economic translation layer.
+This document establishes the **conceptual engineering baseline** for Domain 6 — Financial Engineering. It closes the economic translation layer.
 
-The Stage A.2 chapters:
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.3) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ Development Draft (v0.8) |
-| 5 | A.2.5 | Degradation Engineering | ✅ Development Baseline (v0.2) |
-| 6 | A.2.6 | Financial Engineering | ✅ **This document — Development Draft** |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Next |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.4) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ Baselined (v1.0) |
+| 5 | A.2.5 | Degradation Engineering | ✅ Development Baseline (v0.4) |
+| 6 | A.2.6 | Financial Engineering | ✅ **This document** — Development Baseline (v0.3) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
 **Immediate next document:** `A.2.7 — Data & Application Engineering`, the final domain chapter.
+
+**Next:** Stage A consolidation and audit before Stage B (HLD).
+
+Phase 1 clarification items are organized in `PH1-REG-001` v1.1, the authoritative consolidated Register. This domain's dependencies are listed in §23.3.
 
 ---
 
@@ -1111,7 +1114,7 @@ The following clarification items are relevant to this domain. They are tracked 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.2.6 — Conceptual Engineering (Financial Engineering)
-**Status:** Conceptual Engineering — Development Draft
+**Status:** Conceptual Engineering — **Development Baseline (v0.3)**
 **Duration:** 12 Weeks
 **Language:** English
 

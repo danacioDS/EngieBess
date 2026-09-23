@@ -4,16 +4,16 @@
 
 **Document ID:** A.2.3-OPS-ENG-001
 
-**Version:** 1.3 — Conceptual Engineering Baseline (Closed)
+**Version:** 1.4 — Conceptual Engineering Baseline (Closed)
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
@@ -180,7 +180,7 @@ This uniformity is deliberate. It ensures:
 - New value streams can be added without ad-hoc structure
 - Financial Engineering can attribute value per stream consistently
 
-**Terminology refinement relative to `SYS-ENG-DEF-001` v0.5.** This document uses **operational requirements** in place of the term *candidate actions*, which appears in `SYS-ENG-DEF-001` v0.5 §7.4 and §12. Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**. Scheduling is a Dispatch decision. The `SYS-ENG-DEF-001` terminology will be aligned in v0.6.
+**Terminology alignment.** This document uses **operational requirements** in place of the term *candidate actions* used in earlier versions of `SYS-ENG-DEF-001`. The alignment was completed in `SYS-ENG-DEF-001` v0.6. Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**. Scheduling is a Dispatch decision.
 
 ---
 
@@ -494,7 +494,7 @@ Deliver reactive power (VAR) support within the inverter's capability, respectin
 | Voltage compliance | Must maintain voltage within bands |
 | **Reactive range** | The range of reactive power support the BESS is required to deliver |
 
-**Note on P² + Q² ≤ S².** Under default **D4** (`SYS-STR-FRM-001` §12.2 / **PH-041**), the initial scope represents the inverter envelope as a **fixed envelope**, without linearization of the nonlinear coupling. Linearizing the coupling is a **possible extension** if the target market and project configuration require it. This document declares the coupling as a physical fact; the choice of treatment is a Phase 1 / Stage B decision.
+**Note on P² + Q² ≤ S².** Under working default **PH-041** (`SYS-STR-FRM-001` §12.2), the initial scope represents the inverter envelope as a **fixed envelope**, without linearization of the nonlinear coupling. Linearizing the coupling is a **possible extension** if the target market and project configuration require it. This document declares the coupling as a physical fact; the choice of treatment is a Phase 1 / Stage B decision.
 
 **Note on priority.** The **coupling** between active and reactive power is a physical fact and is declared here. The **priority** — whether reactive curtails active or vice versa when the envelope binds — is a **Dispatch decision** and is not declared in this document.
 
@@ -702,7 +702,7 @@ Those belong to A.2.5, A.2.4, and A.2.6 respectively.
 
 ### 15.1 Attribution Across Two Sources of Truth
 
-Attribution of value to value streams draws on **two sources of truth**, per `SYS-ENG-DEF-001` §10.4:
+Attribution of value to value streams draws on **two sources of truth**, per `SYS-ENG-DEF-001` §11.4:
 
 | Source of truth | What it produces | What it is attributed to |
 |---|---|---|
@@ -903,9 +903,9 @@ These belong to Stages A.2.4, A.2.5, A.2.6, B, C, D, or to market adapters.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §5 Domain 3, §6.2 Causal Backbone, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
-| `SYS-ENG-DEF-001` v0.5 | §7 Domain 3, §4.1 Cross-cutting capabilities, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.2 | Physical capability interface, reactive power responsibility split | Yes |
+| `SYS-STR-FRM-001` v0.9 | §5 Domain 3, §6.2 Causal Backbone, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
+| `SYS-ENG-DEF-001` v0.6 | §7 Domain 3, §4.1 Cross-cutting capabilities, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
+| `A.2.1-BESS-ENG-001` v1.3 | Physical capability interface, reactive power responsibility split | Yes |
 | `A.2.2-LOAD-MKT-ENG-001` v1.3 | External environment, regulation statistics, tariff engine, tariff element 11 (power factor penalties) | Yes |
 | `PH1-REG-001` v1.1 | PH-001, PH-002, PH-033, PH-034, PH-041, PH-055 | Yes |
 | RFP-264144-1 | Peak Shaving, Demand Response, Energy Arbitrage, Frequency Regulation, Voltage Regulation | Yes |
@@ -944,11 +944,11 @@ This document establishes the **conceptual engineering baseline** for Domain 3 �
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.3) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ **This document** — Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.8) |
-| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 3 | A.2.3 | Operational Engineering | ✅ **This document** — Baselined (v1.4) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
 | 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
 | 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 

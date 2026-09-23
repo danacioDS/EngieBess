@@ -4,19 +4,19 @@
 
 **Document ID:** A.2.5-DEG-ENG-001
 
-**Version:** 0.3 — Development Draft
+**Version:** 0.4 — Development Baseline
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Development Baseline
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
-- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
-- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.9)
+- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
+- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v1.0)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 5 — Degradation Engineering
@@ -861,11 +861,11 @@ These belong to Stage B, Stage C, Stage D, or to Scenario Management / Domain 6.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §5 Domain 5, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §12.2 defaults | Yes |
-| `SYS-ENG-DEF-001` v0.5 | §10 Domain 5, §11.5 Degradation cost double-counting rule, §13 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.2 | §8 Interface with Degradation, §11 State Variables, §13 Thermal Considerations | Yes |
-| `A.2.3-OPS-ENG-001` v1.3 | §14 Interface with Degradation | Yes |
-| `A.2.4-DISPATCH-ENG-001` v0.9 | §5.5, §12 Degradation Feedback, §14.4 Degradation-Relevant Usage, §16 Modeling Traps | Yes |
+| `SYS-STR-FRM-001` v0.9 | §5 Domain 5, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §12.2 defaults | Yes |
+| `SYS-ENG-DEF-001` v0.6 | §10 Domain 5, §11.5 Degradation cost double-counting rule, §13 Inter-Domain Contract | Yes |
+| `A.2.1-BESS-ENG-001` v1.3 | §8 Interface with Degradation, §11 State Variables, §13 Thermal Considerations | Yes |
+| `A.2.3-OPS-ENG-001` v1.4 | §14 Interface with Degradation | Yes |
+| `A.2.4-DISPATCH-ENG-001` v1.0 | §5.5, §12 Degradation Feedback, §14.4 Degradation-Relevant Usage, §16 Modeling Traps | Yes |
 | `PH1-REG-001` v1.1 | PH-015, PH-016, PH-017, PH-018, PH-032, PH-036, PH-038, PH-043, PH-044, PH-045 | Yes |
 
 ---
@@ -899,11 +899,11 @@ This document establishes the **conceptual engineering baseline** for Domain 5 �
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.3) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
-| 5 | A.2.5 | Degradation Engineering | ✅ **This document** — Development Baseline (v0.3) |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.4) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ Baselined (v1.0) |
+| 5 | A.2.5 | Degradation Engineering | ✅ **This document** — Development Baseline (v0.4) |
 | 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
 | 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
@@ -939,7 +939,7 @@ The following clarification items are relevant to this domain. They are tracked 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.2.5 — Conceptual Engineering (Degradation Engineering)
-**Status:** Conceptual Engineering — **Development Baseline (v0.3)**
+**Status:** Conceptual Engineering — **Development Baseline (v0.4)**
 **Duration:** 12 Weeks
 **Language:** English
 

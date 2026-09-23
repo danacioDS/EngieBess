@@ -4,19 +4,19 @@
 
 **Document ID:** A.2.4-DISPATCH-ENG-001
 
-**Version:** 0.9 — Development Draft
+**Version:** 1.0 — Conceptual Engineering Baseline (Closed)
 
-**Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Draft
+**Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
-- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
-- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.2)
+- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
+- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.3)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 4 — Dispatch & Optimization Engineering
@@ -194,7 +194,7 @@ The **Dispatch & Optimization domain** is the conceptual representation of the *
 | Grid / Network | System Context via A.2.2 interface | Import / export constraint |
 | Load / Demand | System Context via A.2.2 interface | Net-load objective |
 | Market | System Context via A.2.2 interface | Price / product opportunity |
-| Operational use cases | A.2.3 | Candidate services / objectives |
+| Operational requirements | A.2.3 | Candidate services / objectives |
 | SOH / available capacity | A.2.5 | Current physical capability |
 | Marginal degradation cost | A.2.5 (where produced) | Economic dispatch signal |
 | Project configuration | System Context | Applicable topology and constraints |
@@ -211,7 +211,7 @@ Dispatch Decision
        ├── Grid exchange
        ├── Generation utilization / curtailment
        ├── Market participation
-       ├── Revenue attribution
+       ├── Operational attribution basis
        └── Reserved capacity
                          │
                          ▼
@@ -495,7 +495,7 @@ Under working default **PH-036**, the degradation state is updated **annually**,
 | **Monthly representative periods** | Each simulated representative period is a **complete billing month**. The year is represented by a set of complete months. |
 | **Twelve monthly simulations** | All twelve months of each year are simulated. This preserves full monthly resolution at higher computational cost. |
 
-**Working default for the thin slice:** monthly representative periods. The choice between these two options is revisable in Stage B. **Where demand ratchets apply, representative-period reduction is not permitted** — all 12 months must be simulated (see Strategy D19 / **PH-040**).
+**Working default for the thin slice:** monthly representative periods. The choice between these two options is revisable in Stage B. **Where demand ratchets apply, representative-period reduction is not permitted** — all 12 months must be simulated (see **PH-040**).
 
 **Annual weighting and calendar aging.** Under representative-period simulation, the annual degradation update must:
 
@@ -641,7 +641,7 @@ These are derivative quantities computed by Degradation Engineering from the tra
 | **Regulation charging may create the billed peak (BTM)** | The **net load during regulation reserve** enters the same peak constraint as other net load components |
 | **DR events not known in advance** | Handled via **reserved capacity during event windows** |
 | **Coincident peak uncertainty** | Peak hours assumed **known**, with a **configurable hit-rate factor** |
-| **Demand ratchets** | **Evaluated in the tariff engine**. Where ratchets apply, all 12 months are simulated (Strategy D19 / **PH-040**) |
+| **Demand ratchets** | **Evaluated in the tariff engine**. Where ratchets apply, all 12 months are simulated (**PH-040**) |
 | **P² + Q² ≤ S² nonlinear coupling** | **Fixed envelope** under working default **PH-041** |
 | **Perfect foresight may overstate achievable value** | Perfect foresight is the **primary dispatch mode** (**PH-033**). The **realization factor** is applied in **Financial Engineering** |
 | **Efficiency losses** | Represented as part of the physical model (A.2.1) |
@@ -817,7 +817,7 @@ These are added in subsequent weeks.
 | 1 | Dispatch consumes upstream declarations without redefining them | Preserves causal backbone | Would collapse domain boundaries |
 | 2 | Multiple value streams may participate simultaneously | Matches physical reality | Would require serialization of streams |
 | 3 | Operational attribution basis is required for revenue-by-stream reporting | RFP requirement | Would leave revenue-by-stream undefined |
-| 4 | Financial Engineering is the single source of truth for project financial value | Consistent with `SYS-ENG-DEF-001` §10.4 | Would create double counting |
+| 4 | Financial Engineering is the single source of truth for project financial value | Consistent with `SYS-ENG-DEF-001` §11.4 | Would create double counting |
 | 5 | Degradation feedback is provided as a state and, where applicable, a signal | Consistent with `A.2.1` and `A.2.5` | Would require a different coupling |
 | 6 | Perfect foresight is the primary dispatch mode; realization factor applied in Financial Engineering | Working default **PH-033** | Would change reporting approach |
 | 7 | Post-dispatch net load is a derived system quantity | Preserves composition clarity | Would place derivation responsibility ambiguously |
@@ -930,12 +930,12 @@ See §18.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §4.2 Thin slice, §5 Domain 4, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.2 Defaults | Yes |
-| `SYS-ENG-DEF-001` v0.5 | §9 Domain 4, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.2 | §6.4 Reactive power split, §8 Degradation interface, §9 Dispatch interface, §14 Required BESS input information | Yes |
+| `SYS-STR-FRM-001` v0.9 | §4.2 Thin slice, §5 Domain 4, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.2 Defaults | Yes |
+| `SYS-ENG-DEF-001` v0.6 | §9 Domain 4, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
+| `A.2.1-BESS-ENG-001` v1.3 | §6.4 Reactive power split, §8 Degradation interface, §9 Dispatch interface, §14 Required BESS input information | Yes |
 | `A.2.2-LOAD-MKT-ENG-001` v1.3 | §8.3 Regulation statistics, §9 Tariff engine, §9.8 Single source of truth, §16 Dispatch interface | Yes |
-| `A.2.3-OPS-ENG-001` v1.3 | §4 Requirements pattern, §10 Interactions, §13 Dispatch interface, §14 Degradation interface, §15 Attribution convention | Yes |
-| `A.2.5-DEG-ENG-001` v0.2 | §2.3 Three concepts, §5.1 Cycling metrics derivation, §9 Marginal degradation signal | Yes |
+| `A.2.3-OPS-ENG-001` v1.4 | §4 Requirements pattern, §10 Interactions, §13 Dispatch interface, §14 Degradation interface, §15 Attribution convention | Yes |
+| `A.2.5-DEG-ENG-001` v0.3 | §2.3 Three concepts, §5.1 Cycling metrics derivation, §9 Marginal degradation signal | Yes |
 | `PH1-REG-001` v1.1 | Register IDs | Yes |
 
 ---
@@ -978,32 +978,23 @@ See §18.
 
 ## 27. Next Steps
 
-This document establishes the **conceptual engineering definition** for Domain 4 — Dispatch & Optimization Engineering. It remains a **Development Draft (v0.9)** until the blocking items in `PH1-REG-001` are resolved.
-
-**Recommended sequence:**
-
-```
-A.2.4 v0.9 (this document)
-      │
-      ├── ENGIE clarification responses (PH-001, PH-002, PH-034, PH-036, PH-040)
-      │
-      ▼
-A.2.4 v1.0 — BASELINE
-```
-
-**Note.** A.2.4 v0.9 incorporates the A.2.5 interface. No further interface changes are expected before A.2.6 and A.2.7 consolidation.
+This document establishes the **conceptual engineering baseline** for Domain 4 — Dispatch & Optimization Engineering.
 
 **Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.3) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 **This document — Draft (v0.9)** |
-| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.4) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ **This document** — Baselined (v1.0) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
 | 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
 | 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
+
+**Next:** Stage A consolidation and audit before Stage B (HLD).
+
+Phase 1 clarification items are organized in `PH1-REG-001` v1.1, the authoritative consolidated Register. This domain's dependencies are listed in §21.3.
 
 ---
 
@@ -1056,7 +1047,7 @@ No item in §28.1 is blocking. All have working defaults consistent with `SYS-ST
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.2.4 — Conceptual Engineering (Dispatch & Optimization Engineering)
-**Status:** Conceptual Engineering — **Development Draft (v0.9)**
+**Status:** Conceptual Engineering Baseline — **CLOSED**
 **Duration:** 12 Weeks
 **Language:** English
 

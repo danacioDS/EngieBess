@@ -1,27 +1,24 @@
-
----
-
 # Data & Application Engineering
 ## Stage A.2.7 — Conceptual Engineering
 ### Execution and Delivery Layer of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.7-DATA-APP-ENG-001
 
-**Version:** 0.2 — Development Draft
+**Version:** 0.3 — Development Baseline
 
-**Status:** Stage A.2 — Conceptual Engineering (Domain Level)
+**Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Development Baseline
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
-- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
-- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.8)
-- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.2)
-- `A.2.6-FIN-ENG-001` — Financial Engineering (v0.2)
+- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
+- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v1.0)
+- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.4)
+- `A.2.6-FIN-ENG-001` — Financial Engineering (v0.3)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 7 — Data & Application Engineering
@@ -77,10 +74,10 @@ Those belong to Stage B (architecture), Stage C (specification), and Stage D (im
 
 | Default | Source | Value |
 |---|---|---|
-| Reporting format | Strategy D10 / **PH-047** | **Both PDF and Excel** |
-| Audit scope | Strategy D12 / **PH-048** | **Basic execution logs + data lineage**; full audit framework deferred |
-| Market adapter scope | Strategy D13 | **One adapter at delivery**; architecture supports more |
-| Databricks workspace | Strategy D15 / **PH-046** | **ENGIE-owned workspace**; consultant granted developer access |
+| Reporting format | **PH-047** | **Both PDF and Excel** |
+| Audit scope | **PH-048** | **Basic execution logs + data lineage**; full audit framework deferred |
+| Market adapter scope | **PH-053** | **One adapter at delivery**; architecture supports more |
+| Databricks workspace | **PH-046** | **ENGIE-owned workspace**; consultant granted developer access |
 | Solver licensing | **PH-004** | **TBD — open-source solver preferred unless ENGIE provides commercial license** |
 
 Each default is revisable if ENGIE indicates otherwise.
@@ -525,7 +522,7 @@ Parallelization is **not** valid across:
 - Include scenario comparison sections
 - Support ENGIE branding (where required)
 
-**Working default (D10 / PH-047):** Both PDF and Excel.
+**Working default (PH-047):** Both PDF and Excel.
 
 ### 9.3 Scenario Comparison
 
@@ -559,7 +556,7 @@ Parallelization is **not** valid across:
 - Log errors and warnings
 - Support retrieval of logs for debugging
 
-**Working default (D12 / PH-048):** Basic execution logs.
+**Working default (PH-048):** Basic execution logs.
 
 ### 10.2 Data Lineage
 
@@ -572,7 +569,7 @@ Parallelization is **not** valid across:
 - Track which input produced which result
 - Support retrieval of lineage for audit
 
-**Working default (D12 / PH-048):** Basic data lineage.
+**Working default (PH-048):** Basic data lineage.
 
 ### 10.3 Reproducibility
 
@@ -604,14 +601,14 @@ Parallelization is **not** valid across:
 
 **Conceptual requirements:**
 
-- Deploy to the ENGIE-owned Databricks workspace (per D15)
+- Deploy to the ENGIE-owned Databricks workspace (per **PH-046**)
 - Configure access and permissions
 - Configure compute resources
 - Configure storage locations
 - Support updates and versioning
 - Support rollback where applicable
 
-**Working default (D15 / PH-046):** ENGIE-owned workspace; consultant granted developer access.
+**Working default (PH-046):** ENGIE-owned workspace; consultant granted developer access.
 
 ### 11.2 Training
 
@@ -641,7 +638,7 @@ Parallelization is **not** valid across:
 ### 11.4 What Data & Application Engineering Does Not Do With Deployment
 
 - It does not decide the deployment model (ENGIE and Phase 1 decide)
-- It does not decide training content (depends on user roles — PH-012)
+- It does not decide training content (depends on user roles — **PH-012**)
 - It does not define the modeling methodology (Domains 1–6 define it)
 
 ---
@@ -699,8 +696,8 @@ Those belong to Stage B/C.
 | **Versioning drift** | If parameters, data, or code change without versioning, runs cannot be reproduced | Version inputs, parameters, code (§10.3) |
 | **Scenario leakage** | Parameter overrides in one scenario accidentally affecting another | Scenario isolation in configuration |
 | **Over-parallelization of sequential computations** | Parallelizing across project years or rolling horizons breaks the feedback loop | Parallelization only across scenarios, representative periods (SOH fixed), sensitivities (`SYS-STR-FRM-001` §9.3) |
-| **Reporting format ambiguity** | Different audiences need different formats | Both PDF and Excel (D10 / PH-047) |
-| **Audit scope creep** | Full audit framework is out of initial scope | Basic execution logs + data lineage (D12 / PH-048) |
+| **Reporting format ambiguity** | Different audiences need different formats | Both PDF and Excel (PH-047) |
+| **Audit scope creep** | Full audit framework is out of initial scope | Basic execution logs + data lineage (PH-048) |
 | **Environment mismatch** | Development, staging, production environments behaving differently | Environment parity as a deployment requirement |
 | **User workflow complexity** | The App must be usable by business development users, not only analysts | Output mock prepared during Phase 1 (`SYS-STR-FRM-001` §8.3) |
 | **Premature execution graph definition** | Fixing the execution order in Stage A may constrain Stage B architecture prematurely | §7.2 declares conceptual dependencies only |
@@ -840,10 +837,10 @@ Validation defines **what to validate and how**. Data & Application Engineering 
 | 1 | Data & Application Engineering executes, does not define | Preserves domain boundaries | Would blur analytical and technology layers |
 | 2 | Working stack is Python, PySpark, SQL, Databricks, Databricks App | Per RFP | Would require alternative stack |
 | 3 | PySpark parallelizes across scenarios, representative periods, sensitivities | Consistent with `SYS-STR-FRM-001` §9.3 | Would break feedback loop |
-| 4 | Reporting format is both PDF and Excel | Working default **D10** / **PH-047** | Would change reporting design |
-| 5 | Audit scope is basic execution logs + data lineage | Working default **D12** / **PH-048** | Would change audit design |
-| 6 | ENGIE owns the workspace; consultant has developer access | Working default **D15** / **PH-046** | Would change deployment model |
-| 7 | One market adapter at delivery | Working default **D13** | Would change adapter architecture |
+| 4 | Reporting format is both PDF and Excel | Working default **PH-047** | Would change reporting design |
+| 5 | Audit scope is basic execution logs + data lineage | Working default **PH-048** | Would change audit design |
+| 6 | ENGIE owns the workspace; consultant has developer access | Working default **PH-046** | Would change deployment model |
+| 7 | One market adapter at delivery | Working default **PH-053** | Would change adapter architecture |
 | 8 | Users include business development and technical maintainers | Working default **PH-012** | Would change training content |
 | 9 | Execution graph is defined in Stage B | Preserves Stage A scope | Would prematurely constrain architecture |
 | 10 | Scenario Management and Validation are cross-cutting, not domains | Consistent with `SYS-ENG-DEF-001` §4.1 | Would inflate the domain count |
@@ -868,13 +865,15 @@ Validation defines **what to validate and how**. Data & Application Engineering 
 
 ### 22.3 Phase 1 Clarification Dependencies
 
-This domain depends on the following Phase 1 items from `PH1-REG-001`:
+This domain depends on the following Phase 1 items from `PH1-REG-001` v1.1:
 
 - **PH-004** — Solver licensing
 - **PH-012** — Users and handover
 - **PH-046** — Databricks environment
 - **PH-047** — Reporting requirements
 - **PH-048** — Audit / lineage / traceability scope
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -893,7 +892,7 @@ This domain depends on the following Phase 1 items from `PH1-REG-001`:
 | Training materials | Users | Documents |
 | Technical documentation | Users | Documents |
 
-**Note on audit.** "Execution and lineage records" reflects the working default of D12 / PH-048 (basic execution logs + data lineage). A full audit framework is not committed in the initial scope.
+**Note on audit.** "Execution and lineage records" reflects the working default of **PH-048** (basic execution logs + data lineage). A full audit framework is not committed in the initial scope.
 
 ---
 
@@ -1012,8 +1011,8 @@ These belong to Stage B, Stage C, Stage D, or to Phase 1 decisions.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §5 Domain 7, §6.2 Causal Backbone, §8.2 Validation, §8.3 Output Mock, §9.3 Technology Strategy, §10 Engagement Timeline, §12.2 D10, D12, D13, D15 | Yes |
-| `SYS-ENG-DEF-001` v0.5 | §4.1 Cross-Cutting Capabilities, §12 Domain 7, §13 Inter-Domain Contract | Yes |
+| `SYS-STR-FRM-001` v0.9 | §5 Domain 7, §6.2 Causal Backbone, §8.2 Validation, §8.3 Output Mock, §9.3 Technology Strategy, §10 Engagement Timeline, §12.2 defaults | Yes |
+| `SYS-ENG-DEF-001` v0.6 | §4.1 Cross-Cutting Capabilities, §12 Domain 7, §13 Inter-Domain Contract | Yes |
 | `A.2.1`–`A.2.6` | Data contracts and execution interfaces | Yes |
 | RFP-264144-1 | Python, Databricks, PySpark, SQL, Databricks App, dashboards, exportable reporting, documentation, training | Yes |
 | `PH1-REG-001` v1.1 | PH-004, PH-012, PH-046, PH-047, PH-048 | Yes |
@@ -1049,21 +1048,21 @@ These belong to Stage B, Stage C, Stage D, or to Phase 1 decisions.
 
 ## 29. Next Steps
 
-This document establishes the **conceptual engineering definition** for Domain 7 — Data & Application Engineering. It completes Stage A.2.
+This document establishes the **conceptual engineering baseline** for Domain 7 — Data & Application Engineering. It completes Stage A.2.
 
 **Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.3) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ Development Draft (v0.8) |
-| 5 | A.2.5 | Degradation Engineering | ✅ Development Baseline (v0.2) |
-| 6 | A.2.6 | Financial Engineering | ✅ Development Draft (v0.2) |
-| 7 | A.2.7 | Data & Application Engineering | ✅ **This document — Development Draft (v0.2)** |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.4) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ Baselined (v1.0) |
+| 5 | A.2.5 | Degradation Engineering | ✅ Development Baseline (v0.4) |
+| 6 | A.2.6 | Financial Engineering | ✅ Development Baseline (v0.3) |
+| 7 | A.2.7 | Data & Application Engineering | ✅ **This document** — Development Baseline (v0.3) |
 
-**Note on status.** "Stage A.2 is conceptually complete" means all seven domains have been defined at the conceptual engineering level. It does not mean all documents are baselined. A.2.1, A.2.2, and A.2.3 are **Baselined**. A.2.4, A.2.5, A.2.6, and A.2.7 are **Development Drafts** pending Stage A consolidation and ENGIE clarifications.
+**Note on status.** "Stage A.2 is conceptually complete" means all seven domains have been defined at the conceptual engineering level. A.2.1, A.2.2, A.2.3, and A.2.4 are **Baselined**. A.2.5, A.2.6, and A.2.7 are **Development Baselines** pending ENGIE clarifications.
 
 **Stage A is now conceptually complete.** All seven domains have been defined at the conceptual engineering level.
 
@@ -1112,11 +1111,8 @@ The following clarification items are relevant to this domain. They are tracked 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.2.7 — Conceptual Engineering (Data & Application Engineering)
-**Status:** Conceptual Engineering — **Development Draft (v0.2)**
+**Status:** Conceptual Engineering — **Development Baseline (v0.3)**
 **Duration:** 12 Weeks
 **Language:** English
 
 ---
-
-
-
