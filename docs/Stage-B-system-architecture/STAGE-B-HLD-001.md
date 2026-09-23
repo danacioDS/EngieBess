@@ -1,8 +1,3 @@
-# B.0 v0.3.2 — Documento Completo (Baseline)
-
-Copia todo el contenido de abajo y pégalo en `docs/Stage-B-system-architecture/STAGE-B-HLD-001.md`.
-
----
 
 # STAGE-B-HLD-001 — System Architecture (HLD)
 
