@@ -1,53 +1,54 @@
 # BESS Operational & Financial Modeling Platform
-## Delivery Strategy & Engineering Definition Framework
+## System Strategy & Delivery Framework
 
 **Prepared for:** ENGIE  
 **Engagement:** BESS Operational & Financial Modeling Consultant — 12 Weeks  
-**Document Type:** Delivery Strategy & Methodology Proposal  
+**Document Type:** System Strategy & Delivery Framework  
 **Language:** English
 
 ---
 
 ## 1. Executive Summary
 
-ENGIE is not commissioning a standalone BESS model. ENGIE is commissioning a **software platform for operational and financial evaluation of Battery Energy Storage System projects**, intended to support business development, project evaluation, and value demonstration to both external clients and internal stakeholders.
+ENGIE is commissioning a **BESS Operational & Financial Modeling Platform** — an analytical software solution for evaluating the operational and financial performance of Battery Energy Storage System projects across multiple value streams, market scenarios, and contract conditions.
 
-The distinction is critical. A BESS model produces numbers. A BESS evaluation platform must:
+The platform is intended to support business development and project evaluation by producing robust, auditable analytical outputs that demonstrate project performance, viability, and value to both external clients and internal stakeholders.
 
-- Ingest heterogeneous technical, load, market, and financial data
-- Forecast electricity consumption
-- Simulate the physical behavior of the battery system
-- Optimize dispatch across multiple revenue streams
-- Model degradation as a dynamic state of the system
-- Translate operational results into financial performance
-- Support scenario comparison and reporting
+The solution is not a single model. It is a **system of interconnected engineering areas** — physical, operational, market, degradation, financial, and technological — organized around a central dispatch and optimization engine, and delivered through a Databricks application layer.
 
-This document defines the **delivery strategy and engineering definition framework** that will structure the 12-week engagement. It establishes the conceptual, methodological, and architectural foundation required before implementation begins.
+This document defines the **System Strategy** for that platform. It establishes:
 
-The core principle of this strategy is:
+- What the system is
+- What engineering areas it contains
+- How those areas relate
+- What the system must produce
+- What principles govern its design
+- How it will be delivered across the 12-week engagement
 
-> **Define the engineering model first. Architect the system second. Implement the software third.**
+It deliberately does **not** define equations, algorithms, schemas, class structures, or implementation details. Those belong to subsequent stages: Conceptual Engineering, High-Level Architecture, Product Specification, and Implementation.
 
-This sequence protects ENGIE from the most common failure mode in analytical platform delivery: building software before the underlying model is fully defined and validated.
+The guiding principle of this strategy is:
+
+> **Define the system first. Engineer the model second. Architect the solution third. Implement the software fourth.**
 
 ---
 
 ## 2. Product Intent
 
-The product is a **BESS Operational & Financial Modeling Platform**.
+The product is a **software platform for operational and financial evaluation of BESS projects**.
 
 Its purpose is to answer a single class of questions:
 
 > Given a BESS configuration, a client load profile, a set of market rules, and a set of financial assumptions, what is the operational and financial performance of the project under different scenarios?
 
-The platform must connect, in a coherent and auditable chain:
+To answer that question, the platform must connect, in a coherent and auditable chain:
 
 ```
 Data → Forecast → Physical BESS Model → Dispatch → Degradation
      → Revenue Stacking → Financial Model → Scenarios → Results
 ```
 
-This chain is the backbone of the entire solution. Every component, interface, and deliverable must serve it.
+This chain is the backbone of the entire solution. Every engineering area, interface, and deliverable must serve it.
 
 ---
 
@@ -63,7 +64,7 @@ This chain is the backbone of the entire solution. Every component, interface, a
 - Financial performance calculation
 - Scenario configuration and comparison
 - Interactive dashboards and exportable reporting
-- Data ingestion, validation, transformation, and processing pipelines
+- Data ingestion, validation, transformation, and processing
 - Documentation, training, and handover
 
 ### 3.2 Out of Scope (to be confirmed in Phase 1)
@@ -78,12 +79,12 @@ This chain is the backbone of the entire solution. Every component, interface, a
 
 The RFP references multiple market constructs — LMP, PJM RegD, ERCOT Fast Frequency Response, capacity markets, ancillary services, demand response programs — without specifying a single target market.
 
-This is a **material ambiguity**. Market rules drive eligibility, dispatch logic, settlement, and revenue calculation. The architecture must therefore separate:
+This is a material ambiguity. Market rules drive eligibility, dispatch logic, settlement, and revenue calculation. The architecture must therefore separate:
 
 - A **generic BESS engine** (physics, degradation, dispatch)
 - **Market-specific adapter modules** (rules, settlement, revenue mechanisms)
 
-This separation will be formalized in Phase 1 and confirmed with ENGIE stakeholders.
+This separation is a core architectural principle of the platform.
 
 ---
 
@@ -105,252 +106,531 @@ This sequence is deliberate. It ensures that:
 - The specification is complete before implementation begins
 - Validation is defined before results are produced
 
+### 4.1 Stage Progression
+
+```
+SYSTEM STRATEGY
+       │
+       ▼
+ENGINEERING DEFINITION
+       │
+       ├── BESS Engineering
+       ├── Load & Market Engineering
+       ├── Operational Engineering
+       ├── Dispatch & Optimization Engineering
+       ├── Degradation Engineering
+       ├── Financial Engineering
+       └── Data & Application Engineering
+       │
+       ▼
+SYSTEM ARCHITECTURE
+       │
+       ├── Data Architecture
+       ├── Model Architecture
+       ├── Optimization Architecture
+       ├── Financial Architecture
+       ├── Software Architecture
+       └── Databricks Architecture
+       │
+       ▼
+PRODUCT SPECIFICATION
+       │
+       ▼
+IMPLEMENTATION
+       │
+       ├── Python / PySpark / SQL
+       ├── Databricks App
+       ├── Tests
+       ├── UAT
+       └── Deployment & Training
+```
+
+This progression guarantees that each stage produces the foundation required by the next, and that no implementation begins before the engineering model has been fully defined.
+
 ---
 
-## 5. Stage A — Engineering Definition
+## 5. The Seven Engineering Areas
 
-Stage A defines the engineering content of the platform. It is the foundation on which all subsequent stages depend.
+The system is organized into seven engineering areas. Each area represents a distinct domain of modeling responsibility. Together they form the complete operational and financial evaluation platform.
 
-### 5.1 BESS Engineering
+### Area 1 — BESS Engineering
 
-The physical and operational model of the battery system, including:
+Represents the physical system.
 
-- Battery capacity (kWh) and power rating (kW)
-- State of Charge (SOC) and State of Health (SOH)
-- Charge/discharge behavior
-- Round-trip efficiency
+Covers conceptually:
+
+- Battery
+- Energy capacity
+- Power capacity
+- State of Charge (SOC)
+- State of Health (SOH)
+- Efficiency
 - C-rate
-- Ramp rate
-- Minimum and maximum SOC
-- Minimum rest periods
-- Inverter behavior
-- AC/DC considerations
-- Reactive power and apparent power
+- Ramp constraints
 - Operating limits
 - Thermal effects
 - Degradation
-- Capacity augmentation and replacement thresholds
+- Augmentation and replacement
 
-### 5.2 Load & Demand Engineering
+This area is the **physical foundation** of the platform.
 
-The client-side model, including:
+### Area 2 — Load & Market Engineering
 
-- Interval meter data (15-minute or hourly)
-- Historical demand profiles
-- Peak demand
+Represents the economic and energetic environment in which the BESS operates.
+
+Covers conceptually:
+
+- Load profiles
 - Load forecasting
-- Baseline definition
-- Demand charge structure
+- Electricity tariffs
+- LMP and market prices
+- Ancillary service prices
+- Demand response programs
+- Capacity revenues
+- Grid constraints
+- Regulatory constraints
 
-### 5.3 Market & Revenue Engineering
+This area provides the **external signals** the operational model requires.
 
-Each value stream is modeled as an **operational service governed by market or program rules**, not merely as a revenue function. Each stream must define:
+### Area 3 — Operational Engineering
 
-- Objective
-- Inputs
-- Constraints
-- Dispatch logic
-- Revenue mechanism
-- Performance metrics
-- Settlement logic
-- Costs
-- Interactions with other services
+Represents how the BESS can operate.
 
-Value streams in scope:
+The RFP explicitly requires modeling of:
 
 - Peak Shaving
 - Demand Response
 - Energy Arbitrage
 - Frequency Regulation
 - Voltage Regulation
-- Other applicable BESS value streams
 
-### 5.4 Dispatch & Optimization Engineering
+Each **operating mode / value stream** is a distinct operational behavior, later formalized during conceptual engineering.
 
-The optimization layer determines the dispatch that maximizes economic value without violating physical or market constraints.
+### Area 4 — Dispatch & Optimization Engineering
 
-Methodology options to be confirmed in Phase 1:
+This area is distinct from operational modeling and must be treated separately.
+
+The RFP requires not only simulation of individual operating modes, but also:
+
+> Co-optimization across multiple value streams simultaneously.
+
+Conceptually:
+
+```
+Operating Modes
+       │
+       ▼
+Dispatch & Optimization
+       │
+       ├── Physical constraints
+       ├── Market constraints
+       ├── Program constraints
+       ├── SOC constraints
+       └── Economic objectives
+       │
+       ▼
+Optimal / feasible dispatch
+```
+
+Methodology options remain open per the RFP:
 
 - Rule-based heuristic
 - Linear Programming (LP)
 - Mixed-Integer Programming (MILP)
 - Hybrid approach
 
-The choice of methodology is a Phase 1 decision, not a Phase 2 assumption.
+The choice is a **Phase 1 decision**, not a Phase 2 assumption.
 
-### 5.5 Degradation Engineering
+### Area 5 — Degradation Engineering
 
-Degradation is treated as a **dynamic state of the system**, not a post-processing cost.
+Although physically part of the BESS, degradation is treated as a **transversal subsystem** because it affects the system dynamically over time.
 
-It includes:
+```
+Dispatch
+   ↓
+Battery Throughput
+   ↓
+Cycle Aging
+   +
+Calendar Aging
+   ↓
+SOH
+   ↓
+Available Capacity
+   ↓
+Future Dispatch Feasibility
+```
 
-- Calendar aging (temperature, average SOC)
-- Cycle aging (depth of discharge, C-rate, temperature)
-- Equivalent full cycles
-- Remaining capacity (SOH%)
-- Augmentation and replacement triggers
-- Feedback loop into future dispatch feasibility
+The RFP explicitly requires a **feedback loop**: degradation impacts available energy in future periods, dynamically adjusting dispatch feasibility.
 
-### 5.6 Financial Engineering
+This makes degradation a **dynamic state of the system**, not a post-processing cost.
 
-The financial model consumes operational outputs. It does not precede them.
+### Area 6 — Financial Engineering
 
-It includes:
+Consumes operational outputs and produces financial performance.
 
-- Revenue by value stream
+Covers conceptually:
+
 - CAPEX
 - OPEX
-- Degradation costs
-- Cash flow
+- Revenue
+- Savings
+- Degradation cost
+- Augmentation
+- Replacement
+- Incentives
+- Discount rate
+- Escalation
+- Contract term
 - NPV
-- Project and equity IRR
-- Simple payback
-- Demand charge savings
-- Annual revenue breakdown
+- IRR
+- Payback
 
----
-
-## 6. Stage B — System Architecture
-
-Stage B translates the engineering definition into a computational architecture.
-
-### 6.1 Architecture Layers
-
-| Layer | Description |
-|---|---|
-| Data Architecture | Ingestion, validation, transformation, schemas, data quality |
-| Model Architecture | Representation of BESS physics, load, degradation |
-| Optimization Architecture | Dispatch and revenue stacking logic |
-| Financial Architecture | Cash flow, NPV, IRR, scenario valuation |
-| Software Architecture | Python engine, Databricks App, PySpark, SQL |
-| Databricks Architecture | App layer, processing layer, storage layer |
-
-### 6.2 Core Principle
-
-The architecture must preserve the causal chain:
+Critical separation:
 
 ```
-Physical Reality → Operational Reality → Business / Financial Reality
+Operational Model
+       │
+       │ operational outputs
+       ▼
+Financial Model
+       │
+       ├── Revenue
+       ├── Savings
+       ├── Costs
+       └── Investment
+       │
+       ▼
+Financial KPIs
 ```
 
-Not the reverse. Financial outputs are derived from operational simulation, which is derived from physical modeling.
+The financial model **consumes** operational results. It must not become a second operational model.
 
----
+### Area 7 — Data & Application Engineering
 
-## 7. Stage C — Product Specification
+The technological layer that delivers the platform.
 
-Stage C consolidates all definition work into a single, coherent specification.
-
-### 7.1 Specification Structure
-
-1. Product Definition
-2. Scope and Boundaries
-3. Users and Stakeholders
-4. System Use Cases
-5. BESS Engineering Specification
-6. Load Engineering Specification
-7. Market Engineering Specification
-8. Dispatch and Optimization Specification
-9. Degradation Specification
-10. Financial Engineering Specification
-11. Data Engineering Specification
-12. Software Architecture
-13. Reporting and Visualization
-14. Validation and Acceptance
-15. WBS / CBS / OBS
-
-### 7.2 Indicative Use Cases
+Covers:
 
 ```
-UC-01  Configure BESS
-UC-02  Upload load data
-UC-03  Configure tariff
-UC-04  Configure market assumptions
-UC-05  Forecast load
-UC-06  Simulate peak shaving
-UC-07  Simulate arbitrage
-UC-08  Simulate demand response
-UC-09  Optimize stacked dispatch
-UC-10  Simulate degradation
-UC-11  Calculate project revenues
-UC-12  Calculate NPV / IRR / payback
-UC-13  Compare scenarios
-UC-14  Generate report
-```
-
-### 7.3 Work Breakdown Structure
-
-```
-1. BESS Modeling Platform
-├── 1.1 Requirements
-├── 1.2 BESS Engineering
-│   ├── 1.2.1 Battery model
-│   ├── 1.2.2 SOC model
-│   ├── 1.2.3 Efficiency model
-│   ├── 1.2.4 Inverter model
-│   └── 1.2.5 Degradation model
-├── 1.3 Load Engineering
-│   ├── 1.3.1 Data processing
-│   ├── 1.3.2 Load profile
-│   └── 1.3.3 Forecasting
-├── 1.4 Market Engineering
-│   ├── 1.4.1 Peak shaving
-│   ├── 1.4.2 Demand response
-│   ├── 1.4.3 Arbitrage
-│   ├── 1.4.4 Frequency regulation
-│   └── 1.4.5 Voltage regulation
-├── 1.5 Dispatch Optimization
-├── 1.6 Financial Engineering
-│   ├── 1.6.1 Revenue
-│   ├── 1.6.2 CAPEX
-│   ├── 1.6.3 OPEX
-│   ├── 1.6.4 Cash flow
-│   ├── 1.6.5 NPV
-│   ├── 1.6.6 IRR
-│   └── 1.6.7 Payback
-├── 1.7 Data Engineering
-├── 1.8 Software Engineering
-├── 1.9 Validation
-├── 1.10 UAT
-└── 1.11 Deployment & Training
-```
-
----
-
-## 8. Stage D — Implementation
-
-Stage D executes the specification.
-
-```
-Product Specification
-        ↓
-Engineering Specifications
-        ↓
-Implementation Tasks
-        ↓
-Python / PySpark / SQL
-        ↓
+Data Sources
+     ↓
+Data Ingestion
+     ↓
+Data Transformation
+     ↓
+Data Validation
+     ↓
+Data Processing
+     ↓
+Modeling Engine
+     ↓
+Results
+     ↓
 Databricks App
-        ↓
-Tests
-        ↓
-UAT
-        ↓
-Deployment & Training
 ```
 
-Implementation follows the 12-week timeline defined by ENGIE:
+Includes:
+
+- Python
+- PySpark
+- SQL
+- Databricks
+- Databricks App
+- Data pipelines
+- Scenario configuration
+- Visualization
+- Export
+
+This area is **implementation**, not business modeling.
+
+---
+
+## 6. System Architecture
+
+The System Architecture translates the seven engineering areas into a computational structure. It defines how the engineering model is represented, how data flows through the system, and how the components interact.
+
+### 6.1 Architecture Layers (Table)
+
+| Layer | Description | Primary Engineering Areas |
+|---|---|---|
+| **Data Architecture** | Ingestion, validation, transformation, schemas, data quality, historical data, market data, financial assumptions | Area 7 |
+| **Model Architecture** | Representation of BESS physics, load, degradation as computational objects and state | Areas 1, 2, 5 |
+| **Optimization Architecture** | Dispatch logic, revenue stacking, constraint handling, co-optimization | Areas 3, 4 |
+| **Financial Architecture** | Cash flow, NPV, IRR, scenario valuation, revenue attribution | Area 6 |
+| **Software Architecture** | Python engine, Databricks App, PySpark, SQL, APIs, interfaces | Area 7 |
+| **Databricks Architecture** | App layer, processing layer, storage layer, orchestration, deployment | Area 7 |
+
+### 6.2 Architecture Map
+
+```
+                   BESS SYSTEM MODEL
+                          │
+       ┌──────────────────┼──────────────────┐
+       │                  │                  │
+       ▼                  ▼                  ▼
+   Physical           External           Economic
+   System             Environment        Model
+       │                  │                  │
+       └──────────┬───────┴──────────┬───────┘
+                  │                  │
+                  ▼                  │
+             Operational             │
+              Simulation             │
+                  │                  │
+                  ▼                  │
+              Dispatch               │
+             Optimization            │
+                  │                  │
+                  └────────┬─────────┘
+                           ▼
+                    Scenario Engine
+                           │
+                  ┌────────┴────────┐
+                  ▼                 ▼
+             Operational        Financial
+               Results            Results
+                  │                 │
+                  └────────┬────────┘
+                           ▼
+                    Decision Outputs
+                           │
+                           ▼
+                     Databricks App
+```
+
+### 6.3 Architectural Principles
+
+- The architecture must preserve the causal chain: **Physical → Operational → Financial**
+- The generic BESS engine must be separable from market-specific adapters
+- Degradation must be modeled as a dynamic state, not a post-processing cost
+- The financial model must consume operational outputs, never replace them
+- Validation must be defined before results are produced
+
+---
+
+## 7. Two Simultaneous Cycles
+
+The platform contains **two simultaneous cycles** that operate at different logical levels but remain tightly coupled. Understanding this dual-cycle structure is essential to designing a correct architecture.
+
+### 7.1 Physical-Operational Cycle
+
+This cycle represents the **real-world behavior of the battery system over time**. It answers the question:
+
+> What does the battery actually do, hour by hour, day by day, under a given dispatch strategy?
+
+The cycle proceeds as follows:
+
+```
+Inputs (load, market signals, tariffs, BESS parameters)
+        ↓
+Load / Market Conditions
+        ↓
+Dispatch Decision
+        ↓
+Battery Behavior (charge, discharge, rest)
+        ↓
+Degradation (calendar + cycle aging)
+        ↓
+Updated Battery State (SOC, SOH, available capacity)
+        ↓
+Operational Outputs (energy shifted, peak reduced, regulation provided)
+        ↓
+[Feedback into next period's dispatch feasibility]
+```
+
+**Key characteristics:**
+
+- Time-dependent and sequential
+- Stateful (SOC and SOH carry forward)
+- Constraint-driven (physical, market, program rules)
+- Subject to a feedback loop via degradation
+
+**Engineering areas involved:** Area 1 (BESS), Area 2 (Load & Market), Area 3 (Operational), Area 4 (Dispatch), Area 5 (Degradation)
+
+### 7.2 Economic-Financial Cycle
+
+This cycle represents the **economic consequence of the physical-operational cycle**. It answers the question:
+
+> What is the financial value of what the battery did, over the contract term?
+
+The cycle proceeds as follows:
+
+```
+Operational Outputs (from the physical-operational cycle)
+        ↓
+Revenue by Value Stream (peak shaving, DR, arbitrage, regulation)
+        ↓
+Savings (demand charge reduction, energy cost reduction)
+        ↓
+Costs (CAPEX, OPEX, degradation, augmentation, replacement)
+        ↓
+Cash Flow (annual, discounted)
+        ↓
+Financial KPIs (NPV, IRR, payback)
+        ↓
+[Feeds into scenario comparison and business decision]
+```
+
+**Key characteristics:**
+
+- Derived from operational outputs, not independent of them
+- Aggregated over the contract term
+- Discounted and escalated
+- Comparative across scenarios
+
+**Engineering areas involved:** Area 6 (Financial), supported by outputs from Areas 1–5
+
+### 7.3 Coupling Between Cycles
+
+The two cycles are not sequential in the sense that one finishes before the other begins. They are **coupled**:
+
+- The physical-operational cycle runs first within each simulation period
+- The economic-financial cycle consumes the operational outputs of that period
+- Degradation from the physical cycle feeds back into future operational feasibility
+- Financial results from the economic cycle inform scenario comparison, which may re-run the physical cycle under different assumptions
+
+```
+┌─────────────────────────────────────────────┐
+│         PHYSICAL-OPERATIONAL CYCLE          │
+│  Inputs → Dispatch → Battery → Degradation  │
+│         ↓                                   │
+│  Operational Outputs                        │
+└─────────────────┬───────────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────────┐
+│         ECONOMIC-FINANCIAL CYCLE            │
+│  Operational Outputs → Revenue → Costs      │
+│         ↓                                   │
+│  Cash Flow → NPV / IRR / Payback            │
+└─────────────────┬───────────────────────────┘
+                  │
+                  ▼
+         Scenario Comparison
+                  │
+                  ▼
+          Business Decision
+```
+
+### 7.4 Why This Separation Matters
+
+Collapsing the two cycles into a single model is the most common architectural error in BESS evaluation platforms. It leads to:
+
+- Financial assumptions driving operational behavior (backwards causality)
+- Inability to isolate operational performance from financial performance
+- Difficulty validating results against benchmarks
+- Loss of auditability in the revenue attribution chain
+
+Preserving the two-cycle structure ensures that:
+
+- Operational results are always traceable to physical and market inputs
+- Financial results are always traceable to operational results
+- Scenario comparison is meaningful because it varies well-defined inputs
+- Validation can be performed independently at each cycle
+
+### 7.5 Combined View
+
+```
+                    BESS SYSTEM MODEL
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+        ▼                  ▼                  ▼
+    Physical           External           Economic
+    System             Environment        Model
+        │                  │                  │
+        └──────────┬───────┴──────────┬───────┘
+                   │                  │
+                   ▼                  │
+              Operational             │
+               Simulation             │
+                   │                  │
+                   ▼                  │
+               Dispatch               │
+              Optimization            │
+                   │                  │
+                   └────────┬─────────┘
+                            ▼
+                     Scenario Engine
+                            │
+                   ┌────────┴────────┐
+                   ▼                 ▼
+              Operational        Financial
+                Results            Results
+                   │                 │
+                   └────────┬────────┘
+                            ▼
+                     Decision Outputs
+                            │
+                            ▼
+                      Databricks App
+```
+
+Both cycles terminate in the Scenario Engine, which produces the Decision Outputs delivered through the Databricks App.
+
+---
+
+## 8. System Strategy — Scope Definition
+
+This document is a **System Strategy**, not a specification or implementation plan.
+
+### 8.1 What This Strategy Defines
+
+- System boundary
+- System purpose
+- Major engineering areas
+- Major capabilities
+- System interactions
+- Inputs and outputs
+- Architectural principles
+- Validation philosophy
+- Technology strategy
+- Evolution strategy
+
+### 8.2 What This Strategy Does Not Define
+
+- Python classes
+- Concrete data tables
+- APIs
+- Detailed mathematical algorithms
+- Equations
+- Schemas
+- Notebooks
+- Functions
+- SQL
+- PySpark implementation
+- MILP formulations
+- Databricks deployment details
+
+Those belong to subsequent stages.
+
+---
+
+## 9. Engagement Timeline
+
+The 12-week engagement follows ENGIE's defined phases:
 
 | Phase | Weeks | Focus |
 |---|---|---|
 | 1 — Design | 1–2 | Requirements validation, architecture definition |
 | 2 — Development | 3–9 | Model and interface development |
 | 3 — Testing | 10–11 | Model validation, UAT |
-| 4 — Deployment | 12 | Final delivery, deployment, training |
+| 4 — Deployment | 12 | Final delivery, deployment, documentation, training |
 
 ---
 
-## 9. Phase 1 Clarification Items
+## 10. Governance & Communication
+
+- Regular status meetings with stakeholders
+- Periodic progress reporting
+- Review sessions at key milestones
+- Structured issue tracking and resolution
+- Formal sign-off at end of Phase 1, Phase 3, and Phase 4
+
+---
+
+## 11. Phase 1 Clarification Items
 
 The following items require explicit confirmation during Weeks 1–2:
 
@@ -367,21 +647,13 @@ The following items require explicit confirmation during Weeks 1–2:
 
 ---
 
-## 10. Governance & Communication
+## 12. Conclusion
 
-- Regular status meetings with stakeholders
-- Periodic progress reporting
-- Review sessions at key project milestones
-- Structured issue tracking and resolution channels
-- Formal sign-off at end of Phase 1, Phase 3, and Phase 4
+This System Strategy establishes a disciplined, area-driven approach to the ENGIE BESS Operational & Financial Modeling Platform engagement.
 
----
+The system is organized into **seven engineering areas**, connected through a central dispatch and optimization engine, and delivered through a Databricks application layer. Two simultaneous cycles — physical-operational and economic-financial — are preserved as distinct but coupled, ensuring traceability, auditability, and meaningful scenario comparison.
 
-## 11. Conclusion
-
-This delivery strategy establishes a disciplined, engineering-led approach to the ENGIE BESS Operational & Financial Modeling Platform engagement.
-
-The sequence — **Engineering Definition → System Architecture → Product Specification → Implementation** — ensures that the software built in Weeks 3–12 is correct by construction, because the model it implements has been fully defined, validated, and agreed before a single line of production code is written.
+The delivery sequence — **Engineering Definition → System Architecture → Product Specification → Implementation** — ensures that the software built in Weeks 3–12 is correct by construction, because the model it implements has been fully defined, validated, and agreed before a single line of production code is written.
 
 The platform will connect data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation.
 
@@ -394,10 +666,7 @@ The platform will connect data, forecast, physics, dispatch, degradation, revenu
 
 ---
 
-Would you like me to also produce:
-- A **one-page executive version** for ENGIE leadership
-- A **slide deck structure** for the Phase 1 kickoff
-- A **detailed Phase 1 work plan** with daily activities for Weeks 1–2
+
 
 
 
