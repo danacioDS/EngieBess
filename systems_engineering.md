@@ -25,7 +25,7 @@ This document defines the **System Strategy** for that platform. It establishes:
 - What principles govern its design
 - How it will be delivered across the 12-week engagement
 
-It deliberately does **not** define equations, algorithms, schemas, class structures, or implementation details. Those belong to subsequent stages: Conceptual Engineering, High-Level Architecture, Product Specification, and Implementation.
+It deliberately does **not** define equations, algorithms, schemas, class structures, or implementation details. Those belong to subsequent stages.
 
 The guiding principle of this strategy is:
 
@@ -90,14 +90,14 @@ This separation is a core architectural principle of the platform.
 
 ## 4. Delivery Philosophy
 
-The engagement will follow a four-stage definition and delivery strategy:
+The engagement follows a **four-stage engineering progression**, moving from conceptual definition through to implementation. This progression mirrors established engineering practice: conceptual engineering, basic engineering, detailed engineering, and implementation.
 
-| Stage | Name | Purpose |
-|---|---|---|
-| **A** | Engineering Definition | Define what the system must calculate and under what rules |
-| **B** | System Architecture | Define how the engineering model is represented computationally |
-| **C** | Product Specification | Consolidate requirements, models, architecture, interfaces, validation |
-| **D** | Implementation | Build, test, validate, deploy |
+| Stage | Name | Engineering Equivalent | Purpose |
+|---|---|---|---|
+| **A** | Engineering Definition | Conceptual Engineering | Define what the system must calculate and under what rules |
+| **B** | System Architecture | Basic Engineering | Define how the engineering model is represented computationally |
+| **C** | Product Specification | Detailed Engineering | Consolidate requirements, models, architecture, interfaces, validation |
+| **D** | Implementation | Construction & Commissioning | Build, test, validate, deploy |
 
 This sequence is deliberate. It ensures that:
 
@@ -112,7 +112,8 @@ This sequence is deliberate. It ensures that:
 SYSTEM STRATEGY
        │
        ▼
-ENGINEERING DEFINITION
+STAGE A — ENGINEERING DEFINITION
+(Conceptual Engineering)
        │
        ├── BESS Engineering
        ├── Load & Market Engineering
@@ -123,21 +124,25 @@ ENGINEERING DEFINITION
        └── Data & Application Engineering
        │
        ▼
-SYSTEM ARCHITECTURE
+STAGE B — SYSTEM ARCHITECTURE
+(Basic Engineering)
        │
-       ├── Data Architecture
-       ├── Model Architecture
-       ├── Optimization Architecture
-       ├── Financial Architecture
-       ├── Software Architecture
-       └── Databricks Architecture
+       ├── High-Level Design (HLD)
+       └── Basic Architecture Definition
        │
        ▼
-PRODUCT SPECIFICATION
+STAGE C — PRODUCT SPECIFICATION
+(Detailed Engineering)
+       │
+       ├── Low-Level Design (LLD)
+       ├── Product Specification
+       └── Engineering Specifications
        │
        ▼
-IMPLEMENTATION
+STAGE D — IMPLEMENTATION
+(Construction & Commissioning)
        │
+       ├── Prompts / Task Definitions
        ├── Python / PySpark / SQL
        ├── Databricks App
        ├── Tests
@@ -145,7 +150,7 @@ IMPLEMENTATION
        └── Deployment & Training
 ```
 
-This progression guarantees that each stage produces the foundation required by the next, and that no implementation begins before the engineering model has been fully defined.
+Each stage produces the foundation required by the next. No stage begins before the previous stage has been reviewed and accepted.
 
 ---
 
@@ -603,20 +608,20 @@ This document is a **System Strategy**, not a specification or implementation pl
 - MILP formulations
 - Databricks deployment details
 
-Those belong to subsequent stages.
+Those belong to Stages B, C, and D.
 
 ---
 
 ## 9. Engagement Timeline
 
-The 12-week engagement follows ENGIE's defined phases:
+The 12-week engagement follows ENGIE's defined phases, mapped to the four delivery stages:
 
-| Phase | Weeks | Focus |
-|---|---|---|
-| 1 — Design | 1–2 | Requirements validation, architecture definition |
-| 2 — Development | 3–9 | Model and interface development |
-| 3 — Testing | 10–11 | Model validation, UAT |
-| 4 — Deployment | 12 | Final delivery, deployment, documentation, training |
+| Phase | Weeks | Delivery Stage | Focus |
+|---|---|---|---|
+| 1 — Design | 1–2 | Stage A + B | Requirements validation, conceptual engineering, high-level architecture |
+| 2 — Development | 3–9 | Stage C + D | Detailed engineering, product specification, implementation |
+| 3 — Testing | 10–11 | Stage D | Model validation, UAT |
+| 4 — Deployment | 12 | Stage D | Final delivery, deployment, documentation, training |
 
 ---
 
@@ -626,7 +631,7 @@ The 12-week engagement follows ENGIE's defined phases:
 - Periodic progress reporting
 - Review sessions at key milestones
 - Structured issue tracking and resolution
-- Formal sign-off at end of Phase 1, Phase 3, and Phase 4
+- Formal sign-off at end of Stage A, Stage B, Stage C, and Stage D
 
 ---
 
@@ -653,7 +658,7 @@ This System Strategy establishes a disciplined, area-driven approach to the ENGI
 
 The system is organized into **seven engineering areas**, connected through a central dispatch and optimization engine, and delivered through a Databricks application layer. Two simultaneous cycles — physical-operational and economic-financial — are preserved as distinct but coupled, ensuring traceability, auditability, and meaningful scenario comparison.
 
-The delivery sequence — **Engineering Definition → System Architecture → Product Specification → Implementation** — ensures that the software built in Weeks 3–12 is correct by construction, because the model it implements has been fully defined, validated, and agreed before a single line of production code is written.
+The delivery sequence — **Stage A: Engineering Definition (Conceptual Engineering) → Stage B: System Architecture (Basic Engineering) → Stage C: Product Specification (Detailed Engineering) → Stage D: Implementation (Construction & Commissioning)** — ensures that the software built in Weeks 3–12 is correct by construction, because the model it implements has been fully defined, validated, and agreed before a single line of production code is written.
 
 The platform will connect data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation.
 
