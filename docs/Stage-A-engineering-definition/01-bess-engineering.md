@@ -1,21 +1,19 @@
-
----
-
 # BESS Engineering
 ## Stage A.2.1 — Conceptual Engineering
 ### Physical Foundation of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.1-BESS-ENG-001
 
-**Version:** 1.1 — Conceptual Engineering Baseline (Closed)
+**Version:** 1.2 — Conceptual Engineering Baseline (Closed)
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.6)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.4)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
+- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 1 — BESS Engineering
 
@@ -219,7 +217,7 @@ This range is a **physical constraint of the system** — determined by battery 
 
 **Dispatch must respect that range**, but does not redefine it. Dispatch selects an operating point **within** the feasible SOC envelope defined here.
 
-**SOC window behavior under degradation.** Whether the SOC window narrows proportionally as SOH declines (bounds as percentage of available capacity) or is preserved in absolute kWh (bounds as fixed energy reserves) is an explicit engineering uncertainty — see §15.2. The two options yield materially different usable energy in later project years.
+**SOC window behavior under degradation.** Whether the SOC window narrows proportionally as SOH declines (bounds as percentage of available capacity) or is preserved in absolute kWh (bounds as fixed energy reserves) is an explicit engineering uncertainty — see §15.2 and **PH-017**. The two options yield materially different usable energy in later project years.
 
 ### 5.4 Duration — Derived Characteristic
 
@@ -439,8 +437,8 @@ The domain maintains, conceptually, the following state over time:
 | State Variable | Nature | Ownership |
 |---|---|---|
 | SOC | Continuous, bounded | BESS owns state; evolves under Dispatch |
-| SOH | Continuous, non-increasing between augmentation/replacement events | BESS owns state; **evolution determined by Degradation** |
-| Available capacity | Derived from nominal capacity × SOH | BESS exposes; consumed by Dispatch |
+| SOH | Continuous, may change discontinuously at augmentation/replacement events | BESS owns state; **evolution determined by Degradation** |
+| Available capacity | Derived from nominal capacity × SOH, per the applicable aggregation rule | BESS exposes; consumed by Dispatch |
 | Usable capacity | Derived from available capacity × (SOC_max − SOC_min) | BESS exposes; consumed by Dispatch |
 | Available charge power | Function of SOC, SOH, thermal assumption | BESS exposes; consumed by Dispatch |
 | Available discharge power | Function of SOC, SOH, thermal assumption | BESS exposes; consumed by Dispatch |
@@ -448,6 +446,8 @@ The domain maintains, conceptually, the following state over time:
 | Availability | Time-dependent capability condition | BESS declares; consumed by Dispatch |
 
 **Note on thermal state.** Temperature is an **input assumption**, not a dynamic state — see §13 and `SYS-ENG-DEF-001` §5.2.
+
+**Note on SOH nature.** The SOH of the system is not assumed to be monotonically non-increasing across the full project life. Augmentation adds new capacity at a different SOH, and the aggregate system SOH may evolve non-monotonically. The aggregation rule for mixed-cohort systems is a Stage B decision (see **PH-018**).
 
 ---
 
@@ -543,7 +543,7 @@ This list connects A.2.1 directly to:
 
 - **Data & Application Engineering (A.2.7)** — which will define how this information is ingested, validated, and stored
 - **Stage B (System Architecture)** — which will define how this information is represented computationally
-- **Phase 1 clarification items** — particularly **B3 (Data availability)**, which determines what ENGIE can actually provide
+- **Phase 1 clarification items** — particularly **PH-003 (Data availability)**, which determines what ENGIE can actually provide
 
 It is a **bridge**, not a specification.
 
@@ -566,7 +566,7 @@ These belong to A.2.7 and Stage B.
 |---|---|---|---|
 | 1 | Battery is a single aggregate unit | Simplifies conceptual modeling | Multi-stack or mixed-cohort configurations (e.g. after augmentation) would need explicit representation; aggregation rule must be defined (see §15.2) |
 | 2 | Efficiency is representable at a single conceptual level | Keeps interface simple at Stage A.2 | Sub-level losses (cell, module, string) would be lost |
-| 3 | Temperature is an input assumption, not a modeled state | Consistent with A.1 v0.4; matches planning-tool scope | Accuracy of available power in extreme climates may be limited |
+| 3 | Temperature is an input assumption, not a modeled state | Consistent with A.1 v0.5; matches planning-tool scope | Accuracy of available power in extreme climates may be limited |
 | 4 | Reactive capability is part of the inverter envelope | Supports Voltage Regulation value stream | Requires inverter-level detail |
 | 5 | Availability is represented as a declared time-dependent capability condition rather than derived from maintenance or reliability models | Avoids premature commitment to a reliability framework | Availability realism may be limited |
 | 6 | SOC is defined on available capacity (nominal × SOH) | Avoids circular definition; standard formulation | Requires explicit SOC-window behavior decision (see §15.2) |
@@ -581,18 +581,21 @@ These belong to A.2.7 and Stage B.
 | 4 | Whether SOC bounds are warranty-driven or policy-driven | Phase 1 clarification |
 | 5 | Whether efficiency is scalar, curve, or table | Stage B/C |
 | 6 | Deterministic vs. probabilistic availability treatment | Stage B |
-| 7 | **SOC window behavior under degradation** — proportional narrowing (bounds as %) or preserved kWh reserves | Phase 1 clarification (B4-related) and A.2.5 |
-| 8 | **Multi-cohort aggregation rule** after augmentation — weighted SOH, per-cohort tracking, or simplified aggregate | A.2.5 |
+| 7 | **SOC window behavior under degradation** — proportional narrowing (bounds as %) or preserved kWh reserves | Phase 1 clarification (**PH-017**) and A.2.5 |
+| 8 | **Multi-cohort aggregation rule** after augmentation — weighted SOH, per-cohort tracking, or simplified aggregate | A.2.5 / Stage B (**PH-018**) |
 
 ### 15.3 Phase 1 Clarification Dependencies
 
-This domain depends on the following Phase 1 items from `SYS-STR-FRM-001` §12:
+This domain depends on the following Phase 1 items from `PH1-REG-001`:
 
-- **B3** — Data availability (affects parameter sourcing in §14)
-- **B4** — Benchmark data (affects validation scope in §17)
-- **B5** — Acceptance thresholds (affects validation tolerances)
-- **D3** — Degradation feedback loop time scale (affects interface in §8)
-- **New question to ENGIE** — SOC window behavior under degradation (see §15.2 #7)
+- **PH-003** — Data availability (affects parameter sourcing in §14)
+- **PH-005** — Benchmark data (affects validation scope in §17)
+- **PH-006** — Acceptance thresholds (affects validation tolerances)
+- **PH-017** — SOC window behavior under degradation
+- **PH-018** — Multi-cohort aggregation after augmentation
+- **PH-036** — Degradation feedback time scale (affects interface in §8)
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -638,7 +641,7 @@ Following the Validation cross-cutting capability in `SYS-ENG-DEF-001` §4.1, th
 | Check | Nature |
 |---|---|
 | Envelope completeness | Dispatch never receives an incomplete envelope |
-| SOH evolution integrity | SOH is monotonically non-increasing **between augmentation/replacement events**; capability restoration events are represented explicitly |
+| SOH evolution integrity | SOH evolution is consistent with the applicable aging model; discontinuities occur only at augmentation/replacement events |
 | Availability propagation | Unavailability is respected by Dispatch |
 | Auxiliary consumption propagation | Auxiliary consumption reaches the tariff engine via net load |
 
@@ -683,8 +686,9 @@ Each of these belongs to another domain, as declared in `SYS-ENG-DEF-001` §12.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.6 | §1.1, §5 Domain 1, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
-| `SYS-ENG-DEF-001` v0.4 | §5 Domain 1, §4.1 Cross-cutting capabilities, §12 Inter-Domain Contract | Yes |
+| `SYS-STR-FRM-001` v0.8 | §1.1, §5 Domain 1, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
+| `SYS-ENG-DEF-001` v0.5 | §5 Domain 1, §4.1 Cross-cutting capabilities, §12 Inter-Domain Contract | Yes |
+| `PH1-REG-001` v1.1 | PH-003, PH-005, PH-006, PH-017, PH-018, PH-036 | Yes |
 | RFP-264144-1 | Technical system parameters, SOC/SOH, efficiency, power, C-rate, ramp, thermal, augmentation/replacement | Yes |
 | RFP-264144-1 | "Feedback loop: degradation impacts available energy in future periods" | Yes — §8 |
 
@@ -704,10 +708,10 @@ This section consolidates all decisions that are **deliberately not made** in th
 | 6 | Storage and time-indexing conventions | B | Architecture decision |
 | 7 | Interpolation strategy between intervals | B | Architecture decision |
 | 8 | Numerical integration scheme | C | Detailed engineering |
-| 9 | Validation tolerances | C | Depends on **B5** |
+| 9 | Validation tolerances | C | Depends on **PH-006** |
 | 10 | Deterministic vs. probabilistic availability treatment | B | Depends on RFP reliability scope and data |
-| 11 | SOC window behavior under degradation | Phase 1 + A.2.5 | Affects usable energy in later years |
-| 12 | Multi-cohort aggregation rule after augmentation | A.2.5 / B | Affects SOH representation |
+| 11 | SOC window behavior under degradation | **PH-017** + A.2.5 | Affects usable energy in later years |
+| 12 | Multi-cohort aggregation rule after augmentation | **PH-018** / A.2.5 / B | Affects SOH representation |
 | 13 | Auxiliary consumption thermal dependency | B | Affects accuracy in extreme climates |
 | 14 | Parameter schemas, units, missing-data handling | B / A.2.7 | Data contracts |
 
@@ -717,19 +721,21 @@ This section consolidates all decisions that are **deliberately not made** in th
 
 This document establishes the **conceptual engineering baseline** for Domain 1 — BESS Engineering.
 
-The Stage A.2 chapters are developed in the priority order defined in `SYS-ENG-DEF-001` §19, prioritizing thin-slice blockers:
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.4 | Dispatch & Optimization Engineering | ⏭ Next |
-| 2 | A.2.5 | Degradation Engineering | ⏭ Next |
-| 3 | A.2.1 | BESS Engineering | ✅ **This document** — Baselined |
-| 4 | A.2.2 | Load & Market Engineering | ⏭ Pending |
-| 5 | A.2.3 | Operational Engineering | ⏭ Pending |
-| 6 | A.2.6 | Financial Engineering | ⏭ Pending |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
+| 1 | A.2.1 | BESS Engineering | ✅ **This document** — Baselined (v1.2) |
+| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.8) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
-Phase 1 clarification items are organized as **blocking (B1–B5)** and **defaultable (D1–D15)** in `SYS-STR-FRM-001` §12. This domain's dependencies are listed in §15.3.
+**Next:** Stage A consolidation and audit before Stage B (HLD).
+
+Phase 1 clarification items are organized in `PH1-REG-001` v1.1, the authoritative consolidated Register. This domain's dependencies are listed in §15.3.
 
 ---
 
@@ -739,8 +745,24 @@ Phase 1 clarification items are organized as **blocking (B1–B5)** and **defaul
 **Status:** Conceptual Engineering Baseline — **CLOSED**
 **Duration:** 12 Weeks
 **Language:** English
+
 ---
 
-**BESS Operational & Financial Modeling (RFP-264144-1): Observations and Clarification Requests**
+## Addendum: ENGIE Clarification Requests Relevant to BESS Engineering
 
-1. SOC window under degradation. As the battery ages, does the operating SOC window scale proportionally with remaining capacity, or does the integrator preserve fixed energy reserves in kWh? The two approaches produce materially different usable energy in later project years. Vendor warranty terms usually define this.
+The following clarification items are relevant to this domain. They are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), which is the authoritative consolidated list. This section lists only the items relevant to BESS Engineering, by their **Register ID**.
+
+| Register ID | Clarification / Data Request | Why Required |
+|---|---|---|
+| **PH-003** | **Data availability.** What historical data will ENGIE provide — meter data, market prices, ancillary prices, regulation signals, customer bills — and at what resolution and horizon? | Determines what can be modeled and how ingestion is designed |
+| **PH-005** | **Benchmark data.** What established benchmarks will be used to validate the model? Can ENGIE provide reference cases with expected results? | Defines acceptance and validation |
+| **PH-006** | **Acceptance thresholds.** What quantified accuracy, runtime, and usability criteria define acceptance? | Must be concrete before the thin slice is built |
+| **PH-015** | **Battery data.** Are vendor degradation curves or warranty terms available for the reference technologies? | Anchors the degradation model |
+| **PH-016** | **SOC bounds and warranty.** Are SOC bounds driven by warranty terms, operating policy, or both? | Affects available capacity and EOL threshold |
+| **PH-017** | **SOC window behavior under degradation.** As the battery ages, does the operating SOC window scale proportionally with remaining capacity, or does the integrator preserve fixed energy reserves in kWh? | The two approaches produce materially different usable energy in later project years |
+| **PH-018** | **Multi-cohort aggregation after augmentation.** How should SOH be aggregated when multiple cohorts coexist? | Affects post-augmentation representation |
+| **PH-036** | **Degradation feedback time scale.** Frequency of SOH update during operational simulation? | Determines feedback loop architecture |
+
+**Note.** Items are assigned IDs in `PH1-REG-001`. The Register is the authoritative source; this section is a filtered view.
+
+---
