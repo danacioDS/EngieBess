@@ -1,3 +1,6 @@
+# B.0 v0.3.2 — Documento Completo (Baseline)
+
+Copia todo el contenido de abajo y pégalo en `docs/Stage-B-system-architecture/STAGE-B-HLD-001.md`.
 
 ---
 
@@ -5,9 +8,9 @@
 
 **Document ID:** STAGE-B-HLD-001
 
-**Version:** 0.3.1 — Draft for Baseline
+**Version:** 0.3.3 — Baseline (Frozen)
 
-**Status:** Stage B — Draft for Baseline
+**Status:** Stage B — Baseline (Frozen)
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
@@ -147,7 +150,7 @@ These two dimensions are **different architectural concepts**. They are not laye
                 EXTERNAL DATA SOURCES
 ```
 
-**Note:** Cross-cutting capabilities **span** the engineering components. They are not a "layer".
+**Note:** Cross-cutting capabilities **span** the engineering components. They are not a "layer". The diagram should not be interpreted as a strictly vertical pipeline; it shows the primary architectural groupings.
 
 #### 3.3 Key Distinctions
 
@@ -250,7 +253,7 @@ Represent the **external operating environment** computationally — the electri
 | Market | Prices, products |
 | Programs | DR rules |
 | Grid | Constraints |
-| External context | All context signals |
+| External context | External conditions and derived context signals |
 
 #### 7.3 Inputs and Outputs
 
@@ -263,7 +266,7 @@ Represent the **external operating environment** computationally — the electri
 | **Outputs** | Load signals | Short-horizon, multi-year |
 | **Outputs** | Price signals | DA, RT, ancillary, capacity |
 | **Outputs** | Program signals | DR events, rules |
-| **Outputs** | Context signals | Aggregated external context |
+| **Outputs** | Context-derived signals | Signals and constraints derived from external conditions |
 
 #### 7.4 Boundary
 
@@ -271,7 +274,7 @@ Represent the **external operating environment** computationally — the electri
 |---|---|
 | What is happening outside the BESS? | How should the BESS respond? |
 
-**Ownership note.** Domain 2 owns the External Context interface. Other components consume context-derived signals produced by Domain 2.
+**Ownership note.** Domain 2 owns the External Context interface. Other components consume **context-derived signals** produced by Domain 2, not raw external context.
 
 **Reference:** Detailed in `A.2.2-LOAD-MKT-ENG-001`.
 
@@ -474,7 +477,6 @@ Translate operational behavior into **project-level economic performance**.
 | BESS Model | Degradation | Physical state |
 | Load & Market | Operational | External conditions |
 | Load & Market | Dispatch | Signals, prices, load |
-| Load & Market | Financial | Bill outputs (BTM) |
 | Operational | Dispatch | Requirements |
 | Operational | Degradation | Behavior declarations |
 | Dispatch | Degradation | Trajectories |
@@ -483,11 +485,13 @@ Translate operational behavior into **project-level economic performance**.
 | Degradation | BESS | Updated SOH |
 | Degradation | Dispatch | Marginal signal |
 | Degradation | Financial | Physical events |
-| Tariff Engine | Financial | Savings (BTM) |
+| Tariff Engine | Financial | Bill and savings outputs (BTM) |
 | Scenario Management | All | Configuration |
 | Validation | All | Validation criteria |
 
 **Note on Dispatch → Load & Market.** Dispatch produces the operational net-load outcome used by the tariff calculation. That outcome is routed to the **Tariff Engine**, not to Load & Market.
+
+**Note on BTM savings source of truth.** The Tariff Engine is the single source of truth for BTM bill and savings outputs. Financial consumes from Tariff Engine, not directly from Load & Market.
 
 #### 13.2 Interface Principles
 
@@ -509,6 +513,7 @@ Translate operational behavior into **project-level economic performance**.
 | SOC | BESS Model | Dispatch |
 | SOH | BESS Model | Degradation |
 | Available capacity | BESS Model | Degradation |
+| EFC / degradation history | Degradation Engine | Degradation Engine |
 | Cash flow | Financial | Financial |
 | Augmentation history | Degradation | Degradation |
 
@@ -571,7 +576,7 @@ Dispatch
 | # | Component | Purpose | Key Inputs | Key Outputs | Boundary |
 |---|---|---|---|---|---|
 | 1 | BESS Model | Physical representation | Technical params, limits, temperature | State, envelope | What the BESS can do |
-| 2 | Load & Market Model | External context | Load, market, program, grid data | Context signals | What is outside the BESS |
+| 2 | Load & Market Model | External context | Load, market, program, grid data | Context-derived signals | What is outside the BESS |
 | 3 | Tariff Engine | Bill computation | Tariff, net load | Bill with/without BESS | What the bill is |
 | 4 | Operational Model | Use-case behavior | Physical, external, rules | Requirements, metrics | How each stream uses BESS |
 | 5 | Dispatch Engine | Coordination | Physical, external, operational, degradation | Dispatch, attribution | How to coordinate |
@@ -647,7 +652,7 @@ Stage B → Stage C Handoff
 
 | Aspect | Status |
 |---|---|
-| B.0 Integrated System Architecture | ✅ Draft for Baseline (v0.3.1) |
+| B.0 Integrated System Architecture | ✅ Baseline Frozen (v0.3.3) |
 | B.1 Data Architecture | ⏭ Next |
 | B.2 Model Architecture | ⏭ Pending |
 | B.3 Optimization Architecture | ⏭ Pending |
@@ -658,9 +663,9 @@ Stage B → Stage C Handoff
 
 ---
 
-**End of §3 — B.0 Integrated System Architecture (v0.3.1)**
+**End of §3 — B.0 Integrated System Architecture (v0.3.3 — Baseline Frozen)**
 
-**Status:** Draft for Baseline
+**Status:** Baseline
 
 **Next:** B.1 Data Architecture
 
