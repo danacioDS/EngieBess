@@ -1,13 +1,10 @@
-
----
-
 # Dispatch & Optimization Engineering
 ## Stage A.2.4 — Conceptual Engineering
 ### Coordination Layer of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.4-DISPATCH-ENG-001
 
-**Version:** 0.8 — Development Draft
+**Version:** 0.9 — Development Draft
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Draft
 
@@ -73,11 +70,11 @@ Those belong to Stage B (architecture and optimization formulation) and Stage C 
 
 | Default | Source | Value |
 |---|---|---|
-| Dispatch methodology | Strategy D1 | **LP** |
-| Perfect foresight vs. forecast-based | Strategy D2 | **Perfect foresight**; realization factor applied in Financial Engineering |
-| Degradation feedback time scale | Strategy D3 | **Annual SOH update** with representative-period simulation |
-| Voltage regulation coupling | Strategy D4 | **Fixed envelope** — no P² + Q² ≤ S² linearization |
-| Time resolution | Strategy D14 | **15-minute when input data permits; hourly otherwise** |
+| Dispatch methodology | **PH-034** | **LP** |
+| Perfect foresight vs. forecast-based | **PH-033** | **Perfect foresight**; realization factor applied in Financial Engineering |
+| Degradation feedback time scale | **PH-036** | **Annual SOH update** with representative-period simulation |
+| Voltage regulation coupling | **PH-041** | **Fixed envelope** — no P² + Q² ≤ S² linearization |
+| Time resolution | **PH-054** | **15-minute when input data permits; hourly otherwise** |
 
 ### 1.3 The Most Important Boundary in This Document
 
@@ -265,7 +262,7 @@ Dispatch Decision
 | Capacity price signals | External economic signal for availability |
 | Program compensation signals | DR payment structures |
 | Voltage-support compensation signals | Where applicable |
-| Power factor penalties / kVAR charges | Where applicable (`A.2.2` §9.4 element 11, added per **PH-021**) |
+| Power factor penalties / kVAR charges | Where applicable (`A.2.2` §9.4 element 11) |
 | DR program rules | Event windows, notification, penalties |
 | Baseline methodology | Via program adapter |
 | Grid constraints | Interconnection limits, export constraints |
@@ -306,7 +303,7 @@ Dispatch Decision
 
 **Note on marginal degradation cost — annual offset.** The marginal degradation cost depends on SOH and lifetime throughput, which depend on the dispatch, which depends on the cost. This creates a **potential circularity**.
 
-Under the working default of **annual SOH update** (Strategy D3), the circularity is broken by applying an **annual offset**: the marginal degradation cost consumed during year *n* is computed from the state at the **beginning of year *n***, using the SOH and lifetime throughput known at that point. This avoids fixed-point iteration and is the working assumption for the thin slice.
+Under the working default of **annual SOH update** (**PH-036**), the circularity is broken by applying an **annual offset**: the marginal degradation cost consumed during year *n* is computed from the state at the **beginning of year *n***, using the SOH and lifetime throughput known at that point. This avoids fixed-point iteration and is the working assumption for the thin slice.
 
 The precise derivation is defined in `A.2.5-DEG-ENG-001` §9. Dispatch consumes whatever signal A.2.5 produces.
 
@@ -346,7 +343,7 @@ All value streams compete for the same physical resources (`A.2.3` §10.1):
 
 ### 7.2 Working Default Coordination Strategy
 
-Under working default **D1** (LP with perfect foresight), coordination is achieved through a **single co-optimized objective** subject to physical and operational constraints.
+Under working default **PH-034** (LP with perfect foresight), coordination is achieved through a **single co-optimized objective** subject to physical and operational constraints.
 
 This is the working assumption for the thin slice (§20). It is revisable if ENGIE selects a different methodology.
 
@@ -378,7 +375,7 @@ This is the working assumption for the thin slice (§20). It is revisable if ENG
 
 **Economic signals are not constraints.** Price signals, price differentials, and similar economic quantities are **inputs to the dispatch decision process** and may contribute to the objective, heuristic logic, ranking logic, or another decision mechanism.
 
-The specific role each economic signal plays is decided by the selected methodology (**D1**) and Stage B.
+The specific role each economic signal plays is decided by the selected methodology (**PH-034**) and Stage B.
 
 ### 8.3 Working Default Constraint Treatment
 
@@ -437,7 +434,7 @@ Some value streams require **reserved capacity** that cannot be used for other s
 
 ### 11.1 Foresight Framing
 
-Under working default **D2**, dispatch operates in **perfect-foresight mode**. This is the primary dispatch mode for the thin slice.
+Under working default **PH-033**, dispatch operates in **perfect-foresight mode**. This is the primary dispatch mode for the thin slice.
 
 **The realization factor is applied in Financial Engineering, not in Dispatch.** Dispatch produces the operational results under perfect foresight; Financial Engineering applies the realization factor when converting those results into reported project value.
 
@@ -485,7 +482,7 @@ Dispatch (next year)
 
 ### 12.2 Working Default Feedback Time Scale
 
-Under working default **D3**, the degradation state is updated **annually**, with representative-period simulation within each year.
+Under working default **PH-036**, the degradation state is updated **annually**, with representative-period simulation within each year.
 
 - SOH is held constant **within** each simulated year
 - SOH is updated **between** years based on the year's aggregated usage
@@ -515,9 +512,9 @@ If the selected dispatch methodology includes a degradation-related marginal sig
 
 ### 12.4 What Is Not Decided Here
 
-- The feedback time scale (Phase 1, **D3** / **PH-036**)
+- The feedback time scale (**PH-036**)
 - Whether a marginal degradation signal exists (A.2.5)
-- Whether that signal enters the objective (dispatch methodology decision)
+- Whether that signal enters the objective (dispatch methodology decision, **PH-034**)
 - How the feedback is represented numerically
 
 ---
@@ -645,8 +642,8 @@ These are derivative quantities computed by Degradation Engineering from the tra
 | **DR events not known in advance** | Handled via **reserved capacity during event windows** |
 | **Coincident peak uncertainty** | Peak hours assumed **known**, with a **configurable hit-rate factor** |
 | **Demand ratchets** | **Evaluated in the tariff engine**. Where ratchets apply, all 12 months are simulated (Strategy D19 / **PH-040**) |
-| **P² + Q² ≤ S² nonlinear coupling** | **Fixed envelope** under working default **D4** |
-| **Perfect foresight may overstate achievable value** | Perfect foresight is the **primary dispatch mode** (D2). The **realization factor** is applied in **Financial Engineering** |
+| **P² + Q² ≤ S² nonlinear coupling** | **Fixed envelope** under working default **PH-041** |
+| **Perfect foresight may overstate achievable value** | Perfect foresight is the **primary dispatch mode** (**PH-033**). The **realization factor** is applied in **Financial Engineering** |
 | **Efficiency losses** | Represented as part of the physical model (A.2.1) |
 | **Minimum spread threshold for arbitrage** | A **decision rule**. Under LP + perfect foresight, it emerges endogenously from the objective and the marginal degradation signal (where applicable) |
 | **Terminal SOC at the end of the horizon** | **A terminal SOC condition is required.** Working default: **terminal SOC = initial SOC** at the end of each optimization horizon |
@@ -762,22 +759,22 @@ The thin end-to-end slice (`SYS-STR-FRM-001` §4.2) demonstrates a working dispa
 
 | Dimension | Configuration |
 |---|---|
-| **Methodology** | LP with perfect foresight (working default **D1**) |
+| **Methodology** | LP with perfect foresight (working default **PH-034**) |
 | **Value streams included** | Peak shaving + energy arbitrage (two value streams) |
 | **Horizon** | Monthly horizon, sized to cover the billing period for peak shaving |
-| **Time resolution** | 15-minute when input data permits; hourly otherwise (**D14**) |
-| **SOH update** | Held constant within each simulated year; updated between years (**D3**) |
+| **Time resolution** | 15-minute when input data permits; hourly otherwise (**PH-054**) |
+| **SOH update** | Held constant within each simulated year; updated between years (**PH-036**) |
 | **Representative periods** | Monthly representative periods (see §12.2) |
 | **Terminal SOC** | Terminal SOC = initial SOC at the end of each monthly horizon (see §16) |
 | **Degradation signal** | Consumed if produced by A.2.5; otherwise omitted from the initial slice |
 | **Attribution** | Rule-based (§13.3) |
 | **Scenario handling** | Single scenario per simulation |
-| **Foresight** | Perfect foresight (**D2**); realization factor applied in Financial Engineering |
+| **Foresight** | Perfect foresight (**PH-033**); realization factor applied in Financial Engineering |
 | **Net load derivation** | Executed by the domain designated in Stage B (working assumption: Load & Market) |
 
 ### 20.2 Thin Slice Degradation Configuration
 
-Per `A.2.5-DEG-ENG-001` §20, the thin slice uses the following degradation configuration:
+Per `A.2.5-DEG-ENG-001` §21, the thin slice uses the following degradation configuration:
 
 | Dimension | Configuration |
 |---|---|
@@ -822,7 +819,7 @@ These are added in subsequent weeks.
 | 3 | Operational attribution basis is required for revenue-by-stream reporting | RFP requirement | Would leave revenue-by-stream undefined |
 | 4 | Financial Engineering is the single source of truth for project financial value | Consistent with `SYS-ENG-DEF-001` §10.4 | Would create double counting |
 | 5 | Degradation feedback is provided as a state and, where applicable, a signal | Consistent with `A.2.1` and `A.2.5` | Would require a different coupling |
-| 6 | Perfect foresight is the primary dispatch mode; realization factor applied in Financial Engineering | Working default **D2** | Would change reporting approach |
+| 6 | Perfect foresight is the primary dispatch mode; realization factor applied in Financial Engineering | Working default **PH-033** | Would change reporting approach |
 | 7 | Post-dispatch net load is a derived system quantity | Preserves composition clarity | Would place derivation responsibility ambiguously |
 | 8 | Representative periods respect the monthly billing period | Preserves peak-shaving value stream | Would invalidate demand charge calculations |
 | 9 | **Cycling metrics are derived by Degradation Engineering, not by Dispatch** | Preserves domain boundary | Would blur Dispatch and Degradation |
@@ -836,7 +833,7 @@ These are added in subsequent weeks.
 | 2 | Attribution mechanism | **Stage B** (default: rule-based) |
 | 3 | DR event uncertainty treatment | **Stage B** (default: reserve-based) |
 | 4 | Whether a degradation-related marginal signal exists | **A.2.5** |
-| 5 | Whether P² + Q² ≤ S² is linearized | **D4** (default: fixed envelope) |
+| 5 | Whether P² + Q² ≤ S² is linearized | **PH-041** (default: fixed envelope) |
 | 6 | Multi-timescale operation | **Stage B** (default: single resolution) |
 | 7 | Horizon structure | **Stage B** (default: monthly for thin slice) |
 | 8 | Where net load derivation is executed | **Stage B** |
@@ -852,9 +849,15 @@ These are added in subsequent weeks.
 - **PH-002** — BTM vs. FTM scope
 - **PH-005** — Benchmark data
 - **PH-006** — Acceptance thresholds
+- **PH-027** — Primary model purpose / use case
+- **PH-028** — Model output granularity
+- **PH-033** — Perfect foresight vs. forecast-based dispatch
 - **PH-034** — Dispatch methodology
 - **PH-036** — Degradation feedback time scale
 - **PH-040** — Representative-period scheme and ratchets
+- **PH-041** — Voltage regulation coupling
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -948,11 +951,11 @@ See §18.
 | 5 | Linearization strategy | Stage B / C | — |
 | 6 | Solver selection | Stage C | — |
 | 7 | Attribution mechanism | Stage B | Rule-based |
-| 8 | Uncertainty treatment | Stage B | Perfect foresight (**D2**) |
+| 8 | Uncertainty treatment | Stage B | Perfect foresight (**PH-033**) |
 | 9 | DR event uncertainty treatment | Stage B | Reserve-based |
 | 10 | Whether a degradation-related signal enters the objective | A.2.5 / **PH-034** | Joint decision |
-| 11 | Whether P² + Q² ≤ S² is linearized | **D4** | Fixed envelope |
-| 12 | Time resolution | **D14** | 15-min if data permits |
+| 11 | Whether P² + Q² ≤ S² is linearized | **PH-041** | Fixed envelope |
+| 12 | Time resolution | **PH-054** | 15-min if data permits |
 | 13 | Multi-timescale representation | Stage B | Single resolution |
 | 14 | Horizon structure | Stage B | Monthly (thin slice) |
 | 15 | Scenario handling in dispatch | Stage B | Single scenario |
@@ -975,12 +978,12 @@ See §18.
 
 ## 27. Next Steps
 
-This document establishes the **conceptual engineering definition** for Domain 4 — Dispatch & Optimization Engineering. It remains a **Development Draft (v0.8)** until the blocking items in `PH1-REG-001` are resolved.
+This document establishes the **conceptual engineering definition** for Domain 4 — Dispatch & Optimization Engineering. It remains a **Development Draft (v0.9)** until the blocking items in `PH1-REG-001` are resolved.
 
 **Recommended sequence:**
 
 ```
-A.2.4 v0.8 (this document)
+A.2.4 v0.9 (this document)
       │
       ├── ENGIE clarification responses (PH-001, PH-002, PH-034, PH-036, PH-040)
       │
@@ -988,19 +991,19 @@ A.2.4 v0.8 (this document)
 A.2.4 v1.0 — BASELINE
 ```
 
-**Note.** A.2.4 v0.8 incorporates the A.2.5 interface. No further interface changes are expected before A.2.6 and A.2.7.
+**Note.** A.2.4 v0.9 incorporates the A.2.5 interface. No further interface changes are expected before A.2.6 and A.2.7 consolidation.
 
-The Stage A.2 chapters:
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
 | 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
 | 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 **This document — Draft (v0.8)** |
-| 5 | A.2.5 | Degradation Engineering | ✅ Development Baseline (v0.2) |
-| 6 | A.2.6 | Financial Engineering | ⏭ Next |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 **This document — Draft (v0.9)** |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
 ---
 
@@ -1018,14 +1021,15 @@ The following clarification items are relevant to this domain. They are tracked 
 | **PH-029** | Active vs. reactive priority | Project / grid-code dependent |
 | **PH-030** | Dispatch validation benchmark | Internal consistency checks |
 | **PH-031** | Revenue attribution under simultaneous services | Rule-based |
+| **PH-040** | Representative-period scheme and ratchets | Monthly representative periods |
 
 ### 28.2 Items already resolved by RFP or Strategy
 
 - Co-optimization vs. stacking (RFP)
 - Lifecycle economics in dispatch (`SYS-STR-FRM-001` §6.4)
 - Dispatch methodology — **PH-034** (default: LP)
-- Perfect foresight vs. forecast-based — Strategy D2
-- Time resolution — Strategy D14
+- Perfect foresight vs. forecast-based — **PH-033**
+- Time resolution — **PH-054**
 - Degradation feedback time scale — **PH-036**
 - Market scope — **PH-001**
 - BTM vs. FTM — **PH-002**
@@ -1052,7 +1056,7 @@ No item in §28.1 is blocking. All have working defaults consistent with `SYS-ST
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.2.4 — Conceptual Engineering (Dispatch & Optimization Engineering)
-**Status:** Conceptual Engineering — **Development Draft (v0.8)**
+**Status:** Conceptual Engineering — **Development Draft (v0.9)**
 **Duration:** 12 Weeks
 **Language:** English
 
