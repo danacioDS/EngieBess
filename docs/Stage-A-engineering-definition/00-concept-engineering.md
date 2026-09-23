@@ -1,22 +1,18 @@
-Aquí tienes **SYS-ENG-DEF-001 v0.5 — Baseline for Review** con las correcciones finales aplicadas: Generation como extensión (no capacidad permanente), §14 Core Feedback Loop reformulado, y §20 con A.2.4 como Development Baseline.
-
----
-
 # BESS Operational & Financial Modeling System
 ## Stage A — Engineering Definition
 ### Eagle-Eye View of the Seven Engineering Domains
 
 **Document ID:** SYS-ENG-DEF-001
 
-**Version:** 0.5 — Baseline for Review
+**Version:** 0.6 — Consolidated Baseline
 
-**Status:** Stage A — Engineering Definition (Conceptual Level)
+**Status:** Stage A — Engineering Definition (Conceptual Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
 - `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
-- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.0)
+- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Purpose:** Provide a system-level, eagle-eye definition of the seven engineering domains that constitute the BESS Operational & Financial Modeling System, establishing their identity, purpose, boundaries, responsibilities, inputs, outputs, and relationships — without entering into detailed conceptual engineering, architecture, or implementation.
 
@@ -51,9 +47,11 @@ Stage A is delivered in two levels:
 | Level | Name | Deliverable |
 |---|---|---|
 | **A.1** | System Component Definition | This document — eagle-eye view of the seven domains |
-| **A.2** | Conceptual Engineering per Domain | Seven domain chapters, developed one at a time |
+| **A.2** | Conceptual Engineering per Domain | Seven domain chapters (A.2.1–A.2.7) |
 
 **This document covers Level A.1 only.**
+
+**Status note.** As of this revision, **Stage A.2 is conceptually and formally complete**. All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The next step is the **Stage A Consolidation Audit**, followed by **Stage B — System Architecture (HLD)**.
 
 **Packaging note.** Per `SYS-STR-FRM-001` §4.3, the seven A.2 chapters may be delivered as a **single consolidated document with seven chapters** rather than seven standalone files, if that better serves review velocity.
 
@@ -281,7 +279,7 @@ Define the **physical and technical representation of the battery energy storage
 | **Inputs** | Efficiency Characteristics | Round-trip efficiency, conversion losses |
 | **Inputs** | Operating Limits | SOC bounds, power bounds, ramp limits, C-rate limits |
 | **Inputs** | Environmental | Ambient or cell temperature profile (input assumption) |
-| **Inputs** | Policy | Augmentation policy, replacement policy, availability assumptions |
+| **Inputs** | Policy | Augmentation policy, replacement policy, availability assumptions (via Scenario Management) |
 | **Outputs** | State | SOC, SOH, availability condition |
 | **Outputs** | Capability | Available energy, available charging power, available discharging power |
 | **Outputs** | Envelope | Feasible operating envelope, physical feasibility conditions |
@@ -295,6 +293,8 @@ Define the **physical and technical representation of the battery energy storage
 | What can the physical BESS do? | What should the BESS do economically? **What external context is available?** |
 
 BESS Engineering declares **intrinsic capability**. System Context declares **availability and imposed constraints**. These are separate.
+
+**Reference.** Detailed conceptual engineering: `A.2.1-BESS-ENG-001` v1.2.
 
 ---
 
@@ -341,7 +341,7 @@ Domain 4 (Dispatch)  ─── net load ───►  Domain 2 (Tariff engine)  
 |---|---|---|
 | **Inputs** | Load Data | Historical meter data, interval profiles, demand profiles, peak demand |
 | **Inputs** | Generation Data *(extension)* | Renewable generation profiles, curtailment conditions |
-| **Inputs** | Tariff Data | TOU structures, demand charge structures, energy charge structures, power factor penalties (PH-054) |
+| **Inputs** | Tariff Data | TOU structures, demand charge structures, energy charge structures, power factor penalties (**PH-021**) |
 | **Inputs** | Market Data | Day-ahead LMP, real-time LMP, ancillary service prices, capacity prices |
 | **Inputs** | Program Data | DR program parameters, event windows, notification rules, penalties |
 | **Inputs** | Grid Data | Interconnection limits, export constraints, eligibility rules |
@@ -362,6 +362,8 @@ Domain 4 (Dispatch)  ─── net load ───►  Domain 2 (Tariff engine)  
 | Answers | Does Not Answer |
 |---|---|
 | What is happening outside the BESS, and what tariff applies? | How should the BESS respond? |
+
+**Reference.** Detailed conceptual engineering: `A.2.2-LOAD-MKT-ENG-001` v1.3.
 
 ---
 
@@ -388,7 +390,7 @@ Define **how the BESS can be used to provide specific services or value streams*
 | **Peak shaving** | Demand charges apply to the monthly maximum; the optimization horizon must account for the billing period |
 | **Demand response** | Events are not known in advance; requires reserve-capacity or event-scenario treatment |
 | **Frequency regulation** | A 15-min or hourly model cannot follow a regulation signal; requires capacity reservation plus statistical throughput and SOC drift |
-| **Voltage regulation** | P² + Q² ≤ S² couples active and reactive power; treated as fixed envelope under **D4** |
+| **Voltage regulation** | P² + Q² ≤ S² couples active and reactive power; treated as fixed envelope under **PH-041** |
 
 ### 8.4 Inputs and Outputs
 
@@ -408,6 +410,10 @@ Define **how the BESS can be used to provide specific services or value streams*
 | How does each value stream use the BESS? | Which value stream should receive priority when several compete? |
 
 Operational Engineering declares **operational requirements**. Dispatch selects the actual behavior.
+
+**Terminology alignment.** This document uses **operational requirements** in place of the term *candidate actions* used in previous versions. This aligns with `A.2.3-OPS-ENG-001` v1.3 §4, which establishes that Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**.
+
+**Reference.** Detailed conceptual engineering: `A.2.3-OPS-ENG-001` v1.3.
 
 ---
 
@@ -435,24 +441,24 @@ Act as the **coordination layer between competing operational objectives**.
 ### 9.3 Conceptual Optimization Structure
 
 ```
-                Candidate Value Streams
-                         │
-          ┌──────────────┼──────────────┐
-          ▼              ▼              ▼
-      Peak Shaving       DR        Arbitrage
-          │              │              │
-          └──────────────┼──────────────┘
-                         ▼
-                Dispatch Engine
-                         │
-              Physical Constraints
-                         │
-              Economic Constraints
-                         │
-                  SOC Dynamics
-                         │
-                         ▼
-                 Feasible Dispatch
+                Value Streams
+                     │
+          ┌──────────┼──────────┐
+          ▼          ▼          ▼
+      Peak Shaving   DR     Arbitrage
+          │          │          │
+          └──────────┼──────────┘
+                     ▼
+            Dispatch Engine
+                     │
+          Physical Constraints
+                     │
+          Economic Constraints
+                     │
+              SOC Dynamics
+                     │
+                     ▼
+             Feasible Dispatch
 ```
 
 ### 9.4 Methodology
@@ -464,7 +470,7 @@ Act as the **coordination layer between competing operational objectives**.
 | Mixed-Integer Programming (MILP) | Optimization with discrete decisions |
 | Hybrid | Combination of deterministic rules and optimization |
 
-**Working default** per `SYS-STR-FRM-001` §12.2 **D1** is **LP**. Other methodologies are revisable if ENGIE indicates otherwise.
+**Working default** per **PH-034** is **LP**. Other methodologies are revisable if ENGIE indicates otherwise.
 
 ### 9.5 Inputs and Outputs
 
@@ -479,16 +485,18 @@ Act as the **coordination layer between competing operational objectives**.
 | **Outputs** | Dispatch | Charge/discharge/rest schedule (time series) |
 | **Outputs** | State | SOC trajectory over optimization horizon |
 | **Outputs** | Net Load | Net load profile after BESS dispatch (to Domain 2 tariff engine) |
-| **Outputs** | Attribution | Revenue attribution per value stream |
+| **Outputs** | Attribution | Operational attribution basis per value stream |
 | **Outputs** | Evidence | Constraint compliance evidence |
 
-**Note.** Dispatch **consumes** System Context signals from Domain 2. It does **not** own the external context (`SYS-STR-FRM-001` §6.5).
+**Note.** Dispatch **consumes** System Context signals from Domain 2. It does **not** own the external context (`SYS-STR-FRM-001` §6.5). Dispatch produces **battery power and SOC trajectories**; **cycling metrics are derived by Domain 5** (see `A.2.4-DISPATCH-ENG-001` §4.3, §12.1, §14.4).
 
 ### 9.6 Boundary
 
 | Answers | Does Not Answer |
 |---|---|
 | Given the available opportunities and constraints, how should the BESS be dispatched? | What is the physical battery? **What is the external context?** What is the complete financial valuation? |
+
+**Reference.** Detailed conceptual engineering: `A.2.4-DISPATCH-ENG-001` v0.9.
 
 ---
 
@@ -509,7 +517,7 @@ Represent the **evolution of battery capability over time as a consequence of op
 | Temperature | Thermal influence on aging |
 | Equivalent full cycles | Cumulative throughput metric |
 | Capacity fade | Loss of usable capacity |
-| SOH | Remaining capacity |
+| SOH | Remaining capability relative to beginning-of-life |
 | Augmentation | Capacity addition events |
 | Replacement thresholds | Full replacement triggers |
 
@@ -529,26 +537,40 @@ Degradation Engineering provides Dispatch with two distinct outputs:
 
 **Marginal degradation cost is a derived operational signal** (`SYS-STR-FRM-001` §6.4). It combines a physical input (lifetime throughput, Domain 5) with a scenario input (replacement cost, financial scenario assumption).
 
+**Annual offset.** Under annual SOH update (**PH-036**), the marginal degradation cost consumed during year *n* is computed from the state at the **beginning of year *n***. This breaks the circularity between signal, dispatch, and SOH.
+
 ### 10.5 Inputs and Outputs
 
 | Direction | Category | Items |
 |---|---|---|
-| **Inputs** | Operating History | Dispatch decisions, battery throughput, cycle counts |
+| **Inputs** | Operating History | Battery power trajectory, SOC trajectory, throughput (from Dispatch); cycling metrics derived internally |
 | **Inputs** | Environmental | Temperature conditions, average SOC |
 | **Inputs** | Physical | Initial state, physical parameters |
 | **Inputs** | Scenario Assumption | Replacement cost (financial scenario input) |
-| **Inputs** | Policy | Augmentation policy, replacement thresholds |
-| **Outputs** | State | Updated SOH, remaining capacity |
+| **Inputs** | Policy | Augmentation policy, replacement policy, EOL threshold (via Scenario Management) |
+| **Outputs** | State | Updated SOH, available capacity |
 | **Outputs** | Metrics | Degradation metrics, equivalent cycles |
 | **Outputs** | Dispatch Signal | **Marginal degradation cost** |
 | **Outputs** | Events | Augmentation events, replacement events |
 | **Outputs** | Constraints | Updated operating constraints |
 
-### 10.6 Boundary
+### 10.6 The Three Concepts That Must Not Collapse
+
+| Concept | Nature | Owner |
+|---|---|---|
+| **Physical degradation** | Physical state | Domain 5 |
+| **Marginal degradation cost** | Operational signal | Domain 5 |
+| **Replacement cash flow** | Monetary flow | Domain 6 |
+
+**Rule.** These are three distinct quantities. None may be substituted for another.
+
+### 10.7 Boundary
 
 | Answers | Does Not Answer |
 |---|---|
 | How does operating the battery change the battery over time, and what does one more unit of throughput cost? | What is the total economic value of that degradation over the contract term? |
+
+**Reference.** Detailed conceptual engineering: `A.2.5-DEG-ENG-001` v0.3.
 
 ---
 
@@ -585,21 +607,21 @@ Operational Simulation
         ▼
 Economic Translation
         │
-        ├── Revenue (from D4 attribution)
+        ├── Revenue (from D4 attribution + adapters)
         ├── Savings (from D2 tariff engine)
         ├── Costs
-        └── Degradation impact
+        └── Degradation events (from D5)
         │
         ▼
 Project Cash Flow → Financial KPIs
 ```
 
-### 11.4 Single Source of Truth for Value
+### 11.4 Two Sources of Truth for Value
 
 | Value category | Source of truth |
 |---|---|
 | **Behind-the-meter savings** | **Domain 2 — Tariff engine** |
-| **Market revenues** | **Domain 4 — Revenue attribution per value stream** |
+| **Market revenues** | **Domain 4 — Revenue attribution per value stream**, settled through market adapters |
 
 **Peak shaving is a special case.** The economic value of peak reduction is a tariff saving, computed **only** by the tariff engine.
 
@@ -617,12 +639,12 @@ Project Cash Flow → Financial KPIs
 | Direction | Category | Items |
 |---|---|---|
 | **Inputs** | Operational | Dispatch results, energy shifted, peak reduction, DR performance, regulation service |
-| **Inputs** | Degradation | Augmentation events, replacement events, physical cost basis |
+| **Inputs** | Degradation | Augmentation events, replacement events, physical event information |
 | **Inputs** | Tariff Bill Outputs | Bill with and without BESS (from Domain 2) |
 | **Inputs** | Financial Assumptions | Discount rate, escalation rates, contract term, incentive schedules |
 | **Inputs** | Financing | Debt parameters for equity IRR |
 | **Inputs** | Tax | Tax and incentive parameters |
-| **Inputs** | Cost Data | CAPEX, OPEX, O&M costs, replacement costs |
+| **Inputs** | Cost Data | CAPEX, OPEX, O&M costs, replacement costs (via Scenario Management) |
 | **Outputs** | Revenue | Annual revenue by stream, annual savings |
 | **Outputs** | Costs | Annual costs, demand charge savings |
 | **Outputs** | Cash Flow | Annual net cash flow |
@@ -633,6 +655,8 @@ Project Cash Flow → Financial KPIs
 | Answers | Does Not Answer |
 |---|---|
 | What economic value results from the modeled project behavior? | How does the battery physically operate? |
+
+**Reference.** Detailed conceptual engineering: `A.2.6-FIN-ENG-001` v0.2.
 
 ---
 
@@ -665,13 +689,15 @@ Convert the analytical system into an **executable and usable software product**
 | **Outputs** | Financial Results | Revenue breakdowns, cash flows, NPV, IRR, payback |
 | **Outputs** | Comparison | Scenario comparison views |
 | **Outputs** | Reporting | Dashboards, exportable reports (PDF/Excel) |
-| **Outputs** | Audit | Data lineage, execution logs, traceability |
+| **Outputs** | Execution and lineage records | Basic execution logs, data lineage |
 
 ### 12.4 Boundary
 
 | Answers | Does Not Answer |
 |---|---|
 | How does the user provide information, execute models, and consume results? | The underlying BESS, operational, optimization, degradation, or financial logic |
+
+**Reference.** Detailed conceptual engineering: `A.2.7-DATA-APP-ENG-001` v0.2.
 
 ---
 
@@ -687,13 +713,14 @@ Convert the analytical system into an **executable and usable software product**
 | **Load & Market** | **All domains** | **External Context signals (Generation, Grid, Load, Market)** |
 | Load & Market | Financial | **Bill with and without BESS** — source of truth for behind-the-meter savings |
 | Operational | Dispatch | Operational requirements and service-level metrics |
-| Dispatch | Degradation | Battery usage |
-| Degradation | Dispatch | Updated capacity, **marginal degradation cost** |
-| Dispatch | Financial | Dispatch results and market revenue attribution |
+| Dispatch | Degradation | Battery power trajectory, SOC trajectory |
+| Degradation | Dispatch | Updated SOH, available capacity, **marginal degradation cost** |
+| Dispatch | Financial | Dispatch schedule, SOC trajectory, operational attribution basis |
 | Dispatch | Load & Market | **Net load (post-dispatch)** for tariff engine |
-| Degradation | Financial | Augmentation and replacement events |
-| Scenario / Financial assumptions | Degradation | Replacement cost (scenario input) |
+| Degradation | Financial | Augmentation events, replacement events, physical event information |
+| Scenario Management | Degradation | Replacement cost (scenario input) |
 | **Scenario Management** | **All domains** | **Project Configuration (standalone / co-located / BTM / FTM / AC-DC coupling)** |
+| Market Adapters | Financial | Settled market quantities |
 | Financial | Application | Financial KPIs and economic outputs |
 | All domains | Data & Application | Data contracts and execution interfaces |
 | Validation | All domains | Validation criteria and evidence |
@@ -749,7 +776,7 @@ The External Context enters this loop through Domain 2's signals (`SYS-STR-FRM-0
 | 4 | Dispatch & Optimization | Coordination layer | Physical, external, operational, degradation, value signals, System Context | Dispatch, SOC trajectory, net load, attribution | How to coordinate objectives |
 | 5 | Degradation Engineering | Capability evolution | Operating history, environmental, physical, replacement cost (scenario) | SOH, capacity, marginal degradation cost, events | How usage changes the battery |
 | 6 | Financial Engineering | Economic translation | Operational outputs, degradation, bill outputs, financial assumptions | Revenue, costs, cash flow, NPV, IRR | What value results |
-| 7 | Data & Application Engineering | Execution and delivery | All data and models | Dashboards, reports, exports, audit | How users interact with the system |
+| 7 | Data & Application Engineering | Execution and delivery | All data and models | Dashboards, reports, exports, execution and lineage records | How users interact with the system |
 
 ---
 
@@ -773,8 +800,8 @@ The External Context enters this loop through Domain 2's signals (`SYS-STR-FRM-0
 
 ### Financial Methodology
 - Exact cash-flow formulation
-- Tax treatment — default: pre-tax; see `SYS-STR-FRM-001` §12.2 D9 and PH-008
-- Financing structure — default: project IRR primary; equity IRR computed with default debt parameters, configurable by the user; see `SYS-STR-FRM-001` §12.2 D8 and PH-007
+- Tax treatment — default: pre-tax; see **PH-043**
+- Financing structure — default: project IRR primary; equity IRR computed with default debt parameters, configurable by the user; see **PH-042**
 - Specific financial assumptions
 
 ### UI
@@ -802,7 +829,10 @@ Seven Engineering Domains
         ▼
 STEP A.2
 Conceptual Engineering per Domain
-(seven chapters, consolidated or standalone)
+(seven chapters: A.2.1–A.2.7)
+        │
+        ▼
+STAGE A CONSOLIDATION AUDIT
         │
         ▼
 STEP B
@@ -861,27 +891,35 @@ This provides the correct **eagle-eye baseline** before entering the detailed co
 
 ## 20. Next Steps
 
-**Current state:**
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.1) |
-| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) — patch applied |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.2) — §24 patched |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ **Development Baseline (v0.7)** — §28 patched |
-| 5 | A.2.5 | Degradation Engineering | ⏭ **Next** |
-| 6 | A.2.6 | Financial Engineering | ⏭ Pending |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
-**A.2.4 v0.7 status.** A.2.4 is a **Development Baseline**. It will not be promoted to v0.8 for reference corrections alone. If A.2.5 reveals a real interface incompatibility between Dispatch and Degradation, the correction is applied with explicit traceability.
+**A.2.4 v0.9 status.** A.2.4 remains a **Development Draft** pending ENGIE clarification responses (**PH-001**, **PH-002**, **PH-034**, **PH-036**, **PH-040**). It will be promoted to v1.0 BASELINE once those items are resolved.
 
-**Immediate next document:** `A.2.5 — Degradation Engineering`, which closes the Dispatch ↔ Degradation interface and uses Register IDs **PH-043**, **PH-044**, **PH-045**.
+**Stage A.2 is conceptually and formally complete.** All seven domains have been defined at the conceptual engineering level, with consistent versions, unified PH IDs, correct cross-references, updated Next Steps, and PH addenda.
+
+**Immediate next step:** `Stage A Consolidation Audit`, which verifies:
+- All PH IDs across the seven documents are consistent
+- All cross-references between documents are correct
+- All interfaces are coherent
+- All versions are aligned
+
+**After consolidation audit:** `Stage B — System Architecture (HLD)`.
 
 ---
 
 ## Addendum: Phase 1 Clarification & Data Request Register
 
-Clarification requests previously listed in this document are now consolidated in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001`), the authoritative source for all Phase 1 clarifications across the seven domains and the Strategy.
+Clarification requests previously listed in this document are now consolidated in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), the authoritative source for all Phase 1 clarifications across the seven domains and the Strategy.
 
 The items formerly in this addendum correspond to the following Register IDs:
 
@@ -897,11 +935,56 @@ The items formerly in this addendum correspond to the following Register IDs:
 
 New clarification items (if any) should be added to the Register, not to this document.
 
+**Related Register items across the seven domains:**
+
+| Register ID | Topic | Primary domain |
+|---|---|---|
+| **PH-001** | Target market(s) | Strategy, Domain 2 |
+| **PH-002** | BTM vs. FTM scope | Strategy, Domain 2 |
+| **PH-003** | Data availability | Domain 1, Domain 2 |
+| **PH-004** | Solver licensing | Domain 7 |
+| **PH-005** | Benchmark data and tools | Domain 6, Domain 7 |
+| **PH-006** | Acceptance thresholds | Strategy, all domains |
+| **PH-007** | Commercial perspective | Domain 6 |
+| **PH-012** | Users and handover | Domain 7 |
+| **PH-015** | Battery data | Domain 1, Domain 5 |
+| **PH-016** | SOC bounds and warranty | Domain 1, Domain 5 |
+| **PH-017** | SOC window behavior under degradation | Domain 1, Domain 5 |
+| **PH-018** | Multi-cohort aggregation | Domain 5 |
+| **PH-021** | Power factor penalties / kVAR charges | Domain 2, Domain 3 |
+| **PH-026** | BESS sizing vs. evaluation | Domain 4 |
+| **PH-027** | Primary model purpose / use case | Domain 4 |
+| **PH-028** | Model output granularity | Domain 4 |
+| **PH-032** | Financial objective inside dispatch | Domain 5 |
+| **PH-033** | Perfect foresight vs. forecast-based dispatch | Domain 4 |
+| **PH-034** | Dispatch methodology | Domain 4 |
+| **PH-035** | Realization factor | Domain 6 |
+| **PH-036** | Degradation feedback time scale | Domain 5 |
+| **PH-038** | Degradation feedback time scale (confirmatory) | Domain 5 |
+| **PH-040** | Representative-period scheme and ratchets | Domain 4 |
+| **PH-041** | Voltage regulation coupling | Domain 3, Domain 4 |
+| **PH-042** | Financing structure | Domain 6 |
+| **PH-043** | Degradation model fidelity / tax treatment | Domain 5, Domain 6 |
+| **PH-044** | Augmentation policy | Domain 5 |
+| **PH-045** | Replacement policy | Domain 5 |
+| **PH-046** | Databricks environment | Domain 7 |
+| **PH-047** | Reporting requirements | Domain 7 |
+| **PH-048** | Audit / lineage / traceability scope | Domain 7 |
+| **PH-050** | Load forecasting method | Domain 2 |
+| **PH-051** | Load forecasting home | Domain 2 |
+| **PH-052** | Scenario granularity | Domain 2 |
+| **PH-053** | Market adapter scope | Domain 2 |
+| **PH-054** | Time resolution | Domain 2 |
+| **PH-055** | Presentation of value (BTM mapping convention) | Domain 3, Domain 6 |
+
+**Note.** Items are assigned IDs in `PH1-REG-001` v1.1. The Register is the authoritative source; this table is a consolidated view across the seven domains.
+
 ---
 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.1 — System Component Definition (Eagle-Eye View)
+**Status:** Stage A — Engineering Definition — **Consolidated Baseline (v0.6)**
 **Duration:** 12 Weeks
 **Language:** English
 
