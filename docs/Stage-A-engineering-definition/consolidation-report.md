@@ -504,29 +504,3 @@ Lines: 534
 *End of Stage A Consolidation Report*
 
 ---
-
-## Siguiente paso
-
-**Guarda este documento** como `docs/Stage-A-engineering-definition/consolidation-report.md` (actualizado) y haz commit + push.
-
-```bash
-# 1. Guardar el documento (pegar el contenido)
-nano docs/Stage-A-engineering-definition/consolidation-report.md
-# (pegar contenido, Ctrl+O, Enter, Ctrl+X)
-
-# 2. Verificar
-wc -l docs/Stage-A-engineering-definition/consolidation-report.md
-head -20 docs/Stage-A-engineering-definition/consolidation-report.md
-
-# 3. Commit
-git add docs/Stage-A-engineering-definition/consolidation-report.md
-git commit -m "docs(stage-a): update consolidation report to v1.1
-
-Reflects final Stage A closure state:
-- Register materialized (PH1-REG-001 v1.1, 55 items)
-- Register coverage verified (0 orphan PH IDs)
-- Git repository state documented (12 commits, tag)
-- All cross-references verified
-- Baseline freeze declared
-- Authorization for Stage B"
-
