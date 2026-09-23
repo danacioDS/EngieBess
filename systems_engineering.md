@@ -1,650 +1,403 @@
-# Engineering Method for the Project
-## BESS Operational & Financial Modeling — ENGIE
+# BESS Operational & Financial Modeling Platform
+## Delivery Strategy & Engineering Definition Framework
+
+**Prepared for:** ENGIE  
+**Engagement:** BESS Operational & Financial Modeling Consultant — 12 Weeks  
+**Document Type:** Delivery Strategy & Methodology Proposal  
+**Language:** English
 
 ---
 
-## 0. Guiding Principle
+## 1. Executive Summary
 
-This project builds a traceable engineering system that is **partly phased and partly iterative**:
+ENGIE is not commissioning a standalone BESS model. ENGIE is commissioning a **software platform for operational and financial evaluation of Battery Energy Storage System projects**, intended to support business development, project evaluation, and value demonstration to both external clients and internal stakeholders.
 
-```
-REQUIREMENT → ENGINEERING → SPECIFICATION → IMPLEMENTATION → VALIDATION
-```
+The distinction is critical. A BESS model produces numbers. A BESS evaluation platform must:
 
-Each stage produces the inputs for the next, but stages overlap where the work is empirical (forecasting, optimization).
+- Ingest heterogeneous technical, load, market, and financial data
+- Forecast electricity consumption
+- Simulate the physical behavior of the battery system
+- Optimize dispatch across multiple revenue streams
+- Model degradation as a dynamic state of the system
+- Translate operational results into financial performance
+- Support scenario comparison and reporting
 
-**Prototype/spike work is exploratory.** It is performed before the production specification solely to resolve uncertainty. Prototypes are not production code and are not delivered as part of the solution.
+This document defines the **delivery strategy and engineering definition framework** that will structure the 12-week engagement. It establishes the conceptual, methodological, and architectural foundation required before implementation begins.
 
----
+The core principle of this strategy is:
 
-## 1. Methodological Sequence
+> **Define the engineering model first. Architect the system second. Implement the software third.**
 
-```
-ENGIE REQUIREMENTS
-       │
-       ▼
-STAGE 0 — METHODOLOGY & PROJECT MANAGEMENT SETUP
-       │
-       ▼
-STAGE 0.5 — REQUIREMENTS & SCOPE DEFINITION
-       │
-       ▼
-CONCEPTUAL ENGINEERING
-       │
-       ├── BESS / Physical Engineering
-       ├── Market Engineering
-       ├── Data & Forecasting Engineering
-       └── Financial Engineering
-       │
-       ▼
-BASIC ENGINEERING
-       │
-       ▼
-DETAILED ENGINEERING
-       │
-       ▼
-PRODUCT SPECIFICATION
-       │
-       ├── Engineering Specification
-       ├── Functional Requirements
-       ├── Technical Requirements
-       ├── Interfaces
-       ├── Validation / Acceptance
-       │
-       └── Implementation & Work Breakdown
-           ├── WBS
-           ├── OBS
-           └── CBS
-       │
-       ▼
-IMPLEMENTATION PLANNING
-       │
-       ▼
-IMPLEMENTATION
-       │
-       ├── AI-assisted implementation with human review
-       ├── Code
-       ├── Tests
-       └── Deployment
-       │
-       ▼
-CONTINUOUS VALIDATION
-       │
-       ▼
-UAT / DEPLOYMENT
-```
-
-**Parallel tracks:**
-- **Prototype / Spike Track (Weeks 1–4):** Data and solver feasibility, forecasting baseline. Feeds Basic and Detailed Engineering.
-- **Requirements Traceability, Assumptions, Decisions, Change Control:** Active across all stages.
-- **Validation / Testing:** Runs continuously throughout the project.
-
-**Execution model:** The methodology is stage-gated at the baseline level, but execution is iterative within and across domains. Domains (BESS, Market, Data, Financial) progress through the stages on their own timelines, not in a single sequential pass.
+This sequence protects ENGIE from the most common failure mode in analytical platform delivery: building software before the underlying model is fully defined and validated.
 
 ---
 
-## 2. Method Stages
+## 2. Product Intent
 
-### STAGE 0 — Methodology & Project Management Setup
+The product is a **BESS Operational & Financial Modeling Platform**.
 
-**Objective:** Establish the working framework and project controls.
+Its purpose is to answer a single class of questions:
 
-**Actions:**
-- Define the engineering flow (Section 1).
-- Define the deliverables per stage.
-- Define the transition criteria between stages (time-boxed gate reviews).
-- Capture the initial scope baseline from the ENGIE PDF.
-- Set up on Day 1:
-  - Baseline WBS (project work breakdown; refined in Stage 4)
-  - Risk register
-  - Change control process
-  - Assumptions register
-  - Decision log
-  - Requirements Traceability Matrix (RTM)
-- Agree with ENGIE the gate review turnaround and auto-proceed rule (Section 4).
+> Given a BESS configuration, a client load profile, a set of market rules, and a set of financial assumptions, what is the operational and financial performance of the project under different scenarios?
 
-**Deliverable:** Project Methodology & Project Management Plan.
+The platform must connect, in a coherent and auditable chain:
 
-**Exit criterion:** Approved by ENGIE at the **Scope Gate (end of Week 1)**, merged with Stage 0.5.
+```
+Data → Forecast → Physical BESS Model → Dispatch → Degradation
+     → Revenue Stacking → Financial Model → Scenarios → Results
+```
+
+This chain is the backbone of the entire solution. Every component, interface, and deliverable must serve it.
 
 ---
 
-### STAGE 0.5 — Requirements & Scope Definition
+## 3. System Boundary
 
-**Objective:** Frame the biggest open questions before engineering begins. Establish the scope baseline.
+### 3.1 In Scope
 
-**Key questions to resolve:**
-
-| Question | Why it matters |
-|----------|----------------|
-| Who uses the tool? | Investment analyst, asset operator, or trader. Drives UI, outputs, validation. |
-| Planning/investment tool or operational support? | Determines whether dispatch is advisory or real-time. |
-| Which market or jurisdiction? | ERCOT, CAISO, a European TSO, Chile's SEN — each has different rules, products, and prices. |
-| Which value streams are in scope? | Peak shaving and demand response are typically behind-the-meter; energy arbitrage and frequency regulation are typically front-of-meter; voltage regulation is often not a paid market. |
-| What data exists and can it be accessed? | A data availability check is a prerequisite for forecasting and optimization. |
-
-**Deliverable:** Requirements & Scope Definition Document, including:
-- Users and use cases
-- Jurisdiction and market scope
-- Value streams in scope / out of scope
-- Data availability and access assessment (what exists, who provides it, in what format, by when)
-- High-level acceptance criteria
-- Validation benchmarks, for example:
-  - Perfect-foresight revenue upper bound
-  - Historical backtest
-  - Reconciliation against ENGIE's existing tool or spreadsheet
-  - Cross-check against physical limits (SOC bounds, cycle counts)
-
-**Exit criterion:** Approved by ENGIE at the **Scope Gate (end of Week 1)**, merged with Stage 0. **Scope baseline established.** Changes after this point are managed through change control.
-
----
-
-### STAGE 1 — Conceptual Engineering
-
-**Question it answers:** What is the product and what must it represent?
-
-**Objective:** Build the complete conceptual model of the product across the four domains and their relationships. Architecture constraints (Databricks, Python) are captured here.
-
-**Document structure:**
-
-```
-1. Product Engineering Scope
-2. BESS / Physical Engineering
-   2.1 Concepts
-   2.2 Entities
-   2.3 States
-   2.4 Parameters
-   2.5 Constraints
-   2.6 Behaviors
-3. Market Engineering
-   3.1 Markets
-   3.2 Market Products
-   3.3 Market Rules
-   3.4 Prices & Signals
-   3.5 Revenue Streams
-   3.6 Revenue Stacking
-4. Data & Forecasting Engineering
-   4.1 Data Sources
-   4.2 Time Series
-   4.3 Forecasts
-   4.4 Scenarios
-   4.5 Data Quality
-   4.6 Uncertainty
-5. Financial Engineering
-   5.1 CAPEX
-   5.2 OPEX
-   5.3 Revenues
-   5.4 Degradation Cost
-   5.5 Cash Flow
-   5.6 Investment Metrics
-   5.7 Sensitivity / Scenarios
-6. Cross-Domain Relationships
-7. Engineering Inputs / Outputs
-8. Architecture Constraints (Databricks, Python, solver implications)
-9. Engineering Questions
-```
-
-**Domains to cover:**
-
-**A. BESS / Physical Engineering**
-- What must the model represent for it to be physically valid as a BESS?
-- Entities: Battery, PCS, Energy Capacity, Power Capacity, SOC, SOH, Efficiency, Degradation, Availability, Operating Limits, Operating States, Constraints.
-
-**B. Market Engineering**
-- In which markets can the BESS operate, under what rules and economic opportunities?
-- Value streams: Peak Shaving, Demand Response, Energy Arbitrage, Frequency Regulation, Voltage Regulation.
-- The specific market or jurisdiction defined in Stage 0.5 is named here.
-
-**C. Data & Forecasting Engineering**
-- What information does the model need, and how does it represent data, forecasts, and scenarios?
-- Includes load forecasting, price forecasting, data quality, missing data, uncertainty.
-
-**D. Financial Engineering**
-- How is the operational behavior of the BESS transformed into financial results?
-- Includes CAPEX, OPEX, revenues, degradation cost, cash flow, financing, investment metrics (NPV, IRR, payback), sensitivity.
-
-**Cross-domain relationships:**
-
-```
-                 DATA
-              /    │    \
-             ▼     ▼     ▼
-          BESS   MARKET FINANCIAL
-             │     │     │
-             └─────┼─────┘
-                   ▼
-          INVESTMENT ANALYSIS
-```
-
-```
-BESS PHYSICAL
-      │ physical constraints
-      ▼
-MARKET
-      │ dispatch / prices / revenues
-      ▼
-FINANCIAL
-      │ economic result
-      ▼
-INVESTMENT ANALYSIS
-```
-
-**Deliverable:** Document **BESS Operational & Financial Modeling — Conceptual Engineering**.
-
-**Exit criterion:** The four domains are conceptually defined, their relationships are mapped, architecture constraints are captured, and no fundamental questions remain unresolved.
-
----
-
-### STAGE 2 — Basic Engineering
-
-**Question it answers:** How must it work?
-
-**Objective:** Transform the concepts from Conceptual Engineering into functional models (without equations or code).
-
-**Transformation example:**
-
-Conceptual:
-```
-SOC
-```
-
-Basic Engineering:
-```
-SOC Model
-├── Inputs
-├── State
-├── Calculation
-├── Constraints
-├── Outputs
-└── Operating Behavior
-```
-
-Conceptual:
-```
-Revenue Stacking
-```
-
-Basic Engineering:
-```
-Revenue Stack Model
-├── Market A
-├── Market B
-├── Market C
-├── Priority Rules
-├── Dispatch Allocation
-├── Conflicts
-└── Revenue Calculation
-```
-
-**Models to define:**
-
-```
-BESS → Models
-Market → Models
-Data → Models
-Financial → Models
-```
-
-**Interactions between models:**
-- How the dispatch model consumes the market model
-- How the degradation model affects the financial model
-- How forecasting feeds the optimizer
-
-**Deliverable:** Document **Basic Engineering — Functional Models**.
-
-**Exit criterion:** Each model has defined inputs, outputs, behavior, and relationships.
-
----
-
-### STAGE 3 — Detailed Engineering
-
-**Question it answers:** How is it built exactly?
-
-**Objective:** Reach the construction level. The design is complete enough to hand off with the instruction: "Build exactly this."
-
-**Structure per model:**
-
-```
-SOC MODEL
-   │
-   ├── Equations
-   ├── Parameters
-   ├── State Variables
-   ├── Boundary Conditions
-   ├── Constraints
-   ├── Algorithm
-   ├── Inputs
-   ├── Outputs
-   └── Validation Tests
-```
-
-**Apply to:**
-- BESS models (SOC, SOH, degradation, efficiency, limits)
-- Market models (prices, dispatch, revenue stacking)
-- Forecasting models (load, price, renewables)
-- Financial models (cash flow, NPV, IRR)
-- Optimization (LP, MILP, heuristic, hybrid)
-- Interfaces between models
-
-**Deliverable:** Document **Detailed Engineering — Model Specifications**.
-
-**Exit criterion:** Each model has equations, parameters, algorithms, interfaces, and validation tests defined.
-
----
-
-### STAGE 4 — Product Specification
-
-**Question it answers:** What exactly is the product that will be built?
-
-**Objective:** Consolidate the results of Detailed Engineering into an integrated product baseline.
-
-**Detailed Engineering → technical truth.**
-**Product Specification → integrated product baseline.**
-
-**Structure:**
-
-```
-PRODUCT SPECIFICATION
-│
-├── 1. Product Definition
-├── 2. System Scope & Boundaries
-├── 3. BESS Engineering Specification
-├── 4. Market Engineering Specification
-├── 5. Data & Forecasting Specification
-├── 6. Financial Engineering Specification
-├── 7. Model Specifications
-├── 8. Functional Requirements
-├── 9. Technical Requirements
-├── 10. Data Requirements
-├── 11. Interfaces
-├── 12. Validation Requirements
-├── 13. Acceptance Criteria
-├── 14. Architecture
-└── 15. Implementation & Work Breakdown
-    15.1 WBS
-    15.2 OBS
-    15.3 CBS
-```
-
-**WBS — Work Breakdown Structure**
-Baselined in Stage 0; refined in Stage 4.
-
-```
-BESS Modeling Project
-├── Project Management
-│   ├── Risk Management
-│   ├── Change Control
-│   └── Stakeholder Communication
-├── Requirements & Scope
-├── BESS Engine
-├── Market Engine
-├── Data Engine
-├── Forecasting
-├── Financial Engine
-├── Optimization
-├── Integration
-└── Validation
-```
-
-**OBS — Organization Breakdown Structure**
-```
-Project
-├── BESS Engineering
-├── Market Engineering
-├── Data Engineering
-├── Financial Engineering
-├── Software Engineering
-└── Validation
-```
-
-**CBS — Cost Breakdown Structure**
-The CBS tracks actual cost against the contract budget.
-
-```
-Project Cost
-├── Engineering
-├── Development
-├── Infrastructure
-├── Testing
-├── Deployment
-└── Support
-```
-
-**Deliverable:** Complete **Product Specification** document.
-
-**Exit criterion:** Specification approved by ENGIE. Refined WBS, OBS, and CBS defined.
-
----
-
-### STAGE 5 — Implementation Planning
-
-**Question it answers:** How is construction executed?
-
-**Objective:** Transform the Product Specification into executable implementation units with full traceability.
-
-**Sequence:**
-
-```
-PRODUCT SPECIFICATION
-        ↓
-WBS
-        ↓
-WORK PACKAGE
-        ↓
-ENGINEERING REQUIREMENT
-        ↓
-TECHNICAL DESIGN
-        ↓
-IMPLEMENTATION UNIT
-        ↓
-AI PROMPT (with human review)
-        ↓
-CODE
-        ↓
-TEST
-```
-
-**Traceability example:**
-
-```
-WBS
-└── BESS Engine
-     └── SOC Model
-          └── SOC Calculation
-               ├── Requirements
-               ├── Equations
-               ├── Inputs
-               ├── Outputs
-               ├── Constraints
-               └── Tests
-                        ↓
-                  AI PROMPT
-                        ↓
-                     CODE
-                        ↓
-                     TEST
-```
-
-**Deliverable:** Implementation Plan with Work Packages, Implementation Units, and Prompts.
-
-**Exit criterion:** Each implementation unit is traceable back to an ENGIE requirement through the RTM.
-
----
-
-### STAGE 6 — Implementation & Continuous Validation
-
-**Objective:** Build, test, deploy, and validate the product.
-
-**Activities:**
-- Development of the Python engine
-- Construction of the Databricks App
-- Data pipelines (ingestion, transformation, validation)
-- Forecasting models
-- Multi-value-stream operational models
+- BESS technical and operational modeling
+- Load ingestion and forecasting
+- Market and revenue stream modeling
 - Dispatch optimization and revenue stacking
-- Degradation models
-- Integration with financial calculations
-- Interactive dashboards
-- Technical and methodological documentation
-- Training for stakeholders
+- Battery degradation modeling
+- Financial performance calculation
+- Scenario configuration and comparison
+- Interactive dashboards and exportable reporting
+- Data ingestion, validation, transformation, and processing pipelines
+- Documentation, training, and handover
 
-**Validation:**
-- Model validation against the benchmarks defined in Stage 0.5
-- Continuous validation: automated tests plus benchmark regression runs on each build
-- User Acceptance Testing (UAT)
-- Final deployment
+### 3.2 Out of Scope (to be confirmed in Phase 1)
 
-**Deliverable:** Complete solution, documentation, training, deployment.
+- Real-time operational control of physical assets
+- SCADA or EMS integration
+- Trading execution or market bidding submission
+- Procurement or hardware selection
+- Grid interconnection studies
 
-**Exit criterion:** UAT approved by ENGIE. Solution in production.
+### 3.3 Market Scope Ambiguity — Phase 1 Clarification Required
 
----
+The RFP references multiple market constructs — LMP, PJM RegD, ERCOT Fast Frequency Response, capacity markets, ancillary services, demand response programs — without specifying a single target market.
 
-### PROTOTYPE / SPIKE TRACK (Weeks 1–4)
+This is a **material ambiguity**. Market rules drive eligibility, dispatch logic, settlement, and revenue calculation. The architecture must therefore separate:
 
-**Objective:** Resolve uncertainty before the affected models are specified.
+- A **generic BESS engine** (physics, degradation, dispatch)
+- **Market-specific adapter modules** (rules, settlement, revenue mechanisms)
 
-**Activities:**
-- Data quality and modeling-suitability assessment (following the Stage 0.5 data availability and access check)
-- Forecasting baseline prototype
-- Optimization / solver feasibility test
-- Architecture constraint validation (Databricks, Python)
-
-**Deliverable:** Prototype Findings Report, including:
-- Data quality and modeling-suitability assessment
-- Solver feasibility result (LP, MILP, heuristic, or hybrid)
-- Forecasting baseline results
-- Confirmed or revised architecture constraints
-
-**Interim checkpoint (end of Week 2):** Early data and solver findings are delivered to the Basic Engineering team before the affected models are drafted.
-
-**Exit criterion:** Findings are documented and fed back into Basic Engineering (Stage 2) and Detailed Engineering (Stage 3).
+This separation will be formalized in Phase 1 and confirmed with ENGIE stakeholders.
 
 ---
 
-## 3. Complete Method Map
+## 4. Delivery Philosophy
+
+The engagement will follow a four-stage definition and delivery strategy:
+
+| Stage | Name | Purpose |
+|---|---|---|
+| **A** | Engineering Definition | Define what the system must calculate and under what rules |
+| **B** | System Architecture | Define how the engineering model is represented computationally |
+| **C** | Product Specification | Consolidate requirements, models, architecture, interfaces, validation |
+| **D** | Implementation | Build, test, validate, deploy |
+
+This sequence is deliberate. It ensures that:
+
+- The physical and operational model is correct before software is written
+- The architecture reflects the engineering reality, not the other way around
+- The specification is complete before implementation begins
+- Validation is defined before results are produced
+
+---
+
+## 5. Stage A — Engineering Definition
+
+Stage A defines the engineering content of the platform. It is the foundation on which all subsequent stages depend.
+
+### 5.1 BESS Engineering
+
+The physical and operational model of the battery system, including:
+
+- Battery capacity (kWh) and power rating (kW)
+- State of Charge (SOC) and State of Health (SOH)
+- Charge/discharge behavior
+- Round-trip efficiency
+- C-rate
+- Ramp rate
+- Minimum and maximum SOC
+- Minimum rest periods
+- Inverter behavior
+- AC/DC considerations
+- Reactive power and apparent power
+- Operating limits
+- Thermal effects
+- Degradation
+- Capacity augmentation and replacement thresholds
+
+### 5.2 Load & Demand Engineering
+
+The client-side model, including:
+
+- Interval meter data (15-minute or hourly)
+- Historical demand profiles
+- Peak demand
+- Load forecasting
+- Baseline definition
+- Demand charge structure
+
+### 5.3 Market & Revenue Engineering
+
+Each value stream is modeled as an **operational service governed by market or program rules**, not merely as a revenue function. Each stream must define:
+
+- Objective
+- Inputs
+- Constraints
+- Dispatch logic
+- Revenue mechanism
+- Performance metrics
+- Settlement logic
+- Costs
+- Interactions with other services
+
+Value streams in scope:
+
+- Peak Shaving
+- Demand Response
+- Energy Arbitrage
+- Frequency Regulation
+- Voltage Regulation
+- Other applicable BESS value streams
+
+### 5.4 Dispatch & Optimization Engineering
+
+The optimization layer determines the dispatch that maximizes economic value without violating physical or market constraints.
+
+Methodology options to be confirmed in Phase 1:
+
+- Rule-based heuristic
+- Linear Programming (LP)
+- Mixed-Integer Programming (MILP)
+- Hybrid approach
+
+The choice of methodology is a Phase 1 decision, not a Phase 2 assumption.
+
+### 5.5 Degradation Engineering
+
+Degradation is treated as a **dynamic state of the system**, not a post-processing cost.
+
+It includes:
+
+- Calendar aging (temperature, average SOC)
+- Cycle aging (depth of discharge, C-rate, temperature)
+- Equivalent full cycles
+- Remaining capacity (SOH%)
+- Augmentation and replacement triggers
+- Feedback loop into future dispatch feasibility
+
+### 5.6 Financial Engineering
+
+The financial model consumes operational outputs. It does not precede them.
+
+It includes:
+
+- Revenue by value stream
+- CAPEX
+- OPEX
+- Degradation costs
+- Cash flow
+- NPV
+- Project and equity IRR
+- Simple payback
+- Demand charge savings
+- Annual revenue breakdown
+
+---
+
+## 6. Stage B — System Architecture
+
+Stage B translates the engineering definition into a computational architecture.
+
+### 6.1 Architecture Layers
+
+| Layer | Description |
+|---|---|
+| Data Architecture | Ingestion, validation, transformation, schemas, data quality |
+| Model Architecture | Representation of BESS physics, load, degradation |
+| Optimization Architecture | Dispatch and revenue stacking logic |
+| Financial Architecture | Cash flow, NPV, IRR, scenario valuation |
+| Software Architecture | Python engine, Databricks App, PySpark, SQL |
+| Databricks Architecture | App layer, processing layer, storage layer |
+
+### 6.2 Core Principle
+
+The architecture must preserve the causal chain:
 
 ```
-                 ENGIE REQUIREMENTS
-                         │
-                         ▼
-              REQUIREMENTS & SCOPE BASELINE
-                         │
-                         ▼
-                CONCEPTUAL ENGINEERING
-                         │
-        ┌────────────────┼────────────────┐
-        ▼                ▼                ▼
-      BESS             MARKET            DATA
-        │                │                │
-        └────────────────┼────────────────┘
-                         ▼
-                     FINANCIAL
-                         │
-                         ▼
-                  BASIC ENGINEERING
-                         │
-                         ▼
-                 DETAILED ENGINEERING
-                         │
-                         ▼
-               PRODUCT SPECIFICATION
-                         │
-                         ▼
-              IMPLEMENTATION PLANNING
-                         │
-                         ▼
-                    IMPLEMENTATION
-                         │
-                         ▼
-                 CONTINUOUS VALIDATION
-                         │
-                         ▼
-                   UAT / DEPLOYMENT
+Physical Reality → Operational Reality → Business / Financial Reality
 ```
 
-**Parallel tracks across all stages:**
+Not the reverse. Financial outputs are derived from operational simulation, which is derived from physical modeling.
+
+---
+
+## 7. Stage C — Product Specification
+
+Stage C consolidates all definition work into a single, coherent specification.
+
+### 7.1 Specification Structure
+
+1. Product Definition
+2. Scope and Boundaries
+3. Users and Stakeholders
+4. System Use Cases
+5. BESS Engineering Specification
+6. Load Engineering Specification
+7. Market Engineering Specification
+8. Dispatch and Optimization Specification
+9. Degradation Specification
+10. Financial Engineering Specification
+11. Data Engineering Specification
+12. Software Architecture
+13. Reporting and Visualization
+14. Validation and Acceptance
+15. WBS / CBS / OBS
+
+### 7.2 Indicative Use Cases
 
 ```
-       ┌─────────────────────────────────┐
-       │ PROTOTYPE / SPIKE TRACK         │
-       │ Weeks 1–4                       │
-       └─────────────────────────────────┘
-
-       ┌─────────────────────────────────┐
-       │ REQUIREMENTS TRACEABILITY       │
-       │ + ASSUMPTIONS + DECISIONS       │
-       │ + CHANGE CONTROL                │
-       └─────────────────────────────────┘
-
-       ┌─────────────────────────────────┐
-       │ VALIDATION / TESTING            │
-       │ continuous throughout project   │
-       └─────────────────────────────────┘
+UC-01  Configure BESS
+UC-02  Upload load data
+UC-03  Configure tariff
+UC-04  Configure market assumptions
+UC-05  Forecast load
+UC-06  Simulate peak shaving
+UC-07  Simulate arbitrage
+UC-08  Simulate demand response
+UC-09  Optimize stacked dispatch
+UC-10  Simulate degradation
+UC-11  Calculate project revenues
+UC-12  Calculate NPV / IRR / payback
+UC-13  Compare scenarios
+UC-14  Generate report
 ```
 
-**Note on the four domains:** BESS, Market, and Data feed Financial. Financial is a peer domain that consumes outputs from the other three, not a downstream step beneath them.
+### 7.3 Work Breakdown Structure
+
+```
+1. BESS Modeling Platform
+├── 1.1 Requirements
+├── 1.2 BESS Engineering
+│   ├── 1.2.1 Battery model
+│   ├── 1.2.2 SOC model
+│   ├── 1.2.3 Efficiency model
+│   ├── 1.2.4 Inverter model
+│   └── 1.2.5 Degradation model
+├── 1.3 Load Engineering
+│   ├── 1.3.1 Data processing
+│   ├── 1.3.2 Load profile
+│   └── 1.3.3 Forecasting
+├── 1.4 Market Engineering
+│   ├── 1.4.1 Peak shaving
+│   ├── 1.4.2 Demand response
+│   ├── 1.4.3 Arbitrage
+│   ├── 1.4.4 Frequency regulation
+│   └── 1.4.5 Voltage regulation
+├── 1.5 Dispatch Optimization
+├── 1.6 Financial Engineering
+│   ├── 1.6.1 Revenue
+│   ├── 1.6.2 CAPEX
+│   ├── 1.6.3 OPEX
+│   ├── 1.6.4 Cash flow
+│   ├── 1.6.5 NPV
+│   ├── 1.6.6 IRR
+│   └── 1.6.7 Payback
+├── 1.7 Data Engineering
+├── 1.8 Software Engineering
+├── 1.9 Validation
+├── 1.10 UAT
+└── 1.11 Deployment & Training
+```
 
 ---
 
-## 4. Alignment with ENGIE Contract Phases
+## 8. Stage D — Implementation
 
-| ENGIE Phase | Weeks | Method Stage | Notes |
-|-------------|-------|--------------|-------|
-| Phase 1 – Design | 1–2 | Stage 0, Stage 0.5, Conceptual Engineering, start of Basic Engineering | Prototype track starts. WBS, risk register, change control set up Day 1. Scope Gate at end of Week 1. |
-| Phase 2 – Development | 3–9 | Basic Engineering (cont.), Detailed Engineering, Product Specification, Implementation Planning, Implementation | **Domains progress on their own timelines.** BESS engine leads; Market and Forecasting follow using spike findings. Implementation begins on a rolling basis as each domain passes its Detailed Gate. |
-| Phase 3 – Testing | 10–11 | Validation + UAT | Continuous validation during development reduces end-stage risk. |
-| Phase 4 – Deployment | 12 | Deployment + Documentation + Training | — |
+Stage D executes the specification.
 
-### Gate Table (Rolling Baselines by Domain)
+```
+Product Specification
+        ↓
+Engineering Specifications
+        ↓
+Implementation Tasks
+        ↓
+Python / PySpark / SQL
+        ↓
+Databricks App
+        ↓
+Tests
+        ↓
+UAT
+        ↓
+Deployment & Training
+```
 
-Gates are organized in two waves. Wave 1 covers the BESS engine (fewest unknowns). Wave 2 covers Market, Data/Forecasting, and Financial, informed by the spike findings.
+Implementation follows the 12-week timeline defined by ENGIE:
 
-| Gate | Week | Scope | What is approved |
-|------|------|-------|------------------|
-| **Scope Gate** | End of W1 | Project-wide | Stage 0 (methodology & PM setup) + Stage 0.5 (requirements, scope, data availability, acceptance criteria, validation benchmarks). Scope baseline established. |
-| **BESS Conceptual + Basic Gate** | End of W3 | BESS domain | Conceptual and Basic Engineering for the BESS engine. |
-| **BESS Detailed Gate** | End of W4 | BESS domain | Detailed Engineering for the BESS engine. **BESS implementation begins in W5.** |
-| **Market / Data / Financial Conceptual + Basic Gate** | End of W5 | Market, Data, Financial | Conceptual and Basic Engineering for the remaining domains, informed by spike findings. |
-| **Market / Data / Financial Detailed Gate** | End of W6 | Market, Data, Financial | Detailed Engineering for the remaining domains. |
-| **Integrated Specification Gate** | End of W6 | Project-wide | Consolidated Product Specification (integrated baseline, refined WBS/OBS/CBS, acceptance criteria). |
-| **Implementation Planning Gate** | End of W6 | Project-wide | Implementation Plan (work packages, implementation units, prompts, RTM linkage). Implementation proceeds on a rolling basis from W5 onward. |
-| **UAT Gate** | End of W11 | Project-wide | User Acceptance Testing results and benchmark validation. |
-| **Deployment Gate** | Start of W12 | Project-wide | Final delivery, deployment, documentation, training. Held at the start of W12 to allow the 3-business-day turnaround to complete within the contract. |
-
-**Rolling baselines:** An approved domain may begin implementation before the integrated Specification Gate closes. The Specification Gate consolidates the domains; it does not gate each domain's start.
-
-**Gate review turnaround:** Maximum 3 business days for ENGIE sign-off at each gate. If exceeded, the project proceeds on the current baseline with a documented assumption, subject to later revision. This rule is agreed with ENGIE in the contract or kickoff minutes.
-
-**Named approvers:** Each gate has a named ENGIE approver, confirmed at kickoff. The 3-day turnaround applies to that approver.
-
----
-
-## 5. Execution Principles
-
-1. **Traceability at the function/unit level.** The Requirements Traceability Matrix (RTM) links requirements to functions, units, and tests.
-2. **Stages are gated at the baseline level; execution is iterative within and across domains.** Domains progress through the stages on their own timelines, with rolling baselines.
-3. **Prototypes are exploratory.** They resolve uncertainty before the production specification. Prototypes are not production code and are not delivered as part of the solution.
-4. **Time-boxed gate reviews.** Each transition requires review and approval within a defined maximum turnaround, agreed with ENGIE.
-5. **AI-assisted implementation with human review.** Prompts are derived from the technical specification, and every implementation unit is traceable back to an ENGIE requirement.
-6. **Integrated and continuous validation.** Acceptance criteria and validation benchmarks are written alongside requirements. Each model has its own validation tests defined in Detailed Engineering. Continuous validation means automated tests plus benchmark regression runs on each build.
-7. **Project management from Day 1.** WBS, risk register, change control, assumptions register, and decision log are established in Stage 0. The WBS is baselined in Stage 0 and refined in Stage 4. The CBS tracks actual cost against the contract budget.
-8. **Living documentation.** Each stage produces documentation that feeds the next.
+| Phase | Weeks | Focus |
+|---|---|---|
+| 1 — Design | 1–2 | Requirements validation, architecture definition |
+| 2 — Development | 3–9 | Model and interface development |
+| 3 — Testing | 10–11 | Model validation, UAT |
+| 4 — Deployment | 12 | Final delivery, deployment, training |
 
 ---
 
-## 6. Open Items for the ENGIE Kickoff
+## 9. Phase 1 Clarification Items
 
-These items require ENGIE input and are confirmed at kickoff:
+The following items require explicit confirmation during Weeks 1–2:
 
-1. **Gate review turnaround and auto-proceed rule:** Confirmation of the maximum 3 business days for sign-off, and the contractual basis for proceeding on the current baseline if the turnaround is exceeded.
-2. **Named approvers per gate:** Identification of the ENGIE approver for each gate.
-3. **Data access:** Which datasets ENGIE provides, in what format, and by when.
-4. **Validation benchmarks:** Confirmation of the specific benchmarks (perfect-foresight upper bound, historical backtest, reconciliation against existing tools, physical limits cross-check).
-5. **Market/jurisdiction scope:** Confirmation of the specific market(s) and value streams in scope.
-6. **Users and use cases:** Confirmation of who uses the tool and whether it is a planning/investment tool or operational support.
+1. **Target market(s)** — Which ISO/RTO or jurisdiction defines the market rules?
+2. **Dispatch methodology** — Heuristic, LP, MILP, or hybrid?
+3. **Degradation model fidelity** — Empirical, semi-empirical, or vendor-data-driven?
+4. **Load forecasting method** — Statistical, ML-based, or provided by ENGIE?
+5. **Reporting format** — PDF, Excel, or both?
+6. **Scenario granularity** — How many scenarios, what dimensions?
+7. **Benchmark data** — What established benchmarks will be used for validation?
+8. **Data availability** — What historical data will ENGIE provide?
+9. **Market adapter scope** — Which markets must be supported at delivery?
+10. **Acceptance thresholds** — What accuracy and performance criteria define acceptance?
 
 ---
+
+## 10. Governance & Communication
+
+- Regular status meetings with stakeholders
+- Periodic progress reporting
+- Review sessions at key project milestones
+- Structured issue tracking and resolution channels
+- Formal sign-off at end of Phase 1, Phase 3, and Phase 4
+
+---
+
+## 11. Conclusion
+
+This delivery strategy establishes a disciplined, engineering-led approach to the ENGIE BESS Operational & Financial Modeling Platform engagement.
+
+The sequence — **Engineering Definition → System Architecture → Product Specification → Implementation** — ensures that the software built in Weeks 3–12 is correct by construction, because the model it implements has been fully defined, validated, and agreed before a single line of production code is written.
+
+The platform will connect data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation.
+
+---
+
+**Prepared by:** BESS Operational & Financial Modeling Consultant  
+**Engagement:** RFP-264144-1  
+**Duration:** 12 Weeks  
+**Language:** English
+
+---
+
+Would you like me to also produce:
+- A **one-page executive version** for ENGIE leadership
+- A **slide deck structure** for the Phase 1 kickoff
+- A **detailed Phase 1 work plan** with daily activities for Weeks 1–2
 
 
 
