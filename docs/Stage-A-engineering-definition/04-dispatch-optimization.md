@@ -16,7 +16,7 @@
 - `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
 - `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
-- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.3)
+- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.4)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 4 — Dispatch & Optimization Engineering

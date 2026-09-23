@@ -18,10 +18,10 @@
 - `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
 - `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
-- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.9)
-- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.3)
-- `A.2.6-FIN-ENG-001` — Financial Engineering (v0.2)
-- `A.2.7-DATA-APP-ENG-001` — Data & Application Engineering (v0.2)
+- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v1.0)
+- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.4)
+- `A.2.6-FIN-ENG-001` — Financial Engineering (v0.3)
+- `A.2.7-DATA-APP-ENG-001` — Data & Application Engineering (v0.3)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 ---
