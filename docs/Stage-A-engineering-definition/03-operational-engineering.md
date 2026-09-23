@@ -1,23 +1,21 @@
-
----
-
 # Operational Engineering
 ## Stage A.2.3 — Conceptual Engineering
 ### Value Stream Behavior of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.3-OPS-ENG-001
 
-**Version:** 1.2 — Conceptual Engineering Baseline (Closed)
+**Version:** 1.3 — Conceptual Engineering Baseline (Closed)
 
 **Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.6)
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.4)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.1)
-- `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.2)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.5)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
+- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 3 — Operational Engineering
 
@@ -182,7 +180,7 @@ This uniformity is deliberate. It ensures:
 - New value streams can be added without ad-hoc structure
 - Financial Engineering can attribute value per stream consistently
 
-**Terminology refinement relative to `SYS-ENG-DEF-001` v0.4.** This document uses **operational requirements** in place of the term *candidate actions*, which appears in `SYS-ENG-DEF-001` v0.4 §7.4 and §12. Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**. Scheduling is a Dispatch decision. The `SYS-ENG-DEF-001` terminology will be aligned in the next revision of that document.
+**Terminology refinement relative to `SYS-ENG-DEF-001` v0.5.** This document uses **operational requirements** in place of the term *candidate actions*, which appears in `SYS-ENG-DEF-001` v0.5 §7.4 and §12. Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**. Scheduling is a Dispatch decision. The `SYS-ENG-DEF-001` terminology will be aligned in v0.6.
 
 ---
 
@@ -384,7 +382,7 @@ Charge when prices are low and discharge when prices are high, subject to BESS o
 - How much to cycle (Dispatch decides)
 - Whether to prioritize arbitrage over other value streams (Dispatch decides)
 - What the arbitrage revenue is worth (Financial Engineering decides)
-- Whether perfect foresight or forecast-based dispatch applies (Phase 1 **D2**)
+- Whether perfect foresight or forecast-based dispatch applies (Phase 1 **PH-033**)
 - Whether to introduce a minimum spread threshold (Dispatch decides)
 - Whether to include marginal degradation cost in the objective (Dispatch decides)
 
@@ -496,7 +494,7 @@ Deliver reactive power (VAR) support within the inverter's capability, respectin
 | Voltage compliance | Must maintain voltage within bands |
 | **Reactive range** | The range of reactive power support the BESS is required to deliver |
 
-**Note on P² + Q² ≤ S².** Under default **D4** (`SYS-STR-FRM-001` §12.2), the initial scope represents the inverter envelope as a **fixed envelope**, without linearization of the nonlinear coupling. Linearizing the coupling is a **possible extension** if the target market and project configuration require it. This document declares the coupling as a physical fact; the choice of treatment is a Phase 1 / Stage B decision.
+**Note on P² + Q² ≤ S².** Under default **D4** (`SYS-STR-FRM-001` §12.2 / **PH-041**), the initial scope represents the inverter envelope as a **fixed envelope**, without linearization of the nonlinear coupling. Linearizing the coupling is a **possible extension** if the target market and project configuration require it. This document declares the coupling as a physical fact; the choice of treatment is a Phase 1 / Stage B decision.
 
 **Note on priority.** The **coupling** between active and reactive power is a physical fact and is declared here. The **priority** — whether reactive curtails active or vice versa when the envelope binds — is a **Dispatch decision** and is not declared in this document.
 
@@ -512,7 +510,7 @@ Deliver reactive power (VAR) support within the inverter's capability, respectin
 
 | Trap | Why It Matters |
 |---|---|
-| **P² + Q² ≤ S² is nonlinear** | If the optimization uses LP/MILP, the constraint must be linearized — this is an **extension under D4**, not in the initial scope |
+| **P² + Q² ≤ S² is nonlinear** | If the optimization uses LP/MILP, the constraint must be linearized — this is an **extension under PH-041**, not in the initial scope |
 | **Reactive vs. active priority** | Whether reactive curtails active determines whether the BESS can serve other value streams simultaneously — this is a Dispatch decision |
 | **Often uncompensated in BTM applications** | Value may be compliance-based or penalty-avoidance-based rather than revenue-based |
 | **Coupling with the inverter envelope from Domain 1** | Reactive power capability is not independent of active power |
@@ -523,7 +521,7 @@ Deliver reactive power (VAR) support within the inverter's capability, respectin
 - Whether reactive takes priority over active (Dispatch decides)
 - Whether to curtail active power (Dispatch decides)
 - What the service is worth (Financial Engineering decides, where compensated or where it avoids penalties)
-- Whether to linearize the P² + Q² ≤ S² coupling (Phase 1 / Stage B)
+- Whether to linearize the P² + Q² ≤ S² coupling (Phase 1 / Stage B, **PH-041**)
 
 ---
 
@@ -709,7 +707,7 @@ Attribution of value to value streams draws on **two sources of truth**, per `SY
 | Source of truth | What it produces | What it is attributed to |
 |---|---|---|
 | **Dispatch attribution** (Domain 4) | Market revenues: LMP arbitrage, frequency regulation, DR payments, capacity payments | Market value streams, per Dispatch attribution |
-| **Tariff engine** (Domain 2, `A.2.2` §9.8) | Behind-the-meter savings by **component of the bill**: demand charge savings, energy charge savings, export credits | Behind-the-meter value streams, per mapping convention below |
+| **Tariff engine** (Domain 2, `A.2.2` §9.8) | Behind-the-meter savings by **component of the bill**: demand charge savings, energy charge savings, export credits, power factor / kVAR savings | Behind-the-meter value streams, per mapping convention below |
 
 ### 15.2 Mapping Convention for Behind-the-Meter Savings
 
@@ -758,20 +756,22 @@ Operational Engineering does not perform attribution. It provides the **definiti
 | 3 | Treatment of DR event uncertainty (reserve vs. scenario) | **A.2.4** |
 | 4 | Frequency regulation statistical characteristics | **A.2.2** §8.3 (adapter supplies) |
 | 5 | Frequency regulation aggregation methodology | **Stage B/C** |
-| 6 | Whether voltage regulation is compensated | **B1** / **B2** (target market and configuration) |
-| 7 | Whether the P² + Q² ≤ S² coupling is linearized | Phase 1 / **D4** |
-| 8 | Whether behind-the-meter savings mapping convention is accepted by ENGIE | Phase 1 |
+| 6 | Whether voltage regulation is compensated | **PH-001** / **PH-002** |
+| 7 | Whether the P² + Q² ≤ S² coupling is linearized | Phase 1 / **PH-041** |
+| 8 | Whether behind-the-meter savings mapping convention is accepted by ENGIE | Phase 1 (**PH-055**) |
 
 ### 16.3 Phase 1 Clarification Dependencies
 
-This domain depends on the following Phase 1 items from `SYS-STR-FRM-001` §12:
+This domain depends on the following Phase 1 items from `PH1-REG-001` v1.1:
 
-- **B1** — Target market(s)
-- **B2** — Behind-the-meter vs. front-of-the-meter scope
-- **D1** — Dispatch methodology (affects how operational requirements are consumed)
-- **D2** — Perfect foresight vs. forecast-based dispatch
-- **D4** — Voltage regulation coupling
-- Additional items tracked in the **Phase 1 Clarification & Data Request Register** (see §24)
+- **PH-001** — Target market(s)
+- **PH-002** — Behind-the-meter vs. front-of-the-meter scope
+- **PH-033** — Perfect foresight vs. forecast-based dispatch
+- **PH-034** — Dispatch methodology (affects how operational requirements are consumed)
+- **PH-041** — Voltage regulation coupling
+- **PH-055** — Presentation of value (mapping convention)
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -903,10 +903,11 @@ These belong to Stages A.2.4, A.2.5, A.2.6, B, C, D, or to market adapters.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.6 | §5 Domain 3, §6.2 Causal Backbone, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
-| `SYS-ENG-DEF-001` v0.4 | §7 Domain 3, §4.1 Cross-cutting capabilities, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.1 | Physical capability interface, reactive power responsibility split | Yes |
-| `A.2.2-LOAD-MKT-ENG-001` v1.2 | External environment, regulation statistics, tariff engine, tariff element 11 (power factor penalties) | Yes |
+| `SYS-STR-FRM-001` v0.8 | §5 Domain 3, §6.2 Causal Backbone, §8.2 Validation, §12.1/12.2 Phase 1 items | Yes |
+| `SYS-ENG-DEF-001` v0.5 | §7 Domain 3, §4.1 Cross-cutting capabilities, §10.4 Single source of truth, §12 Inter-Domain Contract | Yes |
+| `A.2.1-BESS-ENG-001` v1.2 | Physical capability interface, reactive power responsibility split | Yes |
+| `A.2.2-LOAD-MKT-ENG-001` v1.3 | External environment, regulation statistics, tariff engine, tariff element 11 (power factor penalties) | Yes |
+| `PH1-REG-001` v1.1 | PH-001, PH-002, PH-033, PH-034, PH-041, PH-055 | Yes |
 | RFP-264144-1 | Peak Shaving, Demand Response, Energy Arbitrage, Frequency Regulation, Voltage Regulation | Yes |
 
 ---
@@ -925,13 +926,13 @@ These belong to Stages A.2.4, A.2.5, A.2.6, B, C, D, or to market adapters.
 | 8 | Minimum spread threshold for arbitrage | A.2.4 | Dispatch decision |
 | 9 | Frequency regulation statistical characteristics | A.2.2 / adapter | External signal |
 | 10 | Frequency regulation aggregation methodology | B / C | Methodological decision |
-| 11 | Time resolution for each value stream | B / **D14** | Architecture decision |
-| 12 | Whether voltage regulation is compensated | **B1** / **B2** | Scope decision |
+| 11 | Time resolution for each value stream | B / **PH-054** | Architecture decision |
+| 12 | Whether voltage regulation is compensated | **PH-001** / **PH-002** | Scope decision |
 | 13 | Attribution mechanism | A.2.4 | Dispatch decision |
 | 14 | Whether degradation consequences enter dispatch | A.2.4 | Dispatch decision |
-| 15 | Validation tolerances | C / **B5** | Detailed engineering |
-| 16 | Whether P² + Q² ≤ S² is linearized | Phase 1 / **D4** | Scope decision |
-| 17 | Behind-the-meter savings mapping convention approval | Phase 1 | Reporting convention |
+| 15 | Validation tolerances | C / **PH-006** | Detailed engineering |
+| 16 | Whether P² + Q² ≤ S² is linearized | Phase 1 / **PH-041** | Scope decision |
+| 17 | Behind-the-meter savings mapping convention approval | Phase 1 (**PH-055**) | Reporting convention |
 
 ---
 
@@ -939,49 +940,23 @@ These belong to Stages A.2.4, A.2.5, A.2.6, B, C, D, or to market adapters.
 
 This document establishes the **conceptual engineering baseline** for Domain 3 — Operational Engineering.
 
-The Stage A.2 chapters, in their natural dependency order:
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.1) |
-| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.2) |
-| 3 | A.2.3 | Operational Engineering | ✅ **This document** — Baselined |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | ⏭ Next |
-| 5 | A.2.5 | Degradation Engineering | ⏭ Pending |
-| 6 | A.2.6 | Financial Engineering | ⏭ Pending |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
+| 3 | A.2.3 | Operational Engineering | ✅ **This document** — Baselined (v1.3) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.8) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.2) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
 **Development strategy note.** To unblock the week-4 thin slice, A.2.4 is developed next even though A.2.5 is logically downstream. A.2.5 follows immediately after, since the thin slice also requires the degradation feedback loop. This is a development sequencing choice, not a change to the domain dependency order.
 
-Phase 1 clarification items are organized as **blocking (B1–B5)** and **defaultable (D1–D15)** in `SYS-STR-FRM-001` §12.
+**Next:** Stage A consolidation and audit before Stage B (HLD).
 
----
-
-## 24. ENGIE Clarification Requests Relevant to Operational Engineering
-
-The following clarification items are relevant to this domain. They are tracked in the **Phase 1 Clarification & Data Request Register**, which is the authoritative consolidated list. This section lists only the items relevant to Operational Engineering, by their **Register ID**.
-
-| Register ID | Clarification / Data Request | Why Required |
-|---|---|---|
-| **[TBD]** | **DR settlement.** Which DR programs in scope are settled as bill credits, and which as independent payments? | Avoids double counting between bill savings and DR revenue |
-| **[TBD]** | **DR baseline.** Should the DR baseline be computed by the platform or supplied as an input by the program/market adapter? | Determines where the baseline methodology is implemented |
-| **[TBD]** | **DR event uncertainty.** Should DR events be modeled as known events within a scenario, as probabilistic events, or via a configurable operational reserve? | Determines the dispatch representation of DR |
-| **[TBD]** | **Target markets.** Which markets and geographies must the first version consider? | Determines which market adapters and rules are developed |
-| **[TBD]** | **DA/RT price data.** Will ENGIE provide historical/forecast day-ahead and real-time price data, or should the platform generate price scenarios? | Determines the source of price signals |
-| **[TBD]** | **Price-taker assumption.** Should the price-taker assumption be maintained for all study cases, or should ENGIE scenarios reflect the impact of higher BESS penetration on prices? | Affects the validity of the price-taker assumption |
-| **[TBD]** | **Ancillary-service saturation.** Does ENGIE have ancillary price projections that already reflect storage growth and possible market saturation? | Affects the realism of ancillary revenue estimates |
-| **[TBD]** | **Regulation signal data.** Does ENGIE have historical regulation signals for the target markets? | Enables data-driven statistical characterization |
-| **[TBD]** | **Regulation assumptions (if signals unavailable).** Does ENGIE have internal assumptions for throughput per MW of regulation capacity, signal bias, mileage, performance score, and SOC drift? | Provides the external statistics required by `A.2.2` §8.3 |
-| **[TBD]** | **Regulation temporal resolution.** What is the minimum temporal resolution ENGIE expects for representing frequency regulation? | Affects the modeling approach in Stage B/C |
-| **[TBD]** | **Voltage regulation scope.** Should voltage regulation be modeled primarily as a compensated service, as a grid-compliance requirement, or as both depending on the project? | Determines the economic treatment of voltage regulation |
-| **[TBD]** | **P/Q priority rule.** When the inverter's apparent-power limit binds simultaneously for active and reactive power, is there a priority rule defined by ENGIE, by the market, or by the grid code? | Determines the dispatch priority rule |
-| **[TBD]** | **Reference projects / benchmark cases.** Can ENGIE provide one or more reference cases with expected results to validate load forecasting, dispatch, revenue stacking, degradation, and financial outputs? | Enables validation against ground truth |
-| **[TBD]** | **Acceptance tolerances.** What tolerances does ENGIE consider acceptable for validating the main model outputs (energy balance, SOC, dispatch, revenue, degradation, NPV/IRR)? | Defines the acceptance thresholds |
-| **[TBD]** | **Historical backtesting.** Does ENGIE expect the model to be validated by backtesting against known projects or historical periods? | Determines the validation approach |
-| **[TBD]** | **Power factor and reactive charges.** Do the customer tariffs in scope include power factor penalties or kVAR charges? | Determines the monetizable value of voltage regulation in BTM projects |
-| **[TBD]** | **BTM savings mapping convention.** Does ENGIE accept the mapping convention proposed in §15.2 for attributing behind-the-meter savings to value streams? | Determines the reporting convention for "revenue by stream" |
-
-**Note.** Items marked **[TBD]** will be assigned IDs when the **Phase 1 Clarification & Data Request Register** is issued as a standalone document. The Register will consolidate all clarifications across the seven domains, deduplicate overlaps, and provide ID, source domain, priority (blocking / defaultable), and status for each item.
+Phase 1 clarification items are organized in `PH1-REG-001` v1.1, the authoritative consolidated Register. This domain's dependencies are listed in §16.3.
 
 ---
 
@@ -991,3 +966,43 @@ The following clarification items are relevant to this domain. They are tracked 
 **Status:** Conceptual Engineering Baseline — **CLOSED**
 **Duration:** 12 Weeks
 **Language:** English
+
+---
+
+## Addendum: ENGIE Clarification Requests Relevant to Operational Engineering
+
+The following clarification items are relevant to this domain. They are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), which is the authoritative consolidated list. This section lists only the items relevant to Operational Engineering, by their **Register ID**.
+
+| Register ID | Clarification / Data Request | Why Required |
+|---|---|---|
+| **PH-001** | **Target market(s).** Which markets and geographies must the first version consider? | Determines which market adapters and rules are developed |
+| **PH-002** | **BTM vs. FTM scope.** Is the initial delivery expected to support both behind-the-meter (BTM) and front-of-the-meter (FTM) configurations, or is one the priority? | Determines which value streams and constraints apply |
+| **PH-033** | **Perfect foresight vs. forecast-based dispatch.** Which dispatch mode should be the default? | Affects how arbitrage and regulation are modeled |
+| **PH-034** | **Dispatch methodology.** Rule-based heuristic, LP, MILP, or hybrid? | Affects how operational requirements are consumed |
+| **PH-041** | **Voltage regulation coupling.** Should the P² + Q² ≤ S² coupling be linearized, or represented as a fixed envelope? | Determines the dispatch formulation for voltage regulation |
+| **PH-055** | **Presentation of value.** Does ENGIE accept the mapping convention proposed in §15.2 for attributing behind-the-meter savings to value streams? | Determines the reporting convention for "revenue by stream" |
+
+### Additional clarification items from the domain
+
+| Topic | Clarification | Why Required |
+|---|---|---|
+| DR settlement | Which DR programs in scope are settled as bill credits, and which as independent payments? | Avoids double counting between bill savings and DR revenue |
+| DR baseline | Should the DR baseline be computed by the platform or supplied as an input by the program/market adapter? | Determines where the baseline methodology is implemented |
+| DR event uncertainty | Should DR events be modeled as known events within a scenario, as probabilistic events, or via a configurable operational reserve? | Determines the dispatch representation of DR |
+| DA/RT price data | Will ENGIE provide historical/forecast day-ahead and real-time price data, or should the platform generate price scenarios? | Determines the source of price signals |
+| Price-taker assumption | Should the price-taker assumption be maintained for all study cases, or should ENGIE scenarios reflect the impact of higher BESS penetration on prices? | Affects the validity of the price-taker assumption |
+| Ancillary-service saturation | Does ENGIE have ancillary price projections that already reflect storage growth and possible market saturation? | Affects the realism of ancillary revenue estimates |
+| Regulation signal data | Does ENGIE have historical regulation signals for the target markets? | Enables data-driven statistical characterization |
+| Regulation assumptions (if signals unavailable) | Does ENGIE have internal assumptions for throughput per MW of regulation capacity, signal bias, mileage, performance score, and SOC drift? | Provides the external statistics required by `A.2.2` §8.3 |
+| Regulation temporal resolution | What is the minimum temporal resolution ENGIE expects for representing frequency regulation? | Affects the modeling approach in Stage B/C |
+| Voltage regulation scope | Should voltage regulation be modeled primarily as a compensated service, as a grid-compliance requirement, or as both depending on the project? | Determines the economic treatment of voltage regulation |
+| P/Q priority rule | When the inverter's apparent-power limit binds simultaneously for active and reactive power, is there a priority rule defined by ENGIE, by the market, or by the grid code? | Determines the dispatch priority rule |
+| Reference projects / benchmark cases | Can ENGIE provide one or more reference cases with expected results to validate load forecasting, dispatch, revenue stacking, degradation, and financial outputs? | Enables validation against ground truth |
+| Acceptance tolerances | What tolerances does ENGIE consider acceptable for validating the main model outputs (energy balance, SOC, dispatch, revenue, degradation, NPV/IRR)? | Defines the acceptance thresholds |
+| Historical backtesting | Does ENGIE expect the model to be validated by backtesting against known projects or historical periods? | Determines the validation approach |
+| Power factor and reactive charges | Do the customer tariffs in scope include power factor penalties or kVAR charges? | Determines the monetizable value of voltage regulation in BTM projects |
+| BTM savings mapping convention | Does ENGIE accept the mapping convention proposed in §15.2 for attributing behind-the-meter savings to value streams? | Determines the reporting convention for "revenue by stream" |
+
+**Note.** Items are assigned IDs in `PH1-REG-001`. The Register is the authoritative source; this section is a filtered view.
+
+---
