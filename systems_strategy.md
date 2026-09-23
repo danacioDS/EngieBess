@@ -1,21 +1,28 @@
-
----
-
 # BESS Operational & Financial Modeling Platform
-
 ## System Strategy & Delivery Framework
 
 **Document ID:** SYS-STR-FRM-001
 
-**Version:** 0.8 — Baseline for Review
+**Version:** 0.9 — Consolidated Baseline
 
-**Status:** System Strategy — Delivery Framework
+**Status:** System Strategy — Delivery Framework — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Engagement:** BESS Operational & Financial Modeling Consultant — 12 Weeks
 
 **Language:** English
+
+**Parent Documents:**
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
+- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
+- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.9)
+- `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.3)
+- `A.2.6-FIN-ENG-001` — Financial Engineering (v0.2)
+- `A.2.7-DATA-APP-ENG-001` — Data & Application Engineering (v0.2)
+- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 ---
 
@@ -87,6 +94,20 @@ Three parallel workstreams, one contract:
 
 Treating ENGINEERING as the whole engagement is the most common underestimation in analytical software contracts.
 
+### 1.2 Stage A.2 Complete
+
+As of this revision, **Stage A.2 is conceptually and formally complete**. All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The next step is the **Stage A Consolidation Audit**, followed by **Stage B — System Architecture (HLD)**.
+
+| Order | Document ID | Domain | Status |
+|---|---|---|---|
+| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
+| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
+| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
+| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
+
 ---
 
 ## 2. Product Intent
@@ -125,7 +146,7 @@ This chain is the backbone of the entire solution. Revenue stacking is part of *
 - Validation against established benchmarks (domain, model, system, UAT)
 - Documentation, training, and handover
 
-**Note on co-located configurations.** The architecture does **not preclude** co-located configurations (BESS with renewable generation, AC- or DC-coupled). However, **co-location is an architecture extension, not part of the initial delivery scope**. Delivery scope is standalone unless Phase 1 clarification **B6** confirms a co-located or integrated configuration as the primary reference case.
+**Note on co-located configurations.** The architecture does **not preclude** co-located configurations (BESS with renewable generation, AC- or DC-coupled). However, **co-location is an architecture extension, not part of the initial delivery scope**. Delivery scope is standalone unless Phase 1 clarification **PH-004** confirms a co-located or integrated configuration as the primary reference case.
 
 ### 3.2 Out of Scope (to be confirmed in Phase 1)
 
@@ -241,6 +262,9 @@ STAGE A — ENGINEERING DEFINITION
                 └── A.2.7  Data & Application Engineering
        │
        ▼
+STAGE A CONSOLIDATION AUDIT
+       │
+       ▼
 STAGE B — SYSTEM ARCHITECTURE
        │
        ├── High-Level Design (HLD)
@@ -311,33 +335,58 @@ Physical system: battery, capacity, power, SOC, SOH, efficiency, C-rate, ramp, l
 
 **Boundary:** BESS Engineering declares **intrinsic capability**. System Context declares **availability and imposed constraints**. These are separate.
 
+**Reference:** `A.2.1-BESS-ENG-001` v1.2.
+
 ### Domain 2 — Load & Market Engineering
 
 Representation of external signals: load, load projection / forecasting, energy markets, programs, grid / regulatory, tariff engine, market adapters, and (as architecture extension) generation signals.
 
 **Owns:** the External Context interface.
 
+**Reference:** `A.2.2-LOAD-MKT-ENG-001` v1.3.
+
 ### Domain 3 — Operational Engineering
 
-Value streams: peak shaving, DR, arbitrage, frequency regulation, voltage regulation. Operational requirements, service metrics, interaction declarations.
+Value streams: peak shaving, DR, arbitrage, frequency regulation, voltage regulation. **Operational requirements** (per `A.2.3` §4), service metrics, interaction declarations.
+
+**Note.** Operational Engineering defines **operational requirements** — what behavior must occur if the service is provided. Dispatch decides which value streams to activate, when, and how.
+
+**Reference:** `A.2.3-OPS-ENG-001` v1.3.
 
 ### Domain 4 — Dispatch & Optimization Engineering
 
 Coordination layer. Consumes physical capability, external signals, operational requirements, **System Context signals** (generation availability, grid limits, demand, market products), and degradation feedback.
 
-**Does not own:** the external context. Consumes context-derived signals from Domain 2.
+**Does not own:** the external context. Consumes context-derived signals from Domain 2. Produces **battery power and SOC trajectories**; **cycling metrics are derived by Domain 5**.
+
+**Reference:** `A.2.4-DISPATCH-ENG-001` v0.9.
 
 ### Domain 5 — Degradation Engineering
 
 Dynamic state evolution: calendar aging, cycle aging, SOH, capacity fade, augmentation, replacement. Provides the feedback loop to Dispatch.
 
+**The three concepts that must not collapse:**
+- **Physical degradation** — state (Domain 5)
+- **Marginal degradation cost** — operational signal (Domain 5)
+- **Replacement cash flow** — monetary flow (Domain 6)
+
+**Reference:** `A.2.5-DEG-ENG-001` v0.3.
+
 ### Domain 6 — Financial Engineering
 
-Economic translation: CAPEX, OPEX, revenue by stream, savings, costs, degradation cost, incentives, tax, discount rate, escalation, contract term, NPV, IRR, payback. Applies the realization factor to operational results.
+Economic translation: CAPEX, OPEX, revenue by stream, savings, costs, degradation events, incentives, tax, discount rate, escalation, contract term, NPV, IRR, payback. Applies the realization factor to operational results.
+
+**Two sources of truth for value:**
+- **Behind-the-meter savings** — Domain 2 (tariff engine)
+- **Market revenues** — Domain 4 (attribution) + market adapters (settlement)
+
+**Reference:** `A.2.6-FIN-ENG-001` v0.2.
 
 ### Domain 7 — Data & Application Engineering
 
-Technological layer: Python, PySpark, SQL, Databricks, Databricks App, data pipelines, scenario configuration, visualization, export, audit.
+Technological layer: Python, PySpark, SQL, Databricks, Databricks App, data pipelines, scenario configuration, visualization, export, execution and lineage records.
+
+**Reference:** `A.2.7-DATA-APP-ENG-001` v0.2.
 
 ---
 
@@ -449,6 +498,8 @@ System Context
 - Validation must be defined before results are produced
 - Scenario Management and Validation are **cross-cutting capabilities**
 - **System-context dimensions are not engineering domains** — they propagate into the domains through explicit interfaces
+- **Operational requirements** (per `A.2.3` §4) are what Operational Engineering declares; Dispatch selects the actual behavior
+- **Cycling metrics** are derived by Degradation from Dispatch's power and SOC trajectories; Dispatch does not produce them
 
 ### 6.4 Operational Signals vs. Investment Assumptions
 
@@ -565,7 +616,7 @@ KPI list + dashboard wireframe, prepared during Phase 1 and refined continuously
 
 | Phase | Weeks | Delivery Stage | Focus |
 |---|---|---|---|
-| 1 — Design | 1–2 | Stage A + B | Requirements validation, conceptual engineering, high-level architecture, output mock |
+| 1 — Design | 1–2 | Stage A + B | Requirements validation, conceptual engineering, high-level architecture, output mock. **Stage A.2 complete by end of Week 2** |
 | 2 — Development | 3–9 | Stage C + D (parallel) | Thin end-to-end slice by ~week 4, then progressive deepening |
 | 3 — Testing | 10–11 | Stage D | Model validation, UAT |
 | 4 — Deployment | 12 | Stage D | Final delivery, deployment, documentation, training |
@@ -584,51 +635,55 @@ KPI list + dashboard wireframe, prepared during Phase 1 and refined continuously
 
 ## 12. Phase 1 Clarification Items
 
+The Phase 1 clarification items are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), the authoritative consolidated source. The items formerly listed as B1–B6 (blocking) and D1–D20 (defaultable) in this Strategy are mapped to their Register IDs below.
+
 ### 12.1 Blocking Items (must be resolved in Weeks 1–2)
 
-| # | Item | Why Blocking |
-|---|---|---|
-| B1 | **Target market(s)** | Market rules drive eligibility, dispatch logic, settlement, revenue |
-| B2 | **Behind-the-meter vs. front-of-the-meter scope** | Determines which value streams and constraints apply |
-| B3 | **Data availability** | Determines what can be modeled; drives ingestion design |
-| B4 | **Benchmark data** | Required to define acceptance |
-| B5 | **Acceptance thresholds (accuracy + runtime + usability)** | Must be concrete before the thin slice is built |
-| **B6** | **Project configuration** | Standalone vs. co-located, generation type, grid constraints. Determines which System Context dimensions are relevant |
+| Register ID | Former ID | Item | Why Blocking |
+|---|---|---|---|
+| **PH-001** | B1 | **Target market(s)** | Market rules drive eligibility, dispatch logic, settlement, revenue |
+| **PH-002** | B2 | **Behind-the-meter vs. front-of-the-meter scope** | Determines which value streams and constraints apply |
+| **PH-003** | B3 | **Data availability** | Determines what can be modeled; drives ingestion design |
+| **PH-005** | B4 | **Benchmark data** | Required to define acceptance |
+| **PH-006** | B5 | **Acceptance thresholds (accuracy + runtime + usability)** | Must be concrete before the thin slice is built |
+| **PH-004** | B6 | **Project configuration** | Standalone vs. co-located, generation type, grid constraints. Determines which System Context dimensions are relevant |
 
 ### 12.2 Defaultable Items (proceed under stated assumption if not confirmed)
 
-| # | Item | Default assumption |
-|---|---|---|
-| D1 | Dispatch methodology | **LP** — Linear Programming |
-| D2 | Perfect foresight vs. forecast-based | **Perfect foresight**; realization factor applied in Financial Engineering |
-| D3 | Degradation feedback time scale | **Annual SOH update** with representative-period simulation |
-| D4 | Voltage regulation coupling | **Fixed envelope** — no P² + Q² ≤ S² linearization initially |
-| D5 | Load forecasting method | **ENGIE-provided** if available; otherwise statistical baseline |
-| D6 | Short-horizon forecast vs. multi-year projection | Both modeled |
-| D7 | Load forecasting home | **Domain 2 owns it conceptually**; implementation via Domain 7 |
-| D8 | Financing structure | **Project IRR primary; equity IRR computed with default debt parameters, configurable by the user** |
-| D9 | Tax and incentives treatment | **Pre-tax** initially; ITC / depreciation flagged as extension |
-| D10 | Reporting format | **Both PDF and Excel** |
-| D11 | Scenario granularity | **3–5 core scenarios** initially, expandable |
-| D12 | Audit / lineage / traceability scope | **Basic execution logs + data lineage** |
-| D13 | Market adapter scope | **One adapter at delivery**, architecture supports more |
-| D14 | Time resolution and simulation horizon | **15-minute when input data permits; hourly otherwise**. 15-year contract term |
-| D15 | Databricks workspace access and environment ownership | **ENGIE-owned workspace**; consultant granted developer access |
-| D16 | BESS sizing vs. evaluation | **Evaluation** of a predefined configuration |
-| D17 | Primary model purpose / use case | **Evaluation** (project development support) |
-| D18 | Model output granularity | **All levels** (interval schedules, daily / monthly metrics, annual KPIs) |
-| D19 | Representative-period scheme | **Monthly representative periods, respecting the billing period.** If demand ratchets apply, all 12 months of the year are simulated — representative-period reduction is not permitted where ratchets are present |
-| D20 | Initial implementation configuration assumption | **Standalone BESS** unless Phase 1 (B6) confirms a co-located or integrated configuration as the primary reference case. This is an **implementation assumption**, not a conceptual limitation — the architecture does not preclude co-located configurations |
+| Register ID | Former ID | Item | Default assumption |
+|---|---|---|---|
+| **PH-034** | D1 | Dispatch methodology | **LP** — Linear Programming |
+| **PH-033** | D2 | Perfect foresight vs. forecast-based | **Perfect foresight**; realization factor applied in Financial Engineering |
+| **PH-036** | D3 | Degradation feedback time scale | **Annual SOH update** with representative-period simulation |
+| **PH-041** | D4 | Voltage regulation coupling | **Fixed envelope** — no P² + Q² ≤ S² linearization initially |
+| **PH-050** | D5 | Load forecasting method | **ENGIE-provided** if available; otherwise statistical baseline |
+| **PH-051** | D6 | Short-horizon forecast vs. multi-year projection | Both modeled |
+| **PH-052** | D7 | Load forecasting home | **Domain 2 owns it conceptually**; implementation via Domain 7 |
+| **PH-042** | D8 | Financing structure | **Project IRR primary; equity IRR computed with default debt parameters, configurable by the user** |
+| **PH-043** | D9 | Tax and incentives treatment | **Pre-tax** initially; ITC / depreciation flagged as extension |
+| **PH-047** | D10 | Reporting format | **Both PDF and Excel** |
+| **PH-053** | D11 | Scenario granularity | **3–5 core scenarios** initially, expandable |
+| **PH-048** | D12 | Audit / lineage / traceability scope | **Basic execution logs + data lineage** |
+| **PH-054** | D13 | Market adapter scope | **One adapter at delivery**, architecture supports more |
+| **PH-055** | D14 | Time resolution and simulation horizon | **15-minute when input data permits; hourly otherwise**. 15-year contract term |
+| **PH-046** | D15 | Databricks workspace access and environment ownership | **ENGIE-owned workspace**; consultant granted developer access |
+| **PH-026** | D16 | BESS sizing vs. evaluation | **Evaluation** of a predefined configuration |
+| **PH-027** | D17 | Primary model purpose / use case | **Evaluation** (project development support) |
+| **PH-028** | D18 | Model output granularity | **All levels** (interval schedules, daily / monthly metrics, annual KPIs) |
+| **PH-040** | D19 | Representative-period scheme | **Monthly representative periods, respecting the billing period.** If demand ratchets apply, all 12 months of the year are simulated — representative-period reduction is not permitted where ratchets are present |
+| **PH-004** | D20 | Initial implementation configuration assumption | **Standalone BESS** unless **PH-004** confirms a co-located or integrated configuration as the primary reference case. This is an **implementation assumption**, not a conceptual limitation — the architecture does not preclude co-located configurations |
 
 ### 12.3 Rationale
 
 The two-tier structure allows the project to proceed even if ENGIE is slow to answer. Blocking items genuinely prevent design. Defaultable items have defensible working assumptions revisable at Stage B.
 
-**B6** determines which System Context dimensions are relevant. Without knowing whether the first project is standalone or co-located, the platform cannot determine which interfaces must be developed first.
+**PH-004** determines which System Context dimensions are relevant. Without knowing whether the first project is standalone or co-located, the platform cannot determine which interfaces must be developed first.
 
-**D19** is retained in the Strategy because the ratchet exception depends on the client tariff, and it is material for ENGIE's acceptance review. It will be removed from `A.2.4 §28.3` when that document is updated, since it is a technical consultant decision, not a client clarification.
+**PH-040** is retained in the Strategy because the ratchet exception depends on the client tariff, and it is material for ENGIE's acceptance review.
 
-**D20** is an implementation assumption, not a conceptual limitation.
+**PH-004** (as D20) is an implementation assumption, not a conceptual limitation.
+
+**Note.** The former reference to `A.2.4 §28.3` has been resolved. A.2.4 v0.9 §28.3 no longer includes D19; the representative-period scheme is now declared as a technical consultant decision in `A.2.4` §26 and §28.3.
 
 ---
 
@@ -650,33 +705,34 @@ Two simultaneous cycles — physical-operational and economic-financial — are 
 
 The engagement is understood as **three parallel natures** — Engineering, Software, and Delivery. Delivery is **design-led and iteratively delivered**: a thin end-to-end slice exists by approximately week 4. Stage C and Stage D run in parallel from week 3. Stage gates are lightweight.
 
+**Stage A.2 is conceptually and formally complete.** All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The next step is the **Stage A Consolidation Audit**, followed by **Stage B — System Architecture (HLD)**.
+
 The platform will connect system context, data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation — and it will be extensible to new markets, value streams, and system configurations without re-architecture.
 
 ---
 
 ## 14. ENGIE Clarification Requests Relevant to System Strategy
 
-The following clarification items are relevant to the System Strategy. They are tracked in the **Phase 1 Clarification & Data Request Register**, which is the authoritative consolidated list. This section lists only the items relevant to the Strategy, by their **Register ID**.
+The following clarification items are relevant to the System Strategy. They are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), which is the authoritative consolidated list. This section lists only the items relevant to the Strategy, by their **Register ID**.
 
 | Register ID | Clarification / Data Request | Why Required |
 |---|---|---|
-| [TBD] | **Target market(s).** Which electricity markets, tariff structures, and ancillary-service products are within the initial delivery scope? Are PJM RegD, ERCOT FFR, DA/RT LMP, capacity, and DR intended as mandatory use cases or illustrative examples? | Determines market rules, eligibility, dispatch logic, and settlement (B1) |
-| [TBD] | **BTM vs. FTM scope.** Is the initial delivery expected to support both behind-the-meter (BTM) and front-of-the-meter (FTM) configurations, or is one the priority? | Determines which value streams and constraints apply (B2) |
-| [TBD] | **Project configuration.** What is the primary reference configuration: standalone BESS, co-located with renewables, BTM, FTM, AC- or DC-coupled? | Determines which System Context dimensions are relevant and which interfaces are developed first (B6) |
-| [TBD] | **Data availability.** What historical data will ENGIE provide — meter data, market prices, ancillary prices, regulation signals, customer bills — and at what resolution and horizon? | Determines what can be modeled and how ingestion is designed (B3) |
-| [TBD] | **Benchmark data.** What established benchmarks will be used to validate the model? Can ENGIE provide reference cases with expected results? | Defines acceptance and validation (B4) |
-| [TBD] | **Acceptance thresholds.** What quantified accuracy, runtime, and usability criteria define acceptance? | Must be concrete before the thin slice is built (B5) |
-| [TBD] | **Commercial perspective.** Should results be shown from ENGIE's perspective as owner or operator, from the client's perspective (savings), or both? | Affects value attribution and reporting conventions |
-| [TBD] | **Co-located configurations.** Does the first project require co-located BESS with renewable generation, or is standalone BESS the primary reference case? | Determines whether the co-location architecture extension is activated in the initial delivery |
-| [TBD] | **Financing structure.** What debt parameters (gearing, interest rate, tenor) should be used for equity IRR? Are default values acceptable, configurable by the user? | Determines the equity IRR calculation (D8) |
-| [TBD] | **Tax, incentives, and conventions.** Should the model include tax, depreciation, and incentives such as the ITC? What currency? Nominal or real? Inflation and escalation conventions? | Determines the financial methodology (D9) |
-| [TBD] | **Databricks environment.** Please confirm workspace ownership, access provisioning, Databricks Apps availability, Unity Catalog usage, and compute policies. | Determines the delivery environment (D15) |
-| [TBD] | **Users and handover.** Who are the users and roles, how many, and who will maintain the tool after week 12? | Defines training audience and documentation level |
-| [TBD] | **Reporting requirements.** Are there ENGIE templates or branding requirements for PDF and Excel exports? | Determines reporting design (D10) |
-| [TBD] | **Point of contact and decision timing.** A single point of contact and access to subject-matter experts. Decisions on blocking items (B1–B6) by end of Week 2. | Governance |
-| [TBD] | **Interim demo.** Is a working end-to-end demo around Week 4 acceptable as a scope-validation checkpoint? | Aligns with §4.2 |
+| **PH-001** | **Target market(s).** Which electricity markets, tariff structures, and ancillary-service products are within the initial delivery scope? Are PJM RegD, ERCOT FFR, DA/RT LMP, capacity, and DR intended as mandatory use cases or illustrative examples? | Determines market rules, eligibility, dispatch logic, and settlement |
+| **PH-002** | **BTM vs. FTM scope.** Is the initial delivery expected to support both behind-the-meter (BTM) and front-of-the-meter (FTM) configurations, or is one the priority? | Determines which value streams and constraints apply |
+| **PH-004** | **Project configuration.** What is the primary reference configuration: standalone BESS, co-located with renewables, BTM, FTM, AC- or DC-coupled? | Determines which System Context dimensions are relevant and which interfaces are developed first |
+| **PH-003** | **Data availability.** What historical data will ENGIE provide — meter data, market prices, ancillary prices, regulation signals, customer bills — and at what resolution and horizon? | Determines what can be modeled and how ingestion is designed |
+| **PH-005** | **Benchmark data.** What established benchmarks will be used to validate the model? Can ENGIE provide reference cases with expected results? | Defines acceptance and validation |
+| **PH-006** | **Acceptance thresholds.** What quantified accuracy, runtime, and usability criteria define acceptance? | Must be concrete before the thin slice is built |
+| **PH-007** | **Commercial perspective.** Should results be shown from ENGIE's perspective as owner or operator, from the client's perspective (savings), or both? | Affects value attribution and reporting conventions |
+| **PH-042** | **Financing structure.** What debt parameters (gearing, interest rate, tenor) should be used for equity IRR? Are default values acceptable, configurable by the user? | Determines the equity IRR calculation |
+| **PH-043** | **Tax, incentives, and conventions.** Should the model include tax, depreciation, and incentives such as the ITC? What currency? Nominal or real? Inflation and escalation conventions? | Determines the financial methodology |
+| **PH-046** | **Databricks environment.** Please confirm workspace ownership, access provisioning, Databricks Apps availability, Unity Catalog usage, and compute policies. | Determines the delivery environment |
+| **PH-012** | **Users and handover.** Who are the users and roles, how many, and who will maintain the tool after week 12? | Defines training audience and documentation level |
+| **PH-047** | **Reporting requirements.** Are there ENGIE templates or branding requirements for PDF and Excel exports? | Determines reporting design |
+| **PH-006** | **Point of contact and decision timing.** A single point of contact and access to subject-matter experts. Decisions on blocking items (PH-001 to PH-006) by end of Week 2. | Governance |
+| **PH-033** | **Interim demo.** Is a working end-to-end demo around Week 4 acceptable as a scope-validation checkpoint? | Aligns with §4.2 |
 
-**Note.** Items marked **[TBD]** will be assigned IDs when the **Phase 1 Clarification & Data Request Register** is issued as a standalone document. The Register will consolidate all clarifications across the seven domains and the Strategy, deduplicate overlaps, and provide ID, source, priority (blocking / defaultable), and status for each item.
+**Note.** Items are assigned IDs in `PH1-REG-001` v1.1. The Register is the authoritative source; this section is a filtered view.
 
 ---
 
@@ -685,58 +741,69 @@ The following clarification items are relevant to the System Strategy. They are 
 **Duration:** 12 Weeks
 **Language:** English
 
+---
+
+## Addendum A: Consolidated Register Cross-Reference
+
+The following table consolidates all Phase 1 clarification items across the seven domains and the Strategy, by Register ID. The authoritative source is `PH1-REG-001` v1.1.
+
+| Register ID | Topic | Primary domain | Strategy mapping |
+|---|---|---|---|
+| **PH-001** | Target market(s) | Strategy, Domain 2 | B1 |
+| **PH-002** | BTM vs. FTM scope | Strategy, Domain 2 | B2 |
+| **PH-003** | Data availability | Domain 1, Domain 2 | B3 |
+| **PH-004** | Project configuration | Strategy, Domain 5 | B6 / D20 |
+| **PH-005** | Benchmark data | Domain 6, Domain 7 | B4 |
+| **PH-006** | Acceptance thresholds | Strategy, all domains | B5 |
+| **PH-007** | Commercial perspective | Domain 6 | — |
+| **PH-012** | Users and handover | Domain 7 | — |
+| **PH-015** | Battery data | Domain 1, Domain 5 | — |
+| **PH-016** | SOC bounds and warranty | Domain 1, Domain 5 | — |
+| **PH-017** | SOC window behavior under degradation | Domain 1, Domain 5 | — |
+| **PH-018** | Multi-cohort aggregation | Domain 5 | — |
+| **PH-021** | Power factor penalties / kVAR charges | Domain 2, Domain 3 | — |
+| **PH-026** | BESS sizing vs. evaluation | Domain 4 | D16 |
+| **PH-027** | Primary model purpose | Domain 4 | D17 |
+| **PH-028** | Model output granularity | Domain 4 | D18 |
+| **PH-032** | Financial objective inside dispatch | Domain 5 | — |
+| **PH-033** | Perfect foresight vs. forecast-based dispatch | Domain 4 | D2 |
+| **PH-034** | Dispatch methodology | Domain 4 | D1 |
+| **PH-035** | Realization factor | Domain 6 | — |
+| **PH-036** | Degradation feedback time scale | Domain 5 | D3 |
+| **PH-038** | Degradation feedback time scale (confirmatory) | Domain 5 | — |
+| **PH-040** | Representative-period scheme and ratchets | Domain 4 | D19 |
+| **PH-041** | Voltage regulation coupling | Domain 3, Domain 4 | D4 |
+| **PH-042** | Financing structure | Domain 6 | D8 |
+| **PH-043** | Degradation model fidelity / tax treatment | Domain 5, Domain 6 | D9 |
+| **PH-044** | Augmentation policy | Domain 5 | — |
+| **PH-045** | Replacement policy | Domain 5 | — |
+| **PH-046** | Databricks environment | Domain 7 | D15 |
+| **PH-047** | Reporting requirements | Domain 7 | D10 |
+| **PH-048** | Audit / lineage / traceability scope | Domain 7 | D12 |
+| **PH-050** | Load forecasting method | Domain 2 | D5 |
+| **PH-051** | Load forecasting home | Domain 2 | D7 |
+| **PH-052** | Scenario granularity | Domain 2 | D11 |
+| **PH-053** | Market adapter scope | Domain 2 | D13 |
+| **PH-054** | Time resolution | Domain 2 | D14 |
+| **PH-055** | Presentation of value (BTM mapping convention) | Domain 3, Domain 6 | — |
+
+**Note.** The mapping "Former ID → Register ID" is the authoritative cross-reference for the transition from the Strategy's B/D numbering to the Register's PH numbering. Where a former ID does not appear, the Register item was introduced after the Strategy's B/D list was frozen.
 
 ---
 
-**BESS Operational & Financial Modeling (RFP-264144-1): Observations and Clarification Requests**
+## Addendum B: Stage A Consolidation Status
 
-**Scope and market**
+Stage A.2 is conceptually and formally complete. The Stage A Consolidation Audit will verify:
 
-1. **Target market.** The RFP references several market constructs (PJM RegD, ERCOT FFR, day-ahead and real-time LMP, capacity markets, TOU tariffs). *Proposal:* deliver one fully implemented market at week 12, with an architecture that allows further markets to be added without redesign. Which market should be first?
-2. **Behind-the-meter vs. front-of-meter.** Peak shaving and demand response are mainly behind-the-meter use cases. Frequency and voltage regulation are mostly front-of-meter or compensated contractually. Which configurations must the tool support?
-3. **Commercial perspective.** Should results be shown from ENGIE's perspective as owner or operator, from the client's perspective (savings), or both? Examples include shared-savings contracts or storage-as-a-service fees. This affects how value is split and reported.
-4. **Out of scope.** We assume real-time asset control, market bidding and EMS/SCADA integration are out of scope. Please confirm.
+- All PH IDs across the seven A.2.x documents are consistent
+- All cross-references between documents are correct
+- All interfaces are coherent
+- All versions are aligned
+- All parent document citations are correct
 
-**Data**
+**Audit output:** `Stage A Consolidation Report` (to be produced).
 
-5. **Price projections.** Long-term price curves (LMP, ancillary services, capacity) are the largest driver of project value. We assume the tool consumes these as inputs rather than generating them. Will ENGIE provide internal price curves, or should we use a public source?
-6. **Meter data and time resolution.** *Proposal:* 15-minute resolution wherever meter data and demand-charge billing are 15-minute, and hourly elsewhere. Hourly resolution understates peaks and therefore peak-shaving savings.
-7. **Frequency regulation signal.** At 15-minute or hourly resolution, regulation is modeled as capacity reservation plus a statistical estimate of energy throughput and SOC impact. Is this acceptable, or can ENGIE provide historical regulation signal data?
-8. **Battery data.** Are vendor degradation curves or warranty terms available for the reference technologies? These would anchor the degradation model.
-9. **Load forecasting.** A short-term forecast for dispatch and a multi-year projection for the contract term need different methods. Does ENGIE already have load projections or growth assumptions we should use?
-
-**Methodology**
-
-10. **Dispatch method.** *Proposal:* linear programming, with mixed-integer formulations only where strictly required. This gives a good balance of optimality, transparency and runtime.
-11. **Foresight assumption.** *Proposal:* perfect-foresight optimization with a configurable realization factor, for example 80–90% of theoretical arbitrage value, which is standard practice for business development valuation. Forecast-based dispatch would be an optional extension. Does this fit ENGIE's intended use?
-12. **Degradation feedback.** *Proposal:* state of health is updated annually, with representative periods simulated within each year. Augmentation or replacement is triggered at a configurable threshold.
-13. **Demand response.** DR events are not known in advance. *Proposal:* model them through capacity reserved for events plus event scenarios, applying the rules of the specific program. Which programs are in scope?
-14. **Voltage regulation.** *Proposal:* model it as an inverter capability constraint, shown as the active-power curtailment it causes. Revenue is included only where a compensation mechanism exists.
-
-**Financial**
-
-15. **Equity IRR.** This requires a financing structure. *Proposal:* debt parameters (gearing, interest rate, tenor) that ENGIE can configure, with default values provided.
-16. **Tax, incentives and conventions.** Should the model include tax, depreciation and incentives such as the ITC if the market is in the US? Please also confirm the currency, whether figures are nominal or real, and the inflation and escalation conventions.
-
-**Validation and acceptance**
-
-17. **Benchmarks.** *Proposal:* validate against NREL REopt and/or SAM for reference cases, plus ENGIE's internal models or actual project results if available.
-18. **Acceptance thresholds.** *Proposal:* NPV within ±X% of the benchmark on agreed reference cases, energy balance and SOC consistency at 100%, and a full contract-term scenario run in under N minutes. The values to be agreed in week 2.
-
-**Platform and delivery**
-
-19. **Databricks environment.** Please confirm:
-    - workspace ownership and access provisioning,
-    - that Databricks Apps is enabled in the workspace and region,
-    - Unity Catalog usage and compute policies.
-20. **Solver licensing.** *Proposal:* an open-source solver (HiGHS) to avoid licensing dependencies. Does ENGIE hold commercial licenses (Gurobi, CPLEX) it would prefer to use?
-21. **Users and handover.** Who are the users and roles, and how many? Who will maintain the tool after week 12? This defines the training audience and the level of documentation.
-22. **Reporting.** Are there ENGIE templates or branding requirements for the PDF and Excel exports?
-
-**Governance**
-
-23. **Point of contact and decision timing.** We need a single point of contact and access to subject-matter experts. We also need decisions on the blocking items (points 1, 2, 5, 17 and 18) by the end of week 2. Items not confirmed by then will proceed under the stated proposal, documented as an assumption.
-24. **Interim demo.** *Proposal:* a working end-to-end demo around week 4 (peak shaving + arbitrage + degradation + NPV in the app) to validate direction with business development users early.
+**After audit:** Stage B — System Architecture (HLD).
 
 ---
 
