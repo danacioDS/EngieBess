@@ -1,6 +1,3 @@
-# B.0 v0.3.1 — Informe Completo (Texto Normal)
-
-Guarda este contenido como `docs/Stage-B-system-architecture/STAGE-B-HLD-001.md`.
 
 ---
 
