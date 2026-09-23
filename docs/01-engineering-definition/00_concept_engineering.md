@@ -3,9 +3,12 @@
 ### Eagle-Eye View of the Seven Engineering Domains
 
 **Document ID:** SYS-ENG-DEF-001
-#### **Version:** 0.2 — Development Draft
-#### **Status:** Stage A — Engineering Definition (Conceptual Level)
-#### **Project:** ENGIE — BESS Operational & Financial Modeling
+
+**Version:** 0.2 — Development Draft
+
+**Status:** Stage A — Engineering Definition (Conceptual Level)
+
+**Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Purpose:** Provide a system-level, eagle-eye definition of the seven engineering domains that constitute the BESS Operational & Financial Modeling System, establishing their identity, purpose, boundaries, responsibilities, inputs, outputs, and relationships — without entering into detailed conceptual engineering, architecture, or implementation.
 
