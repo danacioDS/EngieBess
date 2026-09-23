@@ -1,13 +1,12 @@
 # BESS Operational & Financial Modeling Platform
 ## System Strategy & Delivery Framework
 
-**Document ID:** SYS-STR-FRM-001
-**Version:** 0.2 — Development Draft
-**Status:** System Strategy — Delivery Framework
-**Project:** ENGIE — BESS Operational & Financial Modeling
-**Engagement:** BESS Operational & Financial Modeling Consultant — 12 Weeks
+**Document ID:** SYS-STR-FRM-001<br>
+**Version:** 0.2 — Development Draft<br>
+**Status:** System Strategy — Delivery Framework<br>
+**Project:** ENGIE — BESS Operational & Financial Modeling<br>
+**Engagement:** BESS Operational & Financial Modeling Consultant — 12 Weeks<br>
 **Language:** English
-
 ---
 
 ## 1. Executive Summary
