@@ -1,3 +1,4 @@
+Aquí tienes **SYS-STR-FRM-001 v0.5 — Development Draft**, con los cinco puntos integrados. Los cambios son quirúrgicos: §9.3 corregida técnicamente, §6.4 reconoce la fuga de investment assumptions, §4 eleva el thin slice a demo con ENGIE, §12 reestructurada con bloqueantes y defaults, y el principio rector reformulado.
 
 ---
 
@@ -7,7 +8,7 @@
 
 **Document ID:** SYS-STR-FRM-001
 
-**Version:** 0.3 — Development Draft
+**Version:** 0.5 — Baseline for Review
 
 **Status:** System Strategy — Delivery Framework
 
@@ -41,9 +42,9 @@ It deliberately does **not** define equations, algorithms, schemas, class struct
 
 The guiding principle of this strategy is:
 
-> **Define the system first. Engineer the model second. Architect the solution third. Implement the software fourth.**
+> **Define before you build; build in thin, validated increments.**
 
-### 1.1 What the Engagement Actually Delivers
+### 1.1 The Three Natures of the RFP
 
 The RFP is not a single-dimensional request. It simultaneously asks for three things, and each carries its own scope, risk, and delivery obligations:
 
@@ -100,11 +101,12 @@ Its purpose is to answer a single class of questions:
 To answer that question, the platform must connect, in a coherent and auditable chain:
 
 ```
-Data → Forecast → Physical BESS Model → Dispatch → Degradation
-     → Revenue Stacking → Financial Model → Scenarios → Results
+Data → Forecast → Physical BESS Model → Operational Modes
+     → Dispatch (with Revenue Stacking) → Degradation
+     → Financial Model → Scenarios → Results
 ```
 
-This chain is the backbone of the entire solution. Every engineering domain, interface, and deliverable must serve it.
+This chain is the backbone of the entire solution. Every engineering domain, interface, and deliverable must serve it. Revenue stacking is part of **Dispatch**, not a separate stage after Degradation.
 
 ---
 
@@ -113,7 +115,7 @@ This chain is the backbone of the entire solution. Every engineering domain, int
 ### 3.1 In Scope
 
 - BESS technical and operational modeling
-- Load ingestion **and load forecasting**
+- Load ingestion **and load forecasting / projection**
 - Market and revenue stream modeling
 - Dispatch optimization and revenue stacking
 - Battery degradation modeling (calendar + cycle aging, feedback loop)
@@ -143,21 +145,11 @@ This is a material ambiguity. Market rules drive eligibility, dispatch logic, se
 
 This separation is a core architectural principle of the platform and is reinforced by the RFP's explicit mention of heterogeneous market products.
 
-### 3.4 The Three Natures of the RFP
-
-The RFP is not a single-dimensional request. It is simultaneously an **engineering**, a **software**, and a **delivery** obligation, and each nature carries its own scope, risk, and acceptance criteria.
-
-- **ENGINEERING** — modeled by the seven domains (Stage A)
-- **SOFTWARE** — delivered by Domain 7 (Data & Application) and realized in Stages C–D
-- **DELIVERY** — the contractual wrapper: documentation, training, deployment, tracked separately in Phase 4
-
-These three natures run in parallel for the full 12 weeks. They are not sequential phases of the same work; they are three simultaneous workstreams.
-
 ---
 
-## 4. Delivery Philosophy
+## 4. Delivery Philosophy — Design-Led, Iteratively Delivered
 
-The engagement follows a **four-stage engineering progression**, moving from conceptual definition through to implementation. This progression mirrors established engineering practice: conceptual engineering, basic engineering, detailed engineering, and implementation.
+The engagement follows a **four-stage engineering progression**, moving from conceptual definition through to implementation.
 
 | Stage | Name | Engineering Equivalent | Purpose |
 |---|---|---|---|
@@ -166,14 +158,9 @@ The engagement follows a **four-stage engineering progression**, moving from con
 | **C** | Product Specification | Detailed Engineering | Consolidate requirements, models, architecture, interfaces, validation |
 | **D** | Implementation | Construction & Commissioning | Build, test, validate, deploy |
 
-This sequence is deliberate. It ensures that:
+The sequence is deliberate, but **the gates between stages are lightweight**, and Stage D begins in **parallel** with Stage C, not after it. The goal is to preserve engineering rigor while ensuring that a working end-to-end artifact exists early enough to de-risk data, runtime, and usability.
 
-- The physical and operational model is correct before software is written
-- The architecture reflects the engineering reality, not the other way around
-- The specification is complete before implementation begins
-- Validation is defined before results are produced
-
-### 4.1 Stage Progression
+### 4.1 Stage Progression with a Thin Vertical Slice
 
 ```
 SYSTEM STRATEGY
@@ -183,7 +170,6 @@ STAGE A — ENGINEERING DEFINITION
 (Conceptual Engineering)
        │
        ├── A.1  System Component Definition
-       │        (Eagle-Eye View of the Seven Domains)
        │
        └── A.2  Conceptual Engineering per Domain
                 ├── A.2.1  BESS Engineering
@@ -202,26 +188,56 @@ STAGE B — SYSTEM ARCHITECTURE
        └── Basic Architecture Definition
        │
        ▼
-STAGE C — PRODUCT SPECIFICATION
-(Detailed Engineering)
-       │
-       ├── Low-Level Design (LLD)
-       ├── Product Specification
-       └── Engineering Specifications
-       │
-       ▼
-STAGE D — IMPLEMENTATION
-(Construction & Commissioning)
-       │
-       ├── Prompts / Task Definitions
-       ├── Python / PySpark / SQL
-       ├── Databricks App
-       ├── Tests
-       ├── UAT
-       └── Deployment & Training
+STAGE C — PRODUCT SPECIFICATION  ────┐
+(Detailed Engineering)              │
+       │                            │  Stage C and Stage D run in parallel
+       ├── Low-Level Design (LLD)   │  from week 3
+       ├── Product Specification    │
+       └── Engineering Specs        │
+                                    │
+                                    ▼
+                          STAGE D — IMPLEMENTATION
+                          (Construction & Commissioning)
+                                    │
+                                    ├── Thin slice demo to ENGIE (~week 4)
+                                    ├── Progressive domain deepening
+                                    ├── Python / PySpark / SQL
+                                    ├── Databricks App
+                                    ├── Tests
+                                    ├── UAT
+                                    └── Deployment & Training
 ```
 
-Each stage produces the foundation required by the next. No stage begins before the previous stage has been reviewed and accepted.
+### 4.2 Thin End-to-End Slice — Internal and Demo
+
+By approximately **week 4**, the platform must demonstrate a **thin end-to-end slice**:
+
+- **Peak shaving** + **energy arbitrage** (two value streams)
+- A **simple degradation update** applied between periods
+- **NPV** displayed on a basic Databricks App page
+- Data flowing through ingestion → dispatch → degradation → financial → app
+
+The slice serves **two purposes**:
+
+1. **Internal de-risking** — proving that data ingestion, dispatch runtime, the degradation feedback loop, and the Databricks App render work end-to-end
+2. **Client demo** — validating scope, expectations, and usability with ENGIE's business development users **before** the full platform is built
+
+The demo is not a formal deliverable, but it is a **strategic checkpoint**. ENGIE's users accept the platform against what they see; showing them something concrete at week 4 prevents surprises at week 12.
+
+### 4.3 Consolidated Stage A.2
+
+The seven A.2 documents **may be delivered as one consolidated document with seven chapters** rather than seven standalone files, if that better serves review velocity. The content requirements are identical; only the packaging differs.
+
+### 4.4 Lightweight Gates
+
+Formal sign-offs at Stage A, B, C, D remain in place, but:
+
+- Stage A.2 review is **per-chapter**, not per-document
+- Stage B review is a **single consolidated review**, not per-layer
+- Stage C review is a **single review**, not per-specification
+- Stage D acceptance is **continuous**, culminating in UAT
+
+This preserves rigor without imposing sequencing that would push the first working model to week 6 or beyond.
 
 ---
 
@@ -256,7 +272,8 @@ Represents the economic and energetic environment in which the BESS operates.
 
 Covers conceptually:
 
-- **Load**: historical meter data (15-min or hourly), demand profiles, peak demand, **load forecasting capability**
+- **Load**: historical meter data (15-min or hourly), demand profiles, peak demand
+- **Load projection / forecasting**: short-horizon forecast and multi-year projection/scenario capability
 - **Energy markets**: TOU tariffs, day-ahead LMP, real-time LMP, ancillary service clearing prices, capacity market revenues
 - **Programs**: demand response program rules, event windows, notification lead time, performance measurement methodology, penalties, eligibility
 - **Grid / regulatory**: interconnection limits, export constraints, participation eligibility by market/program
@@ -275,7 +292,7 @@ The RFP explicitly requires modeling of:
 - Frequency Regulation
 - Voltage Regulation
 
-Each **operating mode / value stream** is a distinct operational behavior with its own logic, key parameters, and output metrics, later formalized during conceptual engineering (A.2.3).
+Each **operating mode / value stream** is a distinct operational behavior with its own logic, key parameters, and output metrics, later formalized during conceptual engineering (A.2.3). Modeling traps — demand-charge billing periods, DR event uncertainty, regulation signal infeasibility at coarse time steps, reactive/active power coupling — are addressed in A.2.3 and A.2.4.
 
 ### Domain 4 — Dispatch & Optimization Engineering
 
@@ -302,6 +319,10 @@ Dispatch & Optimization
        ▼
 Optimal / feasible dispatch
 ```
+
+**Inputs to Dispatch** are *value signals* — prices, program payments, and marginal degradation cost — not revenue attribution.
+
+**Outputs from Dispatch** include dispatch schedule, SOC trajectory, and revenue attribution per value stream.
 
 Methodology options remain open per the RFP:
 
@@ -336,6 +357,8 @@ The RFP explicitly requires a **feedback loop**: degradation impacts available e
 
 This makes degradation a **dynamic state of the system**, not a post-processing cost.
 
+**Time scale of the feedback loop is an explicit Phase 1 decision.** Options range from inside-optimization updates to annual SOH updates with representative-period simulation. The choice drives runtime, fidelity, and defensibility.
+
 ### Domain 6 — Financial Engineering
 
 Consumes operational outputs and produces financial performance.
@@ -349,7 +372,8 @@ Covers conceptually:
 - Degradation cost
 - Augmentation
 - Replacement
-- Incentives
+- Incentives (e.g. ITC, where applicable)
+- Tax and depreciation treatment (where applicable)
 - Discount rate
 - Escalation
 - Contract term
@@ -420,9 +444,7 @@ This domain is **implementation**, not business modeling.
 
 ## 6. System Architecture
 
-The System Architecture translates the seven engineering domains into a computational structure. It defines how the engineering model is represented, how data flows through the system, and how the components interact.
-
-### 6.1 Architecture Layers (Table)
+### 6.1 Architecture Layers
 
 | Layer | Description | Primary Engineering Domains |
 |---|---|---|
@@ -434,8 +456,6 @@ The System Architecture translates the seven engineering domains into a computat
 | **Databricks Architecture** | App layer, processing layer, storage layer, orchestration, deployment | Domain 7 |
 
 ### 6.2 Causal Backbone
-
-The system is not organized "around" Dispatch. It is organized along a **causal backbone** that runs from the physical system to decision support:
 
 ```
                    EXTERNAL WORLD
@@ -494,19 +514,28 @@ Dispatch is **central to co-optimization**, but the system's identity is defined
 - Validation must be defined before results are produced
 - Scenario Management and Validation are **cross-cutting capabilities**, not additional domains
 
+### 6.4 Operational Signals vs. Investment Assumptions
+
+The principle "financial must not drive operational" requires precise formulation:
+
+| Category | Examples | May influence dispatch? |
+|---|---|---|
+| **Operational signals** | Market prices, TOU tariffs, DR program payments, marginal degradation cost, reserve prices | **Yes** — these are inputs to economic dispatch |
+| **Investment assumptions** | Discount rate, CAPEX, financing structure, tax treatment, contract term | **No** — these belong to the financial evaluation layer only |
+
+**Investment assumptions may enter dispatch only through explicitly derived, documented operational signals.** The clearest example is **marginal degradation cost**: it is typically derived as replacement cost ÷ lifetime throughput. Replacement cost is an investment assumption, but once transformed into a per-MWh marginal cost, it becomes an operational signal and legitimately enters the dispatch objective.
+
+The distinction is not "investment assumptions never touch dispatch." It is: **investment assumptions never enter dispatch directly; they may enter only via documented, derived operational signals.**
+
+**Contract term** defines the simulation horizon (how many years are modeled), not the dispatch decisions within those years. It sets the frame; it does not set the decisions.
+
 ---
 
 ## 7. Two Simultaneous Cycles
 
-The platform contains **two simultaneous cycles** that operate at different logical levels but remain tightly coupled. Understanding this dual-cycle structure is essential to designing a correct architecture.
-
 ### 7.1 Physical-Operational Cycle
 
-This cycle represents the **real-world behavior of the battery system over time**. It answers the question:
-
-> What does the battery actually do, hour by hour, day by day, under a given dispatch strategy?
-
-The cycle proceeds as follows:
+Represents the **real-world behavior of the battery system over time**.
 
 ```
 Inputs (load, market signals, tariffs, BESS parameters)
@@ -526,29 +555,20 @@ Operational Outputs (energy shifted, peak reduced, regulation provided)
 [Feedback into next period's dispatch feasibility]
 ```
 
-**Key characteristics:**
+**Key characteristics:** time-dependent, stateful, constraint-driven, subject to a degradation feedback loop.
 
-- Time-dependent and sequential
-- Stateful (SOC and SOH carry forward)
-- Constraint-driven (physical, market, program rules)
-- Subject to a feedback loop via degradation
-
-**Domains involved:** Domain 1 (BESS), Domain 2 (Load & Market), Domain 3 (Operational), Domain 4 (Dispatch), Domain 5 (Degradation)
+**Domains involved:** Domain 1, 2, 3, 4, 5.
 
 ### 7.2 Economic-Financial Cycle
 
-This cycle represents the **economic consequence of the physical-operational cycle**. It answers the question:
-
-> What is the financial value of what the battery did, over the contract term?
-
-The cycle proceeds as follows:
+Represents the **economic consequence of the physical-operational cycle**.
 
 ```
 Operational Outputs (from the physical-operational cycle)
         ↓
-Revenue by Value Stream (peak shaving, DR, arbitrage, regulation)
+Revenue by Value Stream
         ↓
-Savings (demand charge reduction, energy cost reduction)
+Savings
         ↓
 Costs (CAPEX, OPEX, degradation, augmentation, replacement)
         ↓
@@ -559,55 +579,27 @@ Financial KPIs (NPV, IRR, payback)
 [Feeds into scenario comparison and business decision]
 ```
 
-**Key characteristics:**
+**Key characteristics:** derived from operational outputs, aggregated over the contract term, discounted and escalated, comparative across scenarios.
 
-- Derived from operational outputs, not independent of them
-- Aggregated over the contract term
-- Discounted and escalated
-- Comparative across scenarios
-
-**Domains involved:** Domain 6 (Financial), supported by outputs from Domains 1–5
+**Domains involved:** Domain 6, supported by outputs from Domains 1–5.
 
 ### 7.3 Coupling Between Cycles
 
-The two cycles are not sequential in the sense that one finishes before the other begins. They are **coupled**:
+The two cycles are **coupled**:
 
 - The physical-operational cycle runs first within each simulation period
 - The economic-financial cycle consumes the operational outputs of that period
 - Degradation from the physical cycle feeds back into future operational feasibility
-- Financial results from the economic cycle inform scenario comparison, which may re-run the physical cycle under different assumptions
-
-```
-┌─────────────────────────────────────────────┐
-│         PHYSICAL-OPERATIONAL CYCLE          │
-│  Inputs → Dispatch → Battery → Degradation  │
-│         ↓                                   │
-│  Operational Outputs                        │
-└─────────────────┬───────────────────────────┘
-                  │
-                  ▼
-┌─────────────────────────────────────────────┐
-│         ECONOMIC-FINANCIAL CYCLE            │
-│  Operational Outputs → Revenue → Costs      │
-│         ↓                                   │
-│  Cash Flow → NPV / IRR / Payback            │
-└─────────────────┬───────────────────────────┘
-                  │
-                  ▼
-         Scenario Comparison
-                  │
-                  ▼
-          Business Decision
-```
+- Financial results inform scenario comparison, which may re-run the physical cycle under different assumptions
 
 ### 7.4 Why This Separation Matters
 
-Collapsing the two cycles into a single model is the most common architectural error in BESS evaluation platforms. It leads to:
+Collapsing the two cycles into a single model leads to:
 
-- Financial assumptions driving operational behavior (backwards causality)
-- Inability to isolate operational performance from financial performance
-- Difficulty validating results against benchmarks
-- Loss of auditability in the revenue attribution chain
+- Investment assumptions driving operational behavior
+- Inability to isolate operational from financial performance
+- Difficulty validating against benchmarks
+- Loss of auditability in revenue attribution
 
 Preserving the two-cycle structure ensures that:
 
@@ -616,57 +608,15 @@ Preserving the two-cycle structure ensures that:
 - Scenario comparison is meaningful because it varies well-defined inputs
 - Validation can be performed independently at each cycle
 
-### 7.5 Combined View
-
-```
-                    BESS SYSTEM MODEL
-                           │
-        ┌──────────────────┼──────────────────┐
-        │                  │                  │
-        ▼                  ▼                  ▼
-    Physical           External           Economic
-    System             Environment        Model
-        │                  │                  │
-        └──────────┬───────┴──────────┬───────┘
-                   │                  │
-                   ▼                  │
-              Operational             │
-               Simulation             │
-                   │                  │
-                   ▼                  │
-               Dispatch               │
-              Optimization            │
-                   │                  │
-                   └────────┬─────────┘
-                            ▼
-                     Scenario Engine
-                            │
-                   ┌────────┴────────┐
-                   ▼                 ▼
-              Operational        Financial
-                Results            Results
-                   │                 │
-                   └────────┬────────┘
-                            ▼
-                     Decision Outputs
-                            │
-                            ▼
-                      Databricks App
-```
-
-Both cycles terminate in the Scenario Engine, which produces the Decision Outputs delivered through the Databricks App.
+**Note on operational signals.** Market prices, tariffs, and marginal degradation cost are operational signals and may legitimately influence dispatch. The separation prohibits **investment-level assumptions** from entering dispatch directly — see §6.4.
 
 ---
 
 ## 8. Cross-Cutting Capabilities
 
-Two capabilities appear repeatedly in the RFP and cut across multiple domains. They are **not additional domains**; they are transversal concerns that must be designed once and applied consistently.
-
 ### 8.1 Scenario Management
 
-The RFP refers to operational scenarios, market scenarios, scenario configuration, scenario comparison, financial assumptions, and different contract conditions.
-
-Scenario Management is a **cross-domain capability** that parameterizes and orchestrates the other domains:
+Parameterizes and orchestrates the other domains:
 
 ```
                  SCENARIO MANAGEMENT
@@ -691,11 +641,9 @@ Scenario Management is a **cross-domain capability** that parameterizes and orch
                  Scenario Comparison
 ```
 
-Treating Scenario Management as a domain would artificially inflate the system. Treating it as a cross-cutting capability keeps the seven-domain decomposition clean while preserving the RFP's scenario requirements.
-
 ### 8.2 Validation
 
-The RFP requires validation against established benchmarks and successful UAT completion. Validation is therefore a **cross-cutting engineering concern** operating at four levels:
+Operates at four levels:
 
 ```
 DOMAIN VALIDATION
@@ -715,13 +663,20 @@ UAT
 - **System validation** — end-to-end chain integrity
 - **UAT** — user scenario → configuration → execution → results → acceptance
 
-Validation must be defined **before** results are produced, not after.
+Validation must be defined **before** results are produced.
+
+### 8.3 Output Mock — Anchoring Acceptance
+
+Because ENGIE's business development users will accept the platform against what they see, an **early mock of the outputs** is part of the strategy:
+
+- **KPI list** — the full set of outputs the platform will produce (NPV, IRR, payback, annual revenue by stream, demand charge savings, degradation cost, SOC profiles, dispatch profiles, scenario comparison)
+- **Dashboard wireframe** — the initial layout of the Databricks App, showing how a user configures a scenario, runs it, and inspects results
+
+This mock is prepared during Phase 1 and refined continuously. It anchors the RFP's acceptance criteria in something tangible.
 
 ---
 
 ## 9. System Strategy — Scope Definition
-
-This document is a **System Strategy**, not a specification or implementation plan.
 
 ### 9.1 What This Strategy Defines
 
@@ -730,13 +685,11 @@ This document is a **System Strategy**, not a specification or implementation pl
 - The three natures of the RFP (Engineering, Software, Delivery)
 - Major engineering domains
 - Cross-cutting capabilities (Scenario Management, Validation)
-- Major capabilities
-- System interactions
-- Inputs and outputs
-- Architectural principles
+- Operational signals vs. investment assumptions distinction
+- Delivery philosophy (design-led, iteratively delivered)
 - Validation philosophy
-- Technology strategy
-- Evolution strategy
+- **Technology strategy** (see §9.3)
+- **Evolution strategy** (see §9.4)
 
 ### 9.2 What This Strategy Does Not Define
 
@@ -755,16 +708,55 @@ This document is a **System Strategy**, not a specification or implementation pl
 
 Those belong to Stages B, C, and D.
 
+### 9.3 Technology Strategy
+
+The RFP requires Python, Databricks, PySpark, and SQL. Where each earns its place:
+
+| Technology | Role | Where it does **not** belong |
+|---|---|---|
+| **Python** | Modeling engine; BESS physics, dispatch, degradation, financial calculation | — |
+| **PySpark** | Parallelization **across scenarios**, **across representative periods within a year**, and **across sensitivity analyses**; large-scale data transformation | Sequential state evolution (see below) |
+| **SQL** | Data ingestion, validation, transformation, querying, result storage | Modeling logic |
+| **Databricks** | Execution environment, orchestration, storage, app hosting | Model definition |
+| **Databricks App** | User interface — scenario configuration, dashboards, exports | Modeling logic |
+
+**PySpark scope — explicit, and constrained by statefulness.**
+
+Two things in this system are **sequential by construction** and therefore **cannot** be parallelized across their natural axis:
+
+- **Project years** — SOH carries forward from one year to the next
+- **Rolling-horizon windows** — SOC carries forward from one window to the next
+
+Parallelizing either axis would violate the feedback loop the platform is built to preserve.
+
+PySpark therefore parallelizes:
+
+- **Scenarios** — the primary axis. A scenario grid of N scenarios runs as N parallel units of work.
+- **Representative periods within a year** — valid only when SOH is held fixed during that year. Under annual-SOH-update designs, the representative periods of one year are independent and parallelizable.
+- **Sensitivity analyses** — each sensitivity case is an independent scenario.
+
+A single dispatch optimization for one scenario and one representative period is a **single-node Python computation**. PySpark does not parallelize within an optimization.
+
+This is the architectural commitment the RFP's PySpark requirement implies. Stated this way, it has clear boundaries and does not contradict the feedback loop.
+
+### 9.4 Evolution Strategy
+
+The platform is designed to evolve along three axes:
+
+1. **Market coverage** — new markets are added by developing new adapters, not by altering the generic engine
+2. **Value stream coverage** — new value streams are added as new operational modes, dispatched through the existing optimization layer
+3. **Analytical depth** — degradation fidelity, uncertainty modeling, and forecast methodology can be deepened in later phases without restructuring the domains
+
+This means the deliverable at week 12 is a **platform**, not a fixed study: ENGIE can extend it without re-architecting it.
+
 ---
 
 ## 10. Engagement Timeline
 
-The 12-week engagement follows ENGIE's defined phases, mapped to the four delivery stages:
-
 | Phase | Weeks | Delivery Stage | Focus |
 |---|---|---|---|
-| 1 — Design | 1–2 | Stage A + B | Requirements validation, conceptual engineering, high-level architecture |
-| 2 — Development | 3–9 | Stage C + D | Detailed engineering, product specification, implementation |
+| 1 — Design | 1–2 | Stage A + B | Requirements validation, conceptual engineering, high-level architecture, output mock |
+| 2 — Development | 3–9 | Stage C + D (parallel) | Thin end-to-end slice by ~week 4 (demo to ENGIE), then progressive domain deepening |
 | 3 — Testing | 10–11 | Stage D | Model validation, UAT |
 | 4 — Deployment | 12 | Stage D | Final delivery, deployment, documentation, training |
 
@@ -776,26 +768,49 @@ The 12-week engagement follows ENGIE's defined phases, mapped to the four delive
 - Periodic progress reporting
 - Review sessions at key milestones
 - Structured issue tracking and resolution
-- Formal sign-off at end of Stage A, Stage B, Stage C, and Stage D
+- Formal sign-off at end of Stage A, Stage B, Stage C, and Stage D (with the lightweight-gate framing of §4.4)
 
 ---
 
 ## 12. Phase 1 Clarification Items
 
-The following items require explicit confirmation during Weeks 1–2:
+Clarification items are organized into **blocking** and **defaultable**. Blocking items must be resolved in Weeks 1–2; defaultable items will proceed under an explicit working assumption if not confirmed by Week 2, and the assumption will be documented and revisited if contradicted.
 
-1. **Target market(s)** — Which ISO/RTO or jurisdiction defines the market rules?
-2. **Dispatch methodology** — Heuristic, LP, MILP, or hybrid?
-3. **Degradation model fidelity** — Empirical, semi-empirical, or vendor-data-driven?
-4. **Load forecasting method** — Statistical, ML-based, hybrid, or provided by ENGIE?
-5. **Reporting format** — PDF, Excel, or both?
-6. **Scenario granularity** — How many scenarios, what dimensions?
-7. **Benchmark data** — What established benchmarks will be used for validation?
-8. **Data availability** — What historical data will ENGIE provide?
-9. **Market adapter scope** — Which markets must be supported at delivery?
-10. **Acceptance thresholds** — What accuracy and performance criteria define acceptance?
-11. **Audit / lineage / traceability scope** — Are execution logs, data lineage, and audit outputs required deliverables, or are they optional engineering practices?
-12. **Load forecasting home** — Is forecasting owned by Domain 2 (Load & Market), treated as a transversal capability, or delivered as part of Domain 7 (Data & Application)?
+### 12.1 Blocking Items (must be resolved in Weeks 1–2)
+
+| # | Item | Why Blocking |
+|---|---|---|
+| B1 | **Target market(s)** | Market rules drive eligibility, dispatch logic, settlement, revenue calculation |
+| B2 | **Behind-the-meter vs. front-of-the-meter scope** | Determines which value streams and constraints apply |
+| B3 | **Data availability** | Determines what can actually be modeled; drives ingestion design |
+| B4 | **Benchmark data** | Required to define acceptance; validation is defined before results |
+| B5 | **Acceptance thresholds (accuracy + quantified runtime + usability)** | The RFP's "execution standards" must be made concrete before the thin slice is built |
+
+### 12.2 Defaultable Items (proceed under stated assumption if not confirmed by Week 2)
+
+| # | Item | Default assumption if not confirmed |
+|---|---|---|
+| D1 | Dispatch methodology | **Hybrid** — rule-based heuristic with LP refinement for peak shaving + arbitrage; revisit after thin slice |
+| D2 | Perfect foresight vs. forecast-based dispatch | **Forecast-based** with perfect-foresight benchmark available for comparison |
+| D3 | Degradation feedback loop time scale | **Annual SOH update** with representative-period simulation within each year |
+| D4 | Voltage regulation coupling | **Fixed envelope** (no P² + Q² ≤ S² linearization in initial scope); flag as extension |
+| D5 | Load forecasting method | **ENGIE-provided** if available; otherwise statistical baseline (seasonal + TOU pattern) |
+| D6 | Short-horizon forecast vs. multi-year projection | Both are modeled; short-horizon for dispatch, multi-year for contract-term scenarios |
+| D7 | Load forecasting home | **Conceptual ownership: Domain 2**; implementation via Domain 7 |
+| D8 | Financing structure | **Project IRR as primary KPI**; equity IRR deferred pending financing details |
+| D9 | Tax and incentives treatment | **Pre-tax** initially; ITC/depreciation flagged as extension if US market confirmed |
+| D10 | Reporting format | **Both PDF and Excel** — Excel for analysts, PDF for business development |
+| D11 | Scenario granularity | **3–5 core scenarios** initially, expandable |
+| D12 | Audit / lineage / traceability scope | **Basic execution logs + data lineage**; full audit framework deferred |
+| D13 | Market adapter scope | **One adapter at delivery** (target market), architecture supports more |
+| D14 | Time resolution and simulation horizon | **Hourly resolution, 15-year contract term** — revisited if 15-min required |
+| D15 | Databricks workspace access and environment ownership | **ENGIE-owned workspace**; consultant granted developer access |
+
+### 12.3 Rationale
+
+This two-tier structure exists because **the project must be able to proceed even if ENGIE is slow to answer**. Blocking items genuinely prevent design from starting. Defaultable items have defensible working assumptions that can be revisited — and if the assumption is later contradicted, the cost of adjustment is contained by the architecture (adapters, scenario parameters, cross-cutting capabilities).
+
+Every default assumption is documented in the Phase 1 report and flagged for review at the Stage B review session.
 
 ---
 
@@ -807,9 +822,9 @@ The system is organized into **seven engineering domains**, connected through a 
 
 The engagement itself is understood as **three parallel natures** — Engineering, Software, and Delivery — with the seven-domain model constituting the Engineering column, Domain 7 delivering the Software column, and Phase 4 carrying the Delivery column.
 
-The delivery sequence — **Stage A: Engineering Definition (Conceptual Engineering) → Stage B: System Architecture (Basic Engineering) → Stage C: Product Specification (Detailed Engineering) → Stage D: Implementation (Construction & Commissioning)** — ensures that the software built in Weeks 3–12 is correct by construction, because the model it implements has been fully defined, validated, and agreed before a single line of production code is written.
+Delivery is **design-led and iteratively delivered**: a thin end-to-end slice (peak shaving + arbitrage + simple degradation + NPV in the app) exists by approximately week 4 and is demoed to ENGIE as a scope-validation checkpoint. Stage C and Stage D run in parallel from week 3. Stage gates are lightweight, preserving rigor without imposing sequencing that would delay the first working artifact.
 
-The platform will connect data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation.
+The platform will connect data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation — and it will be extensible to new markets and value streams without re-architecture.
 
 ---
 
@@ -819,6 +834,62 @@ The platform will connect data, forecast, physics, dispatch, degradation, revenu
 **Language:** English
 
 ---
+
+
+---
+
+**BESS Operational & Financial Modeling (RFP-264144-1): Observations and Clarification Requests**
+
+**Scope and market**
+
+1. **Target market.** The RFP references several market constructs (PJM RegD, ERCOT FFR, day-ahead and real-time LMP, capacity markets, TOU tariffs). *Proposal:* deliver one fully implemented market at week 12, with an architecture that allows further markets to be added without redesign. Which market should be first?
+2. **Behind-the-meter vs. front-of-meter.** Peak shaving and demand response are mainly behind-the-meter use cases. Frequency and voltage regulation are mostly front-of-meter or compensated contractually. Which configurations must the tool support?
+3. **Commercial perspective.** Should results be shown from ENGIE's perspective as owner or operator, from the client's perspective (savings), or both? Examples include shared-savings contracts or storage-as-a-service fees. This affects how value is split and reported.
+4. **Out of scope.** We assume real-time asset control, market bidding and EMS/SCADA integration are out of scope. Please confirm.
+
+**Data**
+
+5. **Price projections.** Long-term price curves (LMP, ancillary services, capacity) are the largest driver of project value. We assume the tool consumes these as inputs rather than generating them. Will ENGIE provide internal price curves, or should we use a public source?
+6. **Meter data and time resolution.** *Proposal:* 15-minute resolution wherever meter data and demand-charge billing are 15-minute, and hourly elsewhere. Hourly resolution understates peaks and therefore peak-shaving savings.
+7. **Frequency regulation signal.** At 15-minute or hourly resolution, regulation is modeled as capacity reservation plus a statistical estimate of energy throughput and SOC impact. Is this acceptable, or can ENGIE provide historical regulation signal data?
+8. **Battery data.** Are vendor degradation curves or warranty terms available for the reference technologies? These would anchor the degradation model.
+9. **Load forecasting.** A short-term forecast for dispatch and a multi-year projection for the contract term need different methods. Does ENGIE already have load projections or growth assumptions we should use?
+
+**Methodology**
+
+10. **Dispatch method.** *Proposal:* linear programming, with mixed-integer formulations only where strictly required. This gives a good balance of optimality, transparency and runtime.
+11. **Foresight assumption.** *Proposal:* perfect-foresight optimization with a configurable realization factor, for example 80–90% of theoretical arbitrage value, which is standard practice for business development valuation. Forecast-based dispatch would be an optional extension. Does this fit ENGIE's intended use?
+12. **Degradation feedback.** *Proposal:* state of health is updated annually, with representative periods simulated within each year. Augmentation or replacement is triggered at a configurable threshold.
+13. **Demand response.** DR events are not known in advance. *Proposal:* model them through capacity reserved for events plus event scenarios, applying the rules of the specific program. Which programs are in scope?
+14. **Voltage regulation.** *Proposal:* model it as an inverter capability constraint, shown as the active-power curtailment it causes. Revenue is included only where a compensation mechanism exists.
+
+**Financial**
+
+15. **Equity IRR.** This requires a financing structure. *Proposal:* debt parameters (gearing, interest rate, tenor) that ENGIE can configure, with default values provided.
+16. **Tax, incentives and conventions.** Should the model include tax, depreciation and incentives such as the ITC if the market is in the US? Please also confirm the currency, whether figures are nominal or real, and the inflation and escalation conventions.
+
+**Validation and acceptance**
+
+17. **Benchmarks.** *Proposal:* validate against NREL REopt and/or SAM for reference cases, plus ENGIE's internal models or actual project results if available.
+18. **Acceptance thresholds.** *Proposal:* NPV within ±X% of the benchmark on agreed reference cases, energy balance and SOC consistency at 100%, and a full contract-term scenario run in under N minutes. The values to be agreed in week 2.
+
+**Platform and delivery**
+
+19. **Databricks environment.** Please confirm:
+    - workspace ownership and access provisioning,
+    - that Databricks Apps is enabled in the workspace and region,
+    - Unity Catalog usage and compute policies.
+20. **Solver licensing.** *Proposal:* an open-source solver (HiGHS) to avoid licensing dependencies. Does ENGIE hold commercial licenses (Gurobi, CPLEX) it would prefer to use?
+21. **Users and handover.** Who are the users and roles, and how many? Who will maintain the tool after week 12? This defines the training audience and the level of documentation.
+22. **Reporting.** Are there ENGIE templates or branding requirements for the PDF and Excel exports?
+
+**Governance**
+
+23. **Point of contact and decision timing.** We need a single point of contact and access to subject-matter experts. We also need decisions on the blocking items (points 1, 2, 5, 17 and 18) by the end of week 2. Items not confirmed by then will proceed under the stated proposal, documented as an assumption.
+24. **Interim demo.** *Proposal:* a working end-to-end demo around week 4 (peak shaving + arbitrage + degradation + NPV in the app) to validate direction with business development users early.
+
+---
+
 
 
 
