@@ -1,16 +1,12 @@
-Aplico los seis patches. Aquí tienes **A.2.5 v0.2 — Degradation Engineering**, con los cambios integrados en el cuerpo del documento.
-
----
-
 # Degradation Engineering
 ## Stage A.2.5 — Conceptual Engineering
 ### Capability Evolution of the BESS Operational & Financial Modeling System
 
 **Document ID:** A.2.5-DEG-ENG-001
 
-**Version:** 0.2 — Development Draft
+**Version:** 0.3 — Development Draft
 
-**Status:** Stage A.2 — Conceptual Engineering (Domain Level)
+**Status:** Stage A.2 — Conceptual Engineering (Domain Level) — Development Baseline
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
@@ -20,8 +16,8 @@ Aplico los seis patches. Aquí tienes **A.2.5 v0.2 — Degradation Engineering**
 - `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
 - `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
-- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.7)
-- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.0)
+- `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.9)
+- `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Domain:** Domain 5 — Degradation Engineering
 
@@ -70,12 +66,12 @@ Those belong to Stage B (architecture and formulation) and Stage C (detailed for
 
 ### 1.2 Working Defaults from the Strategy
 
-| Strategy default | Working default used in this document |
-|---|---|
-| **D3** | **Annual SOH update** with representative-period simulation within each year |
-| **PH-043** | **Semi-empirical** degradation model |
-| **PH-044** | **SOH-threshold-triggered** augmentation policy |
-| **PH-045** | **Reset to BOL** on replacement |
+| Strategy default | Register ID | Working default used in this document |
+|---|---|---|
+| Degradation feedback time scale | **PH-036** | **Annual SOH update** with representative-period simulation within each year |
+| Degradation model fidelity | **PH-043** | **Semi-empirical** degradation model |
+| Augmentation policy | **PH-044** | **SOH-threshold-triggered** augmentation policy |
+| Replacement policy | **PH-045** | **Reset to BOL** on replacement |
 
 Each default is revisable if ENGIE indicates otherwise.
 
@@ -260,12 +256,14 @@ The domain does **not**:
 |---|---|
 | Dispatch schedule | Charge / discharge / rest per interval |
 | SOC trajectory | SOC per interval |
+| Battery power trajectory | Charge / discharge power per interval |
 | Charge throughput | Cumulative energy charged |
 | Discharge throughput | Cumulative energy discharged |
-| Cycling behavior | Number of cycles, depth of discharge per cycle, C-rate per cycle |
 | Reserved capacity | Time spent in reservation states (does not consume throughput) |
 
-**Feedback frequency.** Per working default **D3**, this input is consumed **annually** with representative-period simulation within each year. The annual SOH update means:
+**Note on cycling metrics.** Cycling metrics — cycle counts, depth of discharge per cycle, C-rate per cycle — are **derived by Degradation Engineering from the power and SOC trajectories** provided by Dispatch. Dispatch does **not** produce these metrics. See `A.2.4-DISPATCH-ENG-001` §4.3, §12.1, §14.4.
+
+**Feedback frequency.** Per working default **PH-036**, this input is consumed **annually** with representative-period simulation within each year. The annual SOH update means:
 
 - SOH is held constant **within** each simulated year
 - SOH is updated **between** years based on the year's aggregated usage
@@ -498,7 +496,7 @@ Dispatch may consume the marginal degradation cost **if the selected methodology
 | Signal provided, methodology does not include it | Signal is available but not used; dispatch may over-cycle |
 | Signal not provided | Dispatch operates without degradation signal; over-cycling risk unless mitigated by other constraints |
 
-**Working default:** The signal is produced. Whether it enters the dispatch objective depends on the selected methodology (**PH-032**).
+**Working default:** The signal is produced. Whether it enters the dispatch objective depends on the selected methodology (**PH-032** / **PH-034**).
 
 ### 9.5 Interface with Financial Engineering
 
@@ -527,14 +525,15 @@ This is the mechanism that prevents double counting (`SYS-ENG-DEF-001` §11.5).
 |---|---|---|
 | **Double counting degradation** | Physical degradation reduces future revenue; a cash-flow degradation cost on top of that would double-count | Marginal degradation cost is a dispatch signal only; cash flow contains real augmentation/replacement flows only (`SYS-ENG-DEF-001` §11.5) |
 | **Conflating three concepts** | Physical degradation, marginal degradation cost, and replacement cash flow are distinct | Each is separately owned (§2.3) |
-| **Feedback frequency inconsistency** | If SOH is updated at the wrong frequency relative to dispatch, the loop is either unstable or inefficient | Working default D3: annual SOH update; revisable per PH-038 |
-| **Mixed cohorts after augmentation** | Multiple cohorts with different SOH coexist after augmentation | Aggregation rule deferred to Stage B; working default is capacity-weighted SOH (per PH-018) |
-| **SOC window behavior** | Whether the SOC window narrows proportionally or is preserved in kWh affects usable energy in later years | Deferred per PH-017 |
+| **Feedback frequency inconsistency** | If SOH is updated at the wrong frequency relative to dispatch, the loop is either unstable or inefficient | Working default **PH-036**: annual SOH update; revisable per **PH-038** |
+| **Mixed cohorts after augmentation** | Multiple cohorts with different SOH coexist after augmentation | Aggregation rule deferred to Stage B; working default is capacity-weighted SOH (per **PH-018**) |
+| **SOC window behavior** | Whether the SOC window narrows proportionally or is preserved in kWh affects usable energy in later years | Deferred per **PH-017** |
 | **Temperature representation** | Temperature affects aging rate; whether it is a fixed assumption or a time-varying input matters | Temperature is an **input assumption** per A.2.1 §13.2 |
-| **C-rate effects on aging** | High C-rate accelerates aging; not all models capture this | Model fidelity per PH-043 (semi-empirical) |
+| **C-rate effects on aging** | High C-rate accelerates aging; not all models capture this | Model fidelity per **PH-043** (semi-empirical) |
 | **Depth of discharge effects** | Deeper cycles typically age the battery faster per unit of throughput | Model structure must represent this |
 | **Reserved capacity does not consume throughput** | Reservations hold capacity but do not cycle it; degradation should reflect actual cycling | Input from Dispatch distinguishes reservation from actual operation |
 | **Representative-period aggregation** | Representative periods are simulated independently for dispatch, but degradation must aggregate their usage annually | Annual update aggregates all representative periods within the year |
+| **Cycling metric ownership** | Dispatch provides power and SOC trajectories; cycling metrics are derived by Degradation | Preserves domain boundary (`A.2.4` §4.3, §12.1, §14.4) |
 
 ---
 
@@ -577,9 +576,11 @@ BESS Engineering **owns the physical state** (including SOH as a state variable)
 |---|---|
 | Dispatch schedule | Charge / discharge / rest per interval |
 | SOC trajectory | SOC per interval |
+| Battery power trajectory | Charge / discharge power per interval |
 | Throughput | Cumulative charge and discharge |
-| Cycling behavior | Cycle count, DoD, C-rate |
 | Reserved capacity | Reservation states |
+
+**Note.** Dispatch does **not** provide cycling metrics. Degradation derives them from the power and SOC trajectories (`A.2.4` §4.3, §12.1, §14.4).
 
 ### 12.2 What Degradation Provides to Dispatch
 
@@ -595,16 +596,20 @@ BESS Engineering **owns the physical state** (including SOH as a state variable)
 ```
 Dispatch
    │
-   │ Battery Usage
+   │ Battery power trajectory + SOC trajectory
    ▼
 Degradation Engineering
    │
-   │ Updated State + Marginal Signal
+   │ derives cycling metrics from trajectories
+   │ updates SOH, available capacity
+   │ derives marginal degradation signal
    ▼
-Dispatch (next step)
+Dispatch (next year)
 ```
 
-**Feedback time scale** is a Phase 1 decision (**D3** / **PH-038**). Working default is annual SOH update with representative-period simulation within each year.
+**Feedback time scale** is a Phase 1 decision (**PH-036**). Working default is annual SOH update with representative-period simulation within each year.
+
+**Annual offset.** Under annual SOH update, the marginal degradation cost consumed during year *n* is computed from the state at the **beginning of year *n***. This breaks the circularity between signal, dispatch, and SOH. See `A.2.4-DISPATCH-ENG-001` §5.5.
 
 ### 12.4 Boundary Discipline
 
@@ -676,13 +681,14 @@ Operational Engineering does **not** declare the magnitude of degradation, the m
 | # | Assumption | Rationale | Impact if Wrong |
 |---|---|---|---|
 | 1 | Degradation model fidelity is semi-empirical | Working default **PH-043** | Would require different calibration approach |
-| 2 | SOH update frequency is annual with representative-period simulation | Working default **D3** / **PH-038** | Would change feedback loop architecture |
+| 2 | SOH update frequency is annual with representative-period simulation | Working default **PH-036** / **PH-038** | Would change feedback loop architecture |
 | 3 | Augmentation is SOH-threshold-triggered | Working default **PH-044** | Would change augmentation logic |
 | 4 | Replacement resets capacity to BOL | Working default **PH-045** | Would change long-term capacity model |
 | 5 | Physical degradation, marginal degradation cost, and replacement cash flow are distinct | Core boundary principle | Would collapse the model |
 | 6 | Marginal degradation cost is a derived signal, not a cash flow | Core boundary principle | Would cause double counting |
 | 7 | Temperature is an input assumption, not a modeled state | Per A.2.1 §13.2 | Would change aging model |
 | 8 | Augmentation and replacement policies are scenario parameters, not BESS Engineering parameters | Ownership principle (§8.1) | Would blur ownership |
+| 9 | Cycling metrics are derived by Degradation from power and SOC trajectories | Preserves domain boundary (`A.2.4` §4.3) | Would blur Dispatch and Degradation |
 
 ### 15.2 Engineering Uncertainties
 
@@ -695,7 +701,7 @@ Operational Engineering does **not** declare the magnitude of degradation, the m
 | 5 | Replacement policy details | **PH-045** |
 | 6 | SOC window behavior under degradation | **PH-017** |
 | 7 | Multi-cohort aggregation rule | **PH-018** |
-| 8 | Whether marginal signal enters dispatch objective | **PH-032** / **PH-039** |
+| 8 | Whether marginal signal enters dispatch objective | **PH-032** / **PH-034** |
 | 9 | End-of-life threshold | **PH-016** / **PH-044** |
 | 10 | Efficiency degradation representation | **Stage B** |
 | 11 | Marginal signal formulation | **Stage B / C** |
@@ -704,17 +710,20 @@ Operational Engineering does **not** declare the magnitude of degradation, the m
 
 ### 15.3 Phase 1 Clarification Dependencies
 
-This domain depends on the following Phase 1 items from `PH1-REG-001`:
+This domain depends on the following Phase 1 items from `PH1-REG-001` v1.1:
 
 - **PH-015** — Battery data
 - **PH-016** — SOC bounds and warranty
 - **PH-017** — SOC window behavior under degradation
 - **PH-018** — Multi-cohort aggregation after augmentation
-- **PH-038** — Degradation feedback time scale
-- **PH-039** — Financial objective inside dispatch
+- **PH-032** — Financial objective inside dispatch
+- **PH-036** — Degradation feedback time scale
+- **PH-038** — Degradation feedback time scale (confirmatory)
 - **PH-043** — Degradation model fidelity
 - **PH-044** — Augmentation policy
 - **PH-045** — Replacement policy
+
+**Note.** PH IDs are assigned in `PH1-REG-001` v1.1, the authoritative consolidated Register.
 
 ---
 
@@ -794,7 +803,7 @@ Validation evidence must be **produced before results are accepted**.
 | Degradation | Dispatch | Updated SOH, available capacity, marginal degradation cost (where applicable), updated constraints |
 | Degradation | Financial | Augmentation events, replacement events, physical event information |
 | BESS Engineering | Degradation | Initial state, physical parameters, temperature profile |
-| Dispatch | Degradation | Battery usage |
+| Dispatch | Degradation | Battery usage (power trajectory, SOC trajectory) |
 | Operational Engineering | Degradation | Degradation-relevant behavior declarations |
 | Scenario Management | Degradation | Augmentation policy, replacement policy, EOL threshold, replacement cost assumption |
 
@@ -852,12 +861,12 @@ These belong to Stage B, Stage C, Stage D, or to Scenario Management / Domain 6.
 
 | Source | Section | Covered Here |
 |---|---|---|
-| `SYS-STR-FRM-001` v0.8 | §5 Domain 5, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §12.2 D3 | Yes |
+| `SYS-STR-FRM-001` v0.8 | §5 Domain 5, §6.2 Causal Backbone, §6.4 Operational signals vs. investment assumptions, §12.2 defaults | Yes |
 | `SYS-ENG-DEF-001` v0.5 | §10 Domain 5, §11.5 Degradation cost double-counting rule, §13 Inter-Domain Contract | Yes |
-| `A.2.1-BESS-ENG-001` v1.2 | §8 Interface with Degradation, §11 State Variables | Yes |
+| `A.2.1-BESS-ENG-001` v1.2 | §8 Interface with Degradation, §11 State Variables, §13 Thermal Considerations | Yes |
 | `A.2.3-OPS-ENG-001` v1.3 | §14 Interface with Degradation | Yes |
-| `A.2.4-DISPATCH-ENG-001` v0.7 | §5.4, §12 Degradation Feedback, §16 Modeling Traps | Yes |
-| `PH1-REG-001` v1.0 | PH-015, PH-016, PH-017, PH-018, PH-038, PH-039, PH-043, PH-044, PH-045 | Yes |
+| `A.2.4-DISPATCH-ENG-001` v0.9 | §5.5, §12 Degradation Feedback, §14.4 Degradation-Relevant Usage, §16 Modeling Traps | Yes |
+| `PH1-REG-001` v1.1 | PH-015, PH-016, PH-017, PH-018, PH-032, PH-036, PH-038, PH-043, PH-044, PH-045 | Yes |
 
 ---
 
@@ -865,20 +874,20 @@ These belong to Stage B, Stage C, Stage D, or to Scenario Management / Domain 6.
 
 | # | Decision | Stage | Working default |
 |---|---|---|---|
-| 1 | Degradation model structure | Stage B | Semi-empirical (PH-043) |
-| 2 | Calibration data source | PH-015 / PH-043 | Vendor data if available; otherwise literature |
-| 3 | Feedback frequency | PH-038 | Annual with representative-period simulation |
-| 4 | Augmentation policy details | PH-044 | SOH-threshold-triggered |
-| 5 | Replacement policy details | PH-045 | Reset to BOL |
-| 6 | SOC window behavior under degradation | PH-017 | Proportional narrowing |
-| 7 | Multi-cohort aggregation rule | PH-018 | Capacity-weighted SOH |
-| 8 | Whether marginal signal enters dispatch objective | PH-032 / PH-039 | Depends on methodology |
+| 1 | Degradation model structure | Stage B | Semi-empirical (**PH-043**) |
+| 2 | Calibration data source | **PH-015** / **PH-043** | Vendor data if available; otherwise literature |
+| 3 | Feedback frequency | **PH-038** | Annual with representative-period simulation |
+| 4 | Augmentation policy details | **PH-044** | SOH-threshold-triggered |
+| 5 | Replacement policy details | **PH-045** | Reset to BOL |
+| 6 | SOC window behavior under degradation | **PH-017** | Proportional narrowing |
+| 7 | Multi-cohort aggregation rule | **PH-018** | Capacity-weighted SOH |
+| 8 | Whether marginal signal enters dispatch objective | **PH-032** / **PH-034** | Depends on methodology |
 | 9 | **Marginal signal formulation** | **Stage B / C** | **Derived from replacement/augmentation economics combined with degradation throughput/capability assumptions** |
-| 10 | End-of-life threshold | PH-016 / PH-044 | Configurable; default TBD |
+| 10 | End-of-life threshold | **PH-016** / **PH-044** | Configurable; default TBD |
 | 11 | Efficiency degradation representation | Stage B | Loss of round-trip efficiency over time |
 | 12 | Rainflow counting | Stage C | Only if cycle aging requires it |
 | 13 | Numerical integration scheme | Stage C | — |
-| 14 | Validation tolerances | Stage C / PH-006 | — |
+| 14 | Validation tolerances | Stage C / **PH-006** | — |
 
 ---
 
@@ -886,25 +895,29 @@ These belong to Stage B, Stage C, Stage D, or to Scenario Management / Domain 6.
 
 This document establishes the **conceptual engineering baseline** for Domain 5 — Degradation Engineering. It establishes the **conceptual contract for the Dispatch ↔ Degradation interface** and defines the three distinct concepts (physical degradation, marginal degradation cost, replacement cash flow) that must not collapse. The contract will be validated as the project advances to Stage B/C.
 
-The Stage A.2 chapters:
+**Stage A.2 status:**
 
 | Order | Document ID | Domain | Status |
 |---|---|---|---|
 | 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
 | 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
 | 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | ✅ Development Baseline (v0.7) |
-| 5 | A.2.5 | Degradation Engineering | ✅ **This document — Development Baseline** |
-| 6 | A.2.6 | Financial Engineering | ⏭ Next |
-| 7 | A.2.7 | Data & Application Engineering | ⏭ Pending |
+| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
+| 5 | A.2.5 | Degradation Engineering | ✅ **This document** — Development Baseline (v0.3) |
+| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
+| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
 
 **Immediate next document:** `A.2.6 — Financial Engineering`, which consumes operational outputs, degradation events, and tariff bill outputs, and produces project-level economic performance.
+
+**Next:** Stage A consolidation and audit before Stage B (HLD).
+
+Phase 1 clarification items are organized in `PH1-REG-001` v1.1, the authoritative consolidated Register. This domain's dependencies are listed in §15.3.
 
 ---
 
 ## 23. ENGIE Clarification Requests Relevant to Degradation Engineering
 
-The following clarification items are relevant to this domain. They are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001`), which is the authoritative consolidated list. This section lists only the items relevant to Degradation Engineering, by their **Register ID**.
+The following clarification items are relevant to this domain. They are tracked in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), which is the authoritative consolidated list. This section lists only the items relevant to Degradation Engineering, by their **Register ID**.
 
 | Register ID | Clarification / Data Request | Why Required |
 |---|---|---|
@@ -912,8 +925,9 @@ The following clarification items are relevant to this domain. They are tracked 
 | **PH-016** | **SOC bounds and warranty.** Are SOC bounds driven by warranty terms, operating policy, or both? | Affects available capacity and EOL threshold |
 | **PH-017** | **SOC window behavior under degradation.** Proportional narrowing or preserved kWh reserves? | Affects usable energy in later years |
 | **PH-018** | **Multi-cohort aggregation after augmentation.** How should SOH be aggregated when multiple cohorts coexist? | Affects post-augmentation representation |
-| **PH-038** | **Degradation feedback time scale.** Frequency of SOH update during operational simulation? | Determines feedback loop architecture |
-| **PH-039** | **Financial objective inside dispatch.** Should degradation cost enter the dispatch objective? | Determines whether the marginal signal is consumed |
+| **PH-032** | **Financial objective inside dispatch.** Should degradation cost enter the dispatch objective? | Determines whether the marginal signal is consumed |
+| **PH-036** | **Degradation feedback time scale.** Frequency of SOH update during operational simulation? | Determines feedback loop architecture |
+| **PH-038** | **Degradation feedback time scale (confirmatory).** Confirmation of annual SOH update with representative-period aggregation. | Confirms the working default |
 | **PH-043** | **Degradation model fidelity.** Empirical, semi-empirical, or vendor-data-driven? | Determines model class |
 | **PH-044** | **Augmentation policy.** Scheduled, SOH-threshold-triggered, or both? | Determines augmentation logic |
 | **PH-045** | **Replacement policy.** Does replacement reset capacity to BOL? | Determines long-term capacity model |
@@ -925,7 +939,7 @@ The following clarification items are relevant to this domain. They are tracked 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.2.5 — Conceptual Engineering (Degradation Engineering)
-**Status:** Conceptual Engineering — **Development Baseline**
+**Status:** Conceptual Engineering — **Development Baseline (v0.3)**
 **Duration:** 12 Weeks
 **Language:** English
 
