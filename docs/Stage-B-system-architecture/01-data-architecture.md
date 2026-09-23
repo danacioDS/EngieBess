@@ -1,4 +1,3 @@
-
 # STAGE-B-HLD-001 — System Architecture (HLD)
 
 ## §4 — B.1 Data Architecture
