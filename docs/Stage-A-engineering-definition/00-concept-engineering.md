@@ -11,7 +11,7 @@
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Parent Documents:**
-- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.8)
+- `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 
 **Purpose:** Provide a system-level, eagle-eye definition of the seven engineering domains that constitute the BESS Operational & Financial Modeling System, establishing their identity, purpose, boundaries, responsibilities, inputs, outputs, and relationships — without entering into detailed conceptual engineering, architecture, or implementation.

@@ -15,9 +15,9 @@
 
 **Parent Documents:**
 - `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
-- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.2)
+- `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
-- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.3)
+- `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
 - `A.2.4-DISPATCH-ENG-001` — Dispatch & Optimization Engineering (v0.9)
 - `A.2.5-DEG-ENG-001` — Degradation Engineering (v0.3)
 - `A.2.6-FIN-ENG-001` — Financial Engineering (v0.2)
