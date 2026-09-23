@@ -1,14 +1,17 @@
+
+---
+
 # STAGE-B-HLD-001 — System Architecture (HLD)
 
 ## §4 — B.1 Data Architecture
 
-**Document ID:** STAGE-B-HLD-001
+**Document ID:** B.1-DATA-ARCH-001
 
-**Version:** 0.3 — Baseline Candidate
+**Version:** 0.3 — Baseline
 
 **Section:** §4 — B.1 Data Architecture
 
-**Status:** Stage B — Baseline Candidate
+**Status:** Stage B — Baseline
 
 **Parent Documents:**
 - `SYS-STR-FRM-001` — System Strategy & Delivery Framework
@@ -24,7 +27,11 @@
 - `STAGE-B-HLD-INDEX-001` — Stage B HLD Master Index and Scope Definition
 - `STAGE-B-HLD-001 §3` — B.0 Integrated System Architecture (v0.3.3 Baseline Frozen)
 
-**Changes from v0.1:** 6 major corrections (see §13 Change Log).
+**Changes from v0.1:** 6 major corrections. See §16 Change Log.
+
+**Changes from v0.2:** 4 corrections. See §16 Change Log.
+
+**Changes from v0.3 (candidate):** 3 editorial adjustments + Runtime State cleanup. See §16 Change Log.
 
 ---
 
@@ -193,9 +200,9 @@ The **Governance Data** represents cross-cutting metadata:
 | **Battery vendor data** | Degradation curves, warranty terms | Domain 1 |
 | **Benchmark data** | Reference cases | Domain 6 |
 | **Financial assumptions** | Discount rate, escalation, tax | Domain 6 |
-| **Scenario definitions** | Scenario parameters | Scenario Management |
+| **Scenario configuration** | Scenario parameters and configuration | Scenario Management |
 
-**Architectural owner:** Domain 7 (data infrastructure)
+**Data infrastructure owner:** Domain 7
 
 **Semantic owner:** The domain that defines what the data means.
 
@@ -216,7 +223,7 @@ The **Governance Data** represents cross-cutting metadata:
 | **Ingested battery data** | Structured vendor data | Domain 1 |
 | **Ingested financial assumptions** | Structured assumptions | Domain 6 |
 
-**Architectural owner:** Domain 7
+**Data infrastructure owner:** Domain 7
 
 **Semantic owner:** The domain that defines the data.
 
@@ -235,7 +242,7 @@ The **Governance Data** represents cross-cutting metadata:
 | **Validated battery data** | Battery data passing quality checks | Domain 1 |
 | **Validated financial assumptions** | Assumptions passing quality checks | Domain 6 |
 
-**Architectural owner:** Domain 7
+**Data infrastructure owner:** Domain 7
 
 **Semantic owner:** The domain that defines the data.
 
@@ -307,8 +314,9 @@ The **Governance Data** represents cross-cutting metadata:
 | Entity | Description | Owner |
 |---|---|---|
 | **Current iteration state** | State of the current execution step | Execution Control |
-| **Current scenario parameters** | Parameters in use | Scenario Management |
 | **Current execution context** | Execution metadata | Execution Control |
+
+**Note.** Scenario parameters and configuration are **not** Runtime State. They belong to Configuration / Scenario Management. Runtime State represents the execution state of the current iteration.
 
 #### 5.3 State History
 
@@ -323,6 +331,8 @@ The **Governance Data** represents cross-cutting metadata:
 | **Cash flow history** | Annual cash flows | Financial Engine |
 
 **Note:** State History is the **output** of execution over time, not runtime state. It is produced by components and persisted for analysis.
+
+**Note:** State History may contribute to Results (e.g., SOC trajectory contributes to KPIs) but is not itself Results.
 
 #### 5.4 Run Metadata
 
@@ -355,7 +365,7 @@ The **Governance Data** represents cross-cutting metadata:
 | **Cash flow** | Annual net cash flow | Financial Engine |
 | **KPIs** | NPV, IRR, payback | Financial Engine |
 
-**Architectural owner:** Domain 7 (storage infrastructure)
+**Storage owner:** Domain 7 (storage infrastructure)
 
 **Producing owner:** The component that produces the results.
 
@@ -528,7 +538,7 @@ This resolves the tension between **domain ownership** (semantic) and **data/app
 | **Explicit** | Every data interface is declared |
 | **Contract-based** | Interfaces have defined contracts |
 | **Directional** | Producer → Consumer |
-| **Deterministic where applicable** | Same declared inputs and configuration produce reproducible outputs |
+| **Deterministic where applicable** | Given the same declared inputs, configuration, state initialization, and execution version, reproducible outputs are expected where the component behavior is deterministic |
 | **Data, not logic** | Interfaces exchange data and state, not algorithms |
 
 **Note on "idempotent" vs "deterministic".** The principle is **determinism** (same inputs → same outputs given same configuration), not strict idempotency. Some operations (e.g., ingestion) may be idempotent; others (e.g., dispatch execution) are deterministic but not necessarily idempotent.
@@ -644,9 +654,9 @@ This resolves the tension between **domain ownership** (semantic) and **data/app
 **Conceptual requirements:**
 
 - Same declared inputs, configuration, state initialization, and execution version → reproducible results
-- Same parameters → same behavior
-- Same code version → same results
 - Support comparison across runs
+- Support replay of historical runs
+- Support verification of reproducibility
 
 ---
 
@@ -739,7 +749,7 @@ Ensure that scenarios do not contaminate each other.
 
 | Aspect | Status |
 |---|---|
-| B.1 Data Architecture | ✅ Baseline Candidate (v0.3) |
+| B.1 Data Architecture | ✅ Baseline (v0.3) |
 | B.2 Model Architecture | ⏭ Next |
 | B.3 Optimization Architecture | ⏭ Pending |
 | B.4 Financial Architecture | ⏭ Pending |
@@ -749,3 +759,57 @@ Ensure that scenarios do not contaminate each other.
 
 ---
 
+### 16. Change Log
+
+#### 16.1 Changes from v0.1 to v0.2
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | Replaced single taxonomy (F1–F6) with **three architectural categories**: Data Lifecycle, Execution Data, Governance Data | F1–F4 were lifecycle states; F5–F6 were different semantic categories |
+| 2 | Clarified **SOC state** vs **SOC trajectory** | State is runtime; trajectory is execution output |
+| 3 | Separated **architectural ownership** (Domain 7) from **semantic ownership** (producing domain) | Resolves "exactly one owner" contradiction |
+| 4 | Replaced "idempotent" with **"deterministic where applicable"** | More precise definition |
+| 5 | Clarified **F1 → F6 lineage flow** as metadata linkage, not data flow | Avoids implying direct Source → Results path |
+| 6 | Clarified **Domain 2 vs Domain 7 ownership** | Distinguishes semantic vs architectural |
+| 7 | Added **§12 Logical Data Types** | Distinguishes logical from physical types |
+| 8 | Replaced "Dispatch inputs" as a single entity with **distinct input categories** | Avoids container-of-everything |
+| 9 | Clarified **Governance Data** as metadata linked to data, not a data flow | Corrects architectural model |
+| 10 | Added **Runtime State** and **Run Metadata** as distinct from Execution State | Completes execution data model |
+
+#### 16.2 Changes from v0.2 to v0.3
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | F4: replaced "Architectural owner" with "Data product owner" + "Persistence/infrastructure owner" | Clarify distinction between semantic product ownership and infrastructure |
+| 2 | F5 §5.1: clarified Persistence owner / State owner / Evolution owner | Remove redundancy in ownership table |
+| 3 | Runtime State: removed "Current scenario parameters" | Configuration is not Runtime State |
+| 4 | Reproducibility: replaced "Same inputs → same outputs" with formulation including configuration, state initialization, execution version | More architecturally precise |
+
+#### 16.3 Changes from v0.3 (candidate) to v0.3 (Baseline)
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | Header: promoted to v0.3 Baseline (removed "Candidate") | Content accepted |
+| 2 | §4.1: "Scenario definitions" → "Scenario configuration" | More precise |
+| 3 | §9.1: aligned determinism definition with §11.3 reproducibility | Consistent terminology |
+| 4 | Runtime State: removed "Current scenario parameters" | Configuration is not Runtime State |
+
+#### 16.4 Version History
+
+| Version | Date | Changes | Status |
+|---|---|---|---|
+| 0.1 | Stage B start | Initial B.1 draft | Superseded |
+| 0.2 | Stage B correction | 10 corrections applied | Superseded |
+| 0.3 | Stage B final | 4 corrections + 4 editorial adjustments | **Baseline** |
+
+---
+
+**End of §4 — B.1 Data Architecture (v0.3 — Baseline)**
+
+**Status:** Baseline
+
+**Next:** B.2 Model Architecture
+
+**Prepared by:** BESS Operational & Financial Modeling Consultant
+
+**Engagement:** RFP-264144-1
