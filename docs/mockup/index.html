@@ -146,14 +146,14 @@ td.num,th.num{text-align:right;font-family:var(--num);font-variant-numeric:tabul
 }
 
 /* patch: footer + about */
-.footer{background:var(--rail);color:#A9B7C0;padding:14px 32px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid #1B3342}
-.footer-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.footer-right{font-size:14px;flex:1;text-align:right}
-.footer .brand-line{font-weight:600;color:#E6ECEF}
-.footer .credit{color:#7FC2DA;font-weight:600}
+.footer{background:var(--rail);color:#E6ECEF;padding:20px 32px;font-size:16px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid #1B3342}
+.footer-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.footer-right{font-size:16px;flex:1;text-align:right}
+.footer .brand-line{font-weight:700;color:#fff}
+.footer .credit{color:#7FC2DA;font-weight:700}
 .footer .sep{color:#6B7C87}
-.footer-right b{color:#7FC2DA;font-weight:600}
-@media (max-width:860px){.footer{padding:14px 18px;flex-direction:column;align-items:flex-start;gap:8px}.footer-right{text-align:left}}
+.footer-right b{color:#7FC2DA;font-weight:700}
+@media (max-width:860px){.footer{padding:16px;flex-direction:column;align-items:flex-start;gap:8px}.footer-right{text-align:left}}
 .about p{margin:0;max-width:72ch}
 .about ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .author{display:flex;align-items:center;gap:14px}
@@ -457,6 +457,843 @@ td.num,th.num{text-align:right;font-family:var(--num);font-variant-numeric:tabul
           </div>
         </div>
       </section>
+    </main>
+  </div>
+</div>
+
+<!-- patch:about-footer-v2 -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-left">
+    <span class="brand-line">Blue Trail Software &middot; BessEngie</span>
+    <span class="sep">&middot;</span>
+    <span>&copy; 2026</span>
+    <span class="sep">|</span>
+    <span class="credit">MSc. Daniel Canedo</span>
+  </div>
+  <div class="footer-right">
+    Engineering domains: <b>BESS</b> &middot; <b>Load &amp; Market</b> &middot; <b>Operational</b> &middot; <b>Dispatch</b> &middot; <b>Degradation</b> &middot; <b>Financial</b> &middot; <b>Data &amp; Application</b>
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   MODEL — pure functions, no DOM. Simplified for demonstration.
+   Structure mirrors the engineering chain:
+   BESS -> Load & Market -> Operational -> Dispatch -> Degradation
+   -> Tariff engine / Settlement -> Financial
+   ============================================================ */
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const DAYS = [31,28,31,30,31,30,31,31,30,31,30,31];
+const SEAS = [0.80,0.78,0.74,0.75,0.84,0.95,1.00,0.99,0.90,0.78,0.76,0.81];
+const WINTER = [1,1,1,0,0,0,0,0,0,0,1,1];
+const CP_DAYS = {5:1, 6:2, 7:2};          // Jun, Jul, Aug peak weekdays
+const CP_HOUR = 17;
+const DAYTYPES = ['Peak weekday','Typical weekday','Weekend'];
+const REG_THROUGHPUT = 0.15;              // MWh DC per MW-h of RegD commitment
+
+const GROUPS = [
+  {g:'bess', t:'Battery system'},
+  {g:'deg',  t:'Degradation and augmentation'},
+  {g:'vs',   t:'Value streams'},
+  {g:'site', t:'Site load and tariff (BGE-style, illustrative)'},
+  {g:'pjm',  t:'PJM market (illustrative prices)'},
+  {g:'fin',  t:'Financial'}
+];
+const SCHEMA = [
+  {g:'bess',id:'eMWh',label:'Energy capacity',unit:'MWh',def:4,step:0.5,min:0.5,max:40},
+  {g:'bess',id:'pMW',label:'Power rating',unit:'MW',def:2,step:0.25,min:0.25,max:20},
+  {g:'bess',id:'rte',label:'Round-trip efficiency',unit:'%',def:88,step:1,min:70,max:95},
+  {g:'bess',id:'auxKW',label:'Auxiliary load',unit:'kW',def:15,step:1,min:0,max:300},
+  {g:'bess',id:'socMin',label:'Minimum SOC',unit:'%',def:10,step:1,min:0,max:40},
+  {g:'bess',id:'socMax',label:'Maximum SOC',unit:'%',def:95,step:1,min:60,max:100},
+  {g:'deg',id:'calFade',label:'Calendar fade',unit:'% per year',def:1.0,step:0.1,min:0,max:5},
+  {g:'deg',id:'cycFade',label:'Cycle fade',unit:'% per 100 EFC',def:0.4,step:0.05,min:0,max:3},
+  {g:'deg',id:'augTrig',label:'Augmentation trigger',unit:'% SOH',def:80,step:1,min:60,max:95},
+  {g:'deg',id:'augCost',label:'Augmentation cost',unit:'$/kWh',def:250,step:10,min:50,max:800},
+  {g:'site',id:'peakKW',label:'Site peak demand',unit:'kW',def:3000,step:100,min:200,max:50000},
+  {g:'site',id:'dcRate',label:'Demand charge',unit:'$/kW-month',def:16,step:0.5,min:0,max:60},
+  {g:'site',id:'onRate',label:'On-peak energy',unit:'$/kWh',def:0.105,step:0.005,min:0,max:1},
+  {g:'site',id:'offRate',label:'Off-peak energy',unit:'$/kWh',def:0.072,step:0.005,min:0,max:1},
+  {g:'site',id:'tariffEsc',label:'Tariff and price escalation',unit:'% per year',def:2,step:0.5,min:0,max:10},
+  {g:'site',id:'costEsc',label:'Cost escalation',unit:'% per year',def:2,step:0.5,min:0,max:10},
+  {g:'pjm',id:'capPrice',label:'Capacity price (RPM)',unit:'$/MW-day',def:300,step:10,min:0,max:1000},
+  {g:'pjm',id:'cpHit',label:'5CP hit rate',unit:'%',def:80,step:5,min:0,max:100},
+  {g:'pjm',id:'regMW',label:'RegD commitment',unit:'MW',def:1,step:0.25,min:0,max:20},
+  {g:'pjm',id:'rmccp',label:'Capability price (RMCCP)',unit:'$/MW-h',def:20,step:1,min:0,max:200},
+  {g:'pjm',id:'rmpcp',label:'Performance price (RMPCP)',unit:'$/MW-h',def:3,step:0.5,min:0,max:50},
+  {g:'pjm',id:'mileage',label:'RegD mileage ratio',unit:'ratio',def:3,step:0.1,min:0,max:10},
+  {g:'pjm',id:'perfScore',label:'Performance score',unit:'0 to 1',def:0.9,step:0.01,min:0,max:1},
+  {g:'fin',id:'capexKWh',label:'CAPEX',unit:'$/kWh',def:380,step:10,min:100,max:1500},
+  {g:'fin',id:'omPct',label:'O&M',unit:'% of CAPEX per year',def:1.5,step:0.1,min:0,max:10},
+  {g:'fin',id:'disc',label:'Discount rate',unit:'%',def:8,step:0.25,min:0,max:25},
+  {g:'fin',id:'years',label:'Project horizon',unit:'years',def:15,step:1,min:5,max:25},
+  {g:'fin',id:'rf',label:'Realization factor',unit:'market revenue, 0 to 1',def:0.85,step:0.01,min:0,max:1},
+  {g:'fin',id:'residual',label:'Residual value',unit:'% of CAPEX',def:5,step:1,min:0,max:50},
+  {g:'fin',id:'debtPct',label:'Debt share',unit:'%',def:60,step:5,min:0,max:90},
+  {g:'fin',id:'debtRate',label:'Debt rate',unit:'%',def:6,step:0.25,min:0,max:20},
+  {g:'fin',id:'debtYears',label:'Debt tenor',unit:'years',def:10,step:1,min:1,max:25}
+];
+const TOGGLES = [
+  {id:'vsPeak',label:'Peak shaving (demand charge)',def:true},
+  {id:'vsTou',label:'TOU energy shifting',def:true},
+  {id:'vsCap',label:'Capacity (5CP peak load contribution)',def:true},
+  {id:'vsReg',label:'Frequency regulation (RegD)',def:true}
+];
+
+function defaults(){
+  const s = {};
+  SCHEMA.forEach(f => { s[f.id] = f.def; });
+  TOGGLES.forEach(t => { s[t.id] = t.def; });
+  return s;
+}
+
+/* ---- Load & Market: synthetic BGE-style commercial load ---- */
+function loadKW(peak, m, h, type){
+  let f = 0.42 + 0.5 * Math.exp(-Math.pow(h - 15, 2) / 16);
+  if (WINTER[m]) f += 0.1 * Math.exp(-Math.pow(h - 8, 2) / 4);
+  f *= SEAS[m];
+  if (type === 1) f *= 0.93;
+  if (type === 2) f *= 0.62;
+  return peak * f / 0.92;
+}
+function dayCounts(m){ const wd = Math.round(DAYS[m] * 5 / 7); return [1, wd - 1, DAYS[m] - wd]; }
+function isOnPeak(h, type){ return type < 2 && h >= 10 && h < 20; }
+function regHours(type){ return type < 2 ? [5,6,7,8,9,21,22,23] : [6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]; }
+
+/* ---- Operational + Dispatch: monthly peak target on the peak weekday ---- */
+function peakTarget(load, budgetAC, P, reserveFrac, eta2){
+  const maxL = Math.max(...load), cap = budgetAC * (1 - reserveFrac);
+  const room = th => [0,1,2,3,4,5,6,7,8,9].reduce((a, h) => a + Math.max(0, Math.min(P, th - load[h])), 0) * eta2;
+  const feasible = th => { const e = load.reduce((a, l) => a + Math.max(0, l - th), 0); return (maxL - th) <= P && e <= cap && e <= room(th); };
+  let lo = 0, hi = maxL;
+  if (!feasible(hi)) return maxL;
+  for (let i = 0; i < 40; i++){ const mid = (lo + hi) / 2; if (feasible(mid)) hi = mid; else lo = mid; }
+  return hi;
+}
+
+/* One representative day. Priority heuristic (mock only):
+   1 peak shaving, 2 coincident-peak hours, 3 TOU shifting, 4 recharge,
+   5 RegD in idle hours. Terminal SOC = initial SOC (B.3 §8.5).
+   Net load = site load + battery power (charge +) + auxiliary (B.2 §4.3). */
+function dispatchDay(s, m, type, Eavail, degCost, th){
+  const P = s.pMW * 1000, eta = Math.sqrt(s.rte / 100);
+  const Emax = Eavail * s.socMax / 100, Emin = Eavail * s.socMin / 100;
+  const budget0 = Math.max(0, (Emax - Emin) * eta);
+  const load = [], dis = new Array(24).fill(0), ch = new Array(24).fill(0), reg = new Array(24).fill(0);
+  for (let h = 0; h < 24; h++) load.push(loadKW(s.peakKW, m, h, type));
+  let roomAC = 0;
+  for (let h = 0; h < 10; h++){ let r = P; if (th !== null) r = Math.min(r, th - load[h] - s.auxKW); roomAC += Math.max(0, r); }
+  const budgetAC = Math.min(budget0, roomAC * eta * eta * 0.999);
+  let used = 0;
+  if (s.vsPeak && th !== null){
+    for (let h = 0; h < 24; h++){
+      if (load[h] > th){ const d = Math.min(P, load[h] - th, budgetAC - used); if (d > 0){ dis[h] = d; used += d; } }
+    }
+  }
+  const cpDay = type === 0 && CP_DAYS[m];
+  if (s.vsCap && cpDay){
+    [16,17,18].forEach(h => {
+      const add = Math.min(P - dis[h], budgetAC - used, load[h] - dis[h]);
+      if (add > 0){ dis[h] += add; used += add; }
+    });
+  }
+  if (s.vsTou && type < 2){
+    const spread = s.onRate - s.offRate / (s.rte / 100) - degCost;
+    if (spread > 0){
+      const hrs = [];
+      for (let h = 10; h < 20; h++) hrs.push(h);
+      hrs.sort((a, b) => load[b] - load[a]);
+      for (const h of hrs){
+        const add = Math.min(P - dis[h], budgetAC - used, load[h] - dis[h]);
+        if (add > 0){ dis[h] += add; used += add; }
+        if (budgetAC - used <= 1e-6) break;
+      }
+    }
+  }
+  let need = used / eta / eta, shortfall = 0;
+  for (const h of [1,2,3,4,0,5,6,7,8,9]){
+    if (need <= 1e-9) break;
+    let room = P - dis[h];
+    if (th !== null) room = Math.min(room, th - load[h] - s.auxKW);
+    const c = Math.max(0, Math.min(room, need));
+    ch[h] = c; need -= c;
+  }
+  if (need > 1e-6) shortfall = need;
+  if (s.vsReg && s.regMW > 0){
+    for (const h of regHours(type)){
+      if (dis[h] === 0 && ch[h] === 0){
+        let mw = Math.min(s.regMW, s.pMW);
+        if (th !== null) mw = Math.max(0, Math.min(mw, (th - load[h] - s.auxKW) / 1000));
+        reg[h] = mw;
+      }
+    }
+  }
+  const removed = used / eta;
+  const soc0 = Emax - removed;
+  const soc = []; let x = soc0, minS = 1, maxS = 0;
+  for (let h = 0; h < 24; h++){
+    x += ch[h] * eta - dis[h] / eta;
+    const f = Eavail > 0 ? x / Eavail : 0;
+    soc.push(f); minS = Math.min(minS, f); maxS = Math.max(maxS, f);
+  }
+  const net = load.map((l, h) => l + ch[h] - dis[h] + s.auxKW);
+  return { load, dis, ch, reg, net, soc, used, th, cpDay: !!cpDay,
+           regMWh: reg.reduce((a, b) => a + b, 0),
+           residual: (x - soc0), minS, maxS, shortfall,
+           maxPow: Math.max(...dis, ...ch) };
+}
+
+function npvOf(rate, fl){ return fl.reduce((a, v, t) => a + v / Math.pow(1 + rate, t), 0); }
+function irrOf(fl){
+  const f = r => npvOf(r, fl);
+  let lo = -0.95, hi = 2;
+  if (f(lo) * f(hi) > 0) return null;
+  for (let i = 0; i < 120; i++){ const mid = (lo + hi) / 2; if (f(lo) * f(mid) <= 0) hi = mid; else lo = mid; }
+  return (lo + hi) / 2;
+}
+
+/* ---- Full simulation: annual loop with degradation feedback ---- */
+function simulate(s){
+  const years = Math.round(s.years), Enom = s.eMWh * 1000, P = s.pMW * 1000;
+  const eta = Math.sqrt(s.rte / 100);
+  const capex = Enom * s.capexKWh;
+  const regRate = s.perfScore * (s.rmccp + s.mileage * s.rmpcp);   // $/MW-h, PJM settlement
+  let soh = 1;
+  let degCost = s.augCost * s.cycFade / 100 / 100;                  // $/kWh throughput, beginning-of-year signal
+  const Y = []; let y1 = null;
+  const chk = { residual: 0, minS: 1, maxS: 0, maxPow: 0, minNet: Infinity, shortfall: 0 };
+  for (let y = 1; y <= years; y++){
+    const Eavail = Enom * soh;
+    const esc = Math.pow(1 + s.tariffEsc / 100, y - 1);
+    let demWo = 0, demW = 0, enWo = 0, enW = 0, regMWh = 0, disDC = 0;
+    const plcWo = [], plcW = [], months = [], peaks = [];
+    for (let m = 0; m < 12; m++){
+      const counts = dayCounts(m);
+      const peakLoad = []; for (let h = 0; h < 24; h++) peakLoad.push(loadKW(s.peakKW, m, h, 0));
+      const eff = Math.max(0, Eavail * (s.socMax - s.socMin) / 100 * eta);
+      const th = s.vsPeak ? peakTarget(peakLoad.map(l => l + s.auxKW), eff, P, (s.vsCap && CP_DAYS[m]) ? 0.25 : 0.1, eta * eta) - s.auxKW : null;
+      const res = [0,1,2].map(t => dispatchDay(s, m, t, Eavail, degCost, th));
+      const maxWo = Math.max(...res.map(r => Math.max(...r.load)));
+      const maxW = Math.max(...res.map(r => Math.max(...r.net)));
+      demWo += maxWo * s.dcRate * esc; demW += maxW * s.dcRate * esc;
+      peaks.push({ wo: maxWo, w: maxW });
+      res.forEach((r, t) => {
+        for (let h = 0; h < 24; h++){
+          const rate = (isOnPeak(h, t) ? s.onRate : s.offRate) * counts[t] * esc;
+          enWo += r.load[h] * rate; enW += r.net[h] * rate;
+        }
+        regMWh += r.regMWh * counts[t];
+        disDC += (r.used / eta) * counts[t];
+        if (y === 1){
+          chk.residual = Math.max(chk.residual, Math.abs(r.residual));
+          chk.minS = Math.min(chk.minS, r.minS); chk.maxS = Math.max(chk.maxS, r.maxS);
+          chk.maxPow = Math.max(chk.maxPow, r.maxPow);
+          chk.minNet = Math.min(chk.minNet, Math.min(...r.net));
+          chk.shortfall = Math.max(chk.shortfall, r.shortfall);
+        }
+      });
+      if (CP_DAYS[m]) for (let k = 0; k < CP_DAYS[m]; k++){ plcWo.push(res[0].load[CP_HOUR]); plcW.push(res[0].net[CP_HOUR]); }
+      months.push(res);
+    }
+    const avg = a => a.reduce((x, v) => x + v, 0) / a.length;
+    const plcRed = (avg(plcWo) - avg(plcW)) * s.cpHit / 100;       // kW
+    const capWo = avg(plcWo) / 1000 * s.capPrice * 365 * esc;
+    const capSav = plcRed / 1000 * s.capPrice * 365 * esc;
+    const demSav = demWo - demW, enSav = enWo - enW;
+    const regRev = regMWh * regRate * esc;
+    const efc = (disDC + regMWh * 1000 * REG_THROUGHPUT) / Enom;
+    const fade = s.calFade / 100 + efc * s.cycFade / 100 / 100;
+    let sohEnd = soh - fade, aug = 0, augKWh = 0;
+    if (sohEnd < s.augTrig / 100 && y <= years - 2){
+      augKWh = Enom * (1 - sohEnd);
+      aug = augKWh * s.augCost * Math.pow(0.97, y);
+      sohEnd = 1;
+    }
+    const om = capex * s.omPct / 100 * Math.pow(1 + s.costEsc / 100, y - 1);
+    const residual = y === years ? capex * s.residual / 100 : 0;
+    const net = demSav + enSav + capSav + regRev * s.rf - om - aug + residual;
+    const row = { y, sohStart: soh, sohEnd, efc, demSav, enSav, capSav, regRev, regReal: regRev * s.rf,
+                  om, aug, augKWh, residual, net, degCost, regMWh,
+                  bill: { demWo, demW, enWo, enW, capWo, capW: capWo - capSav }, plcWo, plcW, peaks, plcRed };
+    if (y === 1){ row.months = months; y1 = row; }
+    Y.push(row);
+    soh = sohEnd;
+    degCost = s.augCost * Math.pow(0.97, y) * s.cycFade / 100 / 100;
+  }
+  const flows = [-capex].concat(Y.map(r => r.net));
+  const npv = npvOf(s.disc / 100, flows);
+  const irr = irrOf(flows);
+  const debt = capex * s.debtPct / 100;
+  const ann = debt > 0 ? (s.debtRate > 0 ? debt * (s.debtRate / 100) / (1 - Math.pow(1 + s.debtRate / 100, -s.debtYears)) : debt / s.debtYears) : 0;
+  const eq = flows.map((v, t) => t === 0 ? -(capex - debt) : (t <= s.debtYears ? v - ann : v));
+  const eirr = irrOf(eq);
+  let cum = 0, pb = null; const cumA = [];
+  flows.forEach((v, t) => { const prev = cum; cum += v; cumA.push(cum); if (pb === null && t > 0 && prev < 0 && cum >= 0) pb = t - 1 + (-prev) / v; });
+  return { s, Y, y1, flows, cum: cumA, capex, npv, irr, eirr, pb, eq, ann, regRate, chk,
+           endSOH: Y[Y.length - 1].sohEnd, augYears: Y.filter(r => r.aug > 0).map(r => r.y),
+           y1Value: y1.demSav + y1.enSav + y1.capSav + y1.regReal - y1.om };
+}
+
+if (typeof module !== 'undefined') module.exports = { simulate, defaults, SCHEMA };
+
+/* ============================================================
+   UI
+   ============================================================ */
+if (typeof document !== 'undefined') (function(){
+const NS = 'http://www.w3.org/2000/svg';
+const $ = id => document.getElementById(id);
+const C = { ink:'#10222E', muted:'#4F616D', line:'#D5DDE2', grid:'#E6ECEF', teal:'#0B5E7E', amber:'#D08A1E', amberInk:'#80520C', cost:'#8796A0', load:'#9AA8B1', reg:'#7FC2DA', band:'#E3EBEF' };
+
+let state = defaults();
+const base = simulate(defaults());
+let R = base;
+let view = 'results', selMonth = 6, selDay = 0;
+
+const VIEWS = [
+  { id:'results', t:'Results', i:'<path d="M5 20V11M11 20V5M17 20v-7M3 20h18"/>' },
+  { id:'setup', t:'Scenario setup', i:'<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>' },
+  { id:'pjm', t:'PJM value streams', i:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>' },
+  { id:'compare', t:'Compare scenarios', i:'<rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/>' },
+  { id:'arch', t:'Architecture', i:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5"/>' },
+  { id:'method', t:'Method and traceability', i:'<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8M18 8l-5 8"/>' },
+  { id:'data', t:'Data and validation', i:'<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>' },
+  { id:'about', t:'About', i:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>' }
+];
+
+/* ---------- formatting ---------- */
+const money = v => { const a = Math.abs(v), sg = v < 0 ? '−' : ''; return a >= 1e6 ? sg + '$' + (a / 1e6).toFixed(2) + 'M' : sg + '$' + Math.round(a / 1e3) + 'k'; };
+const kmoney = v => (v < 0 ? '−' : '') + Math.round(Math.abs(v) / 1e3);
+const pct = v => v === null ? 'n/a' : (v * 100).toFixed(1) + '%';
+const num = (v, d) => v.toLocaleString('en-US', { maximumFractionDigits: d, minimumFractionDigits: d });
+const signed = (v, f) => (v > 0 ? '+' : v < 0 ? '−' : '±') + f(Math.abs(v));
+
+/* ---------- svg helpers ---------- */
+function el(tag, attrs, text){
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+function clear(svg){ while (svg.firstChild) svg.removeChild(svg.firstChild); return svg; }
+function txt(g, x, y, s, o){ g.appendChild(el('text', Object.assign({ x, y, 'font-size': 11.5, fill: C.muted }, o || {}), s)); }
+function hline(g, x1, x2, y, col, dash){ const a = { x1, x2, y1: y, y2: y, stroke: col || C.grid }; if (dash) a['stroke-dasharray'] = dash; g.appendChild(el('line', a)); }
+function poly(g, pts, col, w, dash){ const a = { points: pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '), fill: 'none', stroke: col, 'stroke-width': w || 2, 'stroke-linejoin': 'round' }; if (dash) a['stroke-dasharray'] = dash; g.appendChild(el('polyline', a)); }
+function rect(g, x, y, w, h, fill){ g.appendChild(el('rect', { x: x.toFixed(1), y: Math.min(y, y + h).toFixed(1), width: Math.max(0, w).toFixed(1), height: Math.abs(h).toFixed(1), fill })); }
+function niceMax(v){ const e = Math.pow(10, Math.floor(Math.log10(Math.max(v, 1)))); const n = v / e; return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 2.5 ? 2.5 : n <= 5 ? 5 : 10) * e; }
+
+/* ---------- nav ---------- */
+function buildNav(){
+  const nav = $('nav');
+  VIEWS.forEach(v => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.view = v.id;
+    b.innerHTML = '<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + v.i + '</svg><span>' + v.t + '</span>';
+    b.addEventListener('click', () => go(v.id));
+    nav.appendChild(b);
+  });
+  document.querySelectorAll('[data-go]').forEach(b => b.addEventListener('click', () => go(b.dataset.go)));
+}
+function go(id){
+  view = id;
+  try { history.replaceState(null, '', '#' + id); } catch (e) {}
+  document.querySelectorAll('.nav button').forEach(b => { if (b.dataset.view === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  VIEWS.forEach(v => { $('v-' + v.id).hidden = v.id !== id; });
+  renderView();
+  window.scrollTo({ top: 0 });
+}
+
+/* ---------- KPI strip ---------- */
+function renderStrip(flash){
+  const items = [
+    { l: 'Project NPV', v: money(R.npv), d: R.npv - base.npv, f: x => money(x).replace('$', '$') },
+    { l: 'Project IRR', v: pct(R.irr), d: (R.irr ?? 0) - (base.irr ?? 0), f: x => (x * 100).toFixed(1) + ' pts' },
+    { l: 'Equity IRR', v: pct(R.eirr), d: (R.eirr ?? 0) - (base.eirr ?? 0), f: x => (x * 100).toFixed(1) + ' pts' },
+    { l: 'Simple payback', v: R.pb === null ? 'none' : R.pb.toFixed(1) + ' y', d: (R.pb ?? 99) - (base.pb ?? 99), f: x => x.toFixed(1) + ' y', inv: true },
+    { l: 'Year-1 net value', v: money(R.y1Value), d: R.y1Value - base.y1Value, f: x => money(x) },
+    { l: 'End-of-horizon SOH', v: (R.endSOH * 100).toFixed(0) + '%', d: R.endSOH - base.endSOH, f: x => (x * 100).toFixed(0) + ' pts' }
+  ];
+  const strip = $('strip');
+  strip.innerHTML = items.map(k => {
+    const same = Math.abs(k.d) < 1e-9;
+    const good = k.inv ? k.d < 0 : k.d > 0;
+    const cls = same ? '' : (good ? 'up' : 'down');
+    const dtext = same ? 'Baseline' : signed(k.d, k.f) + ' vs baseline';
+    return '<div class="kpi' + (flash ? ' flash' : '') + '"><div class="l">' + k.l + '</div><div class="v">' + k.v + '</div><div class="d ' + cls + '">' + dtext + '</div></div>';
+  }).join('');
+  const s = state;
+  $('scSub').textContent = num(s.pMW, 2) + ' MW / ' + num(s.eMWh, 1) + ' MWh battery at a ' + num(s.peakKW, 0) + ' kW commercial site, ' + Math.round(s.years) + '-year horizon';
+}
+
+/* ---------- RESULTS ---------- */
+function buildSegs(){
+  const ms = $('monthSeg');
+  MON.forEach((m, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = m; b.addEventListener('click', () => { selMonth = i; renderResults(); }); ms.appendChild(b); });
+  const ds = $('daySeg');
+  DAYTYPES.forEach((d, i) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = d; b.addEventListener('click', () => { selDay = i; renderResults(); }); ds.appendChild(b); });
+}
+function renderDispatch(){
+  [...$('monthSeg').children].forEach((b, i) => b.setAttribute('aria-pressed', i === selMonth));
+  [...$('daySeg').children].forEach((b, i) => b.setAttribute('aria-pressed', i === selDay));
+  const r = R.y1.months[selMonth][selDay];
+  const svg = clear($('dispatchChart'));
+  const L = 64, W = 900, cw = W / 24;
+  const g = el('g', {}); svg.appendChild(g);
+  const top = 12, H1 = 160, top2 = 205, H2 = 70, top3 = 300, H3 = 55;
+  const ymax = niceMax(Math.max(...r.load, ...r.net) * 1.08);
+  const y1 = v => top + H1 - v / ymax * H1;
+  if (selDay < 2) rect(g, L + 10 * cw, top, 10 * cw, H1, C.band);
+  r.reg.forEach((mw, h) => { if (mw > 0) rect(g, L + h * cw, top2, cw, H2, '#EEF6F9'); });
+  for (let i = 0; i <= 4; i++){ const v = ymax * i / 4; hline(g, L, L + W, y1(v), i === 0 ? '#AEBBC4' : C.grid); txt(g, L - 8, y1(v) + 4, num(v, 0), { 'text-anchor': 'end' }); }
+  txt(g, L - 8, top - 1, 'kW', { 'text-anchor': 'end' });
+  const xs = h => L + h * cw + cw / 2;
+  poly(g, r.load.map((v, h) => [xs(h), y1(v)]), C.load, 2);
+  poly(g, r.net.map((v, h) => [xs(h), y1(v)]), C.ink, 2.6);
+  if (r.th !== null) hline(g, L, L + W, y1(r.th + state.auxKW), C.amber, '6 4');
+  if (r.cpDay){ const x = xs(CP_HOUR); g.appendChild(el('line', { x1: x, x2: x, y1: top, y2: top + H1, stroke: C.amberInk, 'stroke-dasharray': '2 3' })); txt(g, x + 6, top + 12, 'Coincident peak hour', { fill: C.amberInk }); }
+  const pmax = state.pMW * 1000, yz = top2 + H2 / 2, sc = (H2 / 2 - 4) / pmax;
+  hline(g, L, L + W, yz, '#AEBBC4');
+  r.ch.forEach((v, h) => { if (v > 0) rect(g, xs(h) - cw * 0.32, yz, cw * 0.64, -v * sc, C.teal); });
+  r.dis.forEach((v, h) => { if (v > 0) rect(g, xs(h) - cw * 0.32, yz, cw * 0.64, v * sc, C.amber); });
+  txt(g, L - 8, top2 + 10, '+' + num(pmax, 0), { 'text-anchor': 'end' });
+  txt(g, L - 8, yz + 4, '0', { 'text-anchor': 'end' });
+  txt(g, L - 8, top2 + H2, '−' + num(pmax, 0), { 'text-anchor': 'end' });
+  txt(g, L + W, top2 - 6, 'Battery power at meter, kW (charge positive)', { 'text-anchor': 'end' });
+  const y3 = v => top3 + H3 - v * H3;
+  hline(g, L, L + W, y3(0), '#AEBBC4');
+  hline(g, L, L + W, y3(state.socMax / 100), C.grid, '3 3');
+  hline(g, L, L + W, y3(state.socMin / 100), C.grid, '3 3');
+  txt(g, L - 8, y3(1) + 4, '100%', { 'text-anchor': 'end' });
+  txt(g, L - 8, y3(0) + 4, '0%', { 'text-anchor': 'end' });
+  const socPts = [[L, y3(r.soc[23])]].concat(r.soc.map((v, h) => [L + (h + 1) * cw, y3(v)]));
+  poly(g, socPts, C.teal, 2);
+  txt(g, L + W, top3 - 6, 'State of charge (starts and ends at the same level)', { 'text-anchor': 'end' });
+  for (let h = 0; h <= 24; h += 3) txt(g, L + h * cw, top3 + H3 + 16, (h < 10 ? '0' : '') + h + ':00', { 'text-anchor': 'middle' });
+  const d = dayCounts(selMonth)[selDay];
+  $('dispatchNote').textContent = MON[selMonth] + ', ' + DAYTYPES[selDay].toLowerCase() + ' (represents ' + d + (d === 1 ? ' day' : ' days') + ' in the month). ' +
+    (r.th !== null ? 'Peak target ' + num(r.th + state.auxKW, 0) + ' kW. ' : '') +
+    'Discharged ' + num(r.used, 0) + ' kWh; RegD offered ' + num(r.regMWh, 2) + ' MW-h in idle hours without raising the billed peak.';
+}
+function renderHeat(){
+  const box = $('heat'); box.innerHTML = '';
+  const fill = s => 'hsl(197, 58%, ' + (95 - Math.max(0, Math.min(1, s)) * 62).toFixed(0) + '%)';
+  MON.forEach((m, mi) => {
+    const lab = document.createElement('div'); lab.className = 'm'; lab.textContent = m; box.appendChild(lab);
+    const soc = R.y1.months[mi][1].soc;
+    for (let h = 0; h < 24; h++){ const c = document.createElement('div'); c.className = 'c'; c.style.background = fill(soc[h]); c.title = m + ' ' + h + ':00, SOC ' + Math.round(soc[h] * 100) + '%'; box.appendChild(c); }
+  });
+  const lg = $('heatLegend');
+  lg.innerHTML = '<span>SOC</span>' + [0.1, 0.3, 0.5, 0.7, 0.95].map(v => '<span><i class="sw" style="background:' + fill(v) + '"></i>' + Math.round(v * 100) + '%</span>').join('') + '<span style="margin-left:auto">Hours 00 to 23, left to right</span>';
+}
+function renderWaterfall(){
+  const y = R.y1;
+  const items = [
+    { n: 'Demand charge', s: 'Tariff engine', v: y.demSav, c: C.teal },
+    { n: 'TOU energy', s: 'Tariff engine', v: y.enSav, c: C.teal },
+    { n: 'Capacity (5CP)', s: 'Tariff engine', v: y.capSav, c: C.teal },
+    { n: 'RegD', s: 'Settled × RF', v: y.regReal, c: C.amber },
+    { n: 'O&M', s: 'Scenario cost', v: -y.om, c: C.cost }
+  ];
+  const svg = clear($('waterfall')); const g = el('g', {}); svg.appendChild(g);
+  const L = 48, W = 500, top = 26, H = 190;
+  let run = 0, hi = 0, lo = 0;
+  items.forEach(it => { run += it.v; hi = Math.max(hi, run); lo = Math.min(lo, run); });
+  hi = Math.max(hi, run); const span = niceMax(Math.max(hi - lo, 1)); const yMin = Math.min(0, lo);
+  const yy = v => top + H - (v - yMin) / (span) * H;
+  for (let i = 0; i <= 4; i++){ const v = yMin + span * i / 4; hline(g, L, L + W, yy(v), C.grid); txt(g, L - 8, yy(v) + 4, kmoney(v), { 'text-anchor': 'end' }); }
+  hline(g, L, L + W, yy(0), '#AEBBC4');
+  txt(g, L - 8, top - 12, '$k', { 'text-anchor': 'end' });
+  const bw = W / 6; run = 0;
+  const all = items.concat([{ n: 'Net value', s: 'Year 1', v: null, c: C.ink }]);
+  all.forEach((it, i) => {
+    const x = L + i * bw + bw * 0.16, w = bw * 0.68;
+    let a, b, label;
+    if (it.v === null){ a = 0; b = run; label = kmoney(run); }
+    else { a = run; b = run + it.v; run = b; label = (it.v >= 0 ? '+' : '') + kmoney(it.v); }
+    rect(g, x, yy(Math.max(a, b)), w, yy(Math.min(a, b)) - yy(Math.max(a, b)), it.c);
+    txt(g, x + w / 2, yy(Math.max(a, b)) - 5, label, { 'text-anchor': 'middle', fill: C.ink, 'font-weight': 600 });
+    txt(g, x + w / 2, top + H + 18, it.n, { 'text-anchor': 'middle', fill: C.ink, 'font-weight': 600 });
+    txt(g, x + w / 2, top + H + 33, it.s, { 'text-anchor': 'middle' });
+  });
+}
+function wfNote(){
+  const y = R.y1;
+  $('wfNote').textContent = 'RegD: settled by the PJM adapter at ' + money(y.regRev) + ', then valued in Financial at realization factor ' + num(state.rf, 2) + ' = ' + money(y.regReal) + '. Bill savings are not scaled; their risk sits in the tariff mechanics.';
+}
+function renderSOH(){
+  const svg = clear($('sohChart')); const g = el('g', {}); svg.appendChild(g);
+  const L = 48, W = 490, top = 14, H = 190, n = R.Y.length;
+  const yMin = Math.min(0.6, Math.floor(Math.min(...R.Y.map(r => r.sohEnd)) * 10) / 10);
+  const x = t => L + t / n * W, y = v => top + H - (v - yMin) / (1 - yMin) * H;
+  for (let v = yMin; v <= 1.0001; v += 0.1){ hline(g, L, L + W, y(v), C.grid); txt(g, L - 8, y(v) + 4, Math.round(v * 100) + '%', { 'text-anchor': 'end' }); }
+  hline(g, L, L + W, y(state.augTrig / 100), C.amber, '6 4');
+  txt(g, L + W, y(state.augTrig / 100) - 6, 'Augmentation trigger', { 'text-anchor': 'end', fill: C.amberInk });
+  const pts = [[x(0), y(1)]];
+  R.Y.forEach(r => {
+    if (r.aug > 0){ const soPre = r.sohStart - (state.calFade / 100 + r.efc * state.cycFade / 10000); pts.push([x(r.y), y(soPre)]); pts.push([x(r.y), y(r.sohEnd)]);
+      g.appendChild(el('line', { x1: x(r.y), x2: x(r.y), y1: top, y2: top + H, stroke: C.load, 'stroke-dasharray': '3 3' })); txt(g, x(r.y) + 4, top + 12, 'Augmentation, year ' + r.y, { fill: C.ink }); }
+    else pts.push([x(r.y), y(r.sohEnd)]);
+  });
+  poly(g, pts, C.teal, 2.6);
+  for (let t = 0; t <= n; t += 5) txt(g, x(t), top + H + 18, String(t), { 'text-anchor': 'middle' });
+  txt(g, L + W, top + H + 18, 'years', { 'text-anchor': 'end' });
+  const avgEfc = R.Y.reduce((a, r) => a + r.efc, 0) / n;
+  $('sohNote').textContent = num(avgEfc, 0) + ' equivalent full cycles per year on average' + '. Marginal degradation signal $' + num(R.y1.degCost, 3) + ' per kWh (dispatch only, not a cash flow)';
+}
+function renderCash(){
+  const svg = clear($('cashChart')); const g = el('g', {}); svg.appendChild(g);
+  const L = 58, W = 480, top = 14, H = 190, n = R.flows.length - 1;
+  const vals = R.flows.concat(R.cum);
+  const hi = niceMax(Math.max(...vals, 1)), lo = -niceMax(Math.max(-Math.min(...vals), 1));
+  const y = v => top + H - (v - lo) / (hi - lo) * H;
+  const bw = W / (n + 1), xc = t => L + t * bw + bw / 2;
+  [lo, lo / 2, 0, hi / 2, hi].forEach(v => { hline(g, L, L + W, y(v), v === 0 ? '#AEBBC4' : C.grid); txt(g, L - 8, y(v) + 4, money(v), { 'text-anchor': 'end' }); });
+  R.flows.forEach((v, t) => rect(g, xc(t) - bw * 0.3, y(0), bw * 0.6, y(v) - y(0), v >= 0 ? C.teal : C.cost));
+  poly(g, R.cum.map((v, t) => [xc(t), y(v)]), C.ink, 2.2);
+  if (R.pb !== null){ const px = xc(R.pb); g.appendChild(el('line', { x1: px, x2: px, y1: top, y2: top + H, stroke: C.amberInk, 'stroke-dasharray': '3 3' })); txt(g, px + 5, top + 12, 'Payback ' + R.pb.toFixed(1) + ' y', { fill: C.amberInk }); }
+  for (let t = 0; t <= n; t += 5) txt(g, xc(t), top + H + 18, String(t), { 'text-anchor': 'middle' });
+}
+function renderResults(){ renderDispatch(); renderHeat(); renderWaterfall(); wfNote(); renderSOH(); renderCash(); }
+
+/* ---------- SETUP ---------- */
+function buildForm(){
+  const form = $('form');
+  GROUPS.forEach(gr => {
+    const fs = document.createElement('fieldset');
+    const lg = document.createElement('legend'); lg.textContent = gr.t; fs.appendChild(lg);
+    if (gr.g === 'vs'){
+      const box = document.createElement('div'); box.style.display = 'flex'; box.style.flexDirection = 'column';
+      TOGGLES.forEach(t => {
+        const lab = document.createElement('label'); lab.className = 'toggle';
+        const inp = document.createElement('input'); inp.type = 'checkbox'; inp.id = 'in-' + t.id; inp.checked = state[t.id];
+        inp.addEventListener('change', () => { state[t.id] = inp.checked; update(); });
+        lab.appendChild(inp); lab.appendChild(document.createTextNode(t.label)); box.appendChild(lab);
+      });
+      const p = document.createElement('p'); p.className = 'hint'; p.style.margin = '8px 0 0';
+      p.textContent = 'Streams are stacked on one battery. RegD is only offered in idle hours and never raises the billed peak.';
+      box.appendChild(p); fs.appendChild(box);
+    } else {
+      const box = document.createElement('div'); box.className = 'fields';
+      SCHEMA.filter(f => f.g === gr.g).forEach(f => {
+        const lab = document.createElement('label'); lab.className = 'field'; lab.htmlFor = 'in-' + f.id;
+        lab.innerHTML = '<span>' + f.label + ' <span class="unit">(' + f.unit + ')</span></span>';
+        const inp = document.createElement('input'); inp.type = 'number'; inp.id = 'in-' + f.id;
+        inp.step = f.step; inp.min = f.min; inp.max = f.max; inp.value = state[f.id]; inp.inputMode = 'decimal';
+        inp.addEventListener('input', () => {
+          const v = parseFloat(inp.value);
+          if (!isFinite(v)) return;
+          state[f.id] = Math.min(f.max, Math.max(f.min, v));
+          inp.classList.toggle('changed', Math.abs(state[f.id] - f.def) > 1e-9);
+          update();
+        });
+        lab.appendChild(inp); box.appendChild(lab);
+      });
+      fs.appendChild(box);
+    }
+    form.appendChild(fs);
+  });
+  $('resetBtn').addEventListener('click', () => {
+    state = defaults();
+    SCHEMA.forEach(f => { const i = $('in-' + f.id); i.value = f.def; i.classList.remove('changed'); });
+    TOGGLES.forEach(t => { $('in-' + t.id).checked = t.def; });
+    update();
+  });
+}
+
+/* ---------- PJM ---------- */
+function renderPJM(){
+  const y = R.y1, s = state;
+  const streams = [
+    { on: s.vsPeak, t: 'Demand charge reduction', src: 'Tariff engine', cls: 't', v: y.demSav,
+      how: 'The battery discharges when site load rises above a monthly target, lowering the highest demand in each billing month.',
+      drv: 'Driver: demand charge rate and how sharp the site peak is.' },
+    { on: s.vsTou, t: 'TOU energy shifting', src: 'Tariff engine', cls: 't', v: y.enSav,
+      how: 'Charges in off-peak hours and discharges in on-peak hours when the spread beats round-trip losses and the marginal degradation cost.',
+      drv: 'Net of losses and auxiliary load, which are billed through the same meter.' },
+    { on: s.vsCap, t: 'Capacity, 5CP peak load contribution', src: 'Tariff engine', cls: 't', v: y.capSav,
+      how: 'Discharging during the PJM summer coincident peak hours lowers the site peak load contribution (PLC) and therefore its capacity charge.',
+      drv: 'Hit rate ' + s.cpHit + '% applied to the modeled reduction; the one-year lag of the PLC is not modeled in this prototype.' },
+    { on: s.vsReg, t: 'Frequency regulation, RegD', src: 'PJM settlement', cls: 'a', v: y.regReal,
+      how: 'Paid for capability (RMCCP) and performance (mileage times RMPCP), scaled by the performance score. Settled by the PJM market adapter, then scaled by the realization factor.',
+      drv: num(y.regMWh, 0) + ' MW-h offered in year 1. Settled value ' + money(y.regRev) + ' ($' + num(R.regRate, 2) + ' per MW-h); valued in Financial at ' + money(y.regReal) + ' after realization factor ' + num(s.rf, 2) + '.' }
+  ];
+  $('streams').innerHTML = streams.map(st =>
+    '<div class="card stream' + (st.on ? '' : ' off') + '"><div class="row"><h3>' + st.t + '</h3><span class="tag ' + st.cls + '">' + st.src + '</span></div>' +
+    '<div class="big">' + (st.on ? money(st.v) : 'Off') + '<span class="hint" style="font-family:Barlow;font-size:13px;font-weight:400"> ' + (st.on ? 'year 1' : 'enable in Scenario setup') + '</span></div>' +
+    '<p>' + st.how + '</p><p class="hint">' + st.drv + '</p></div>').join('');
+  // 5CP chart
+  const svg = clear($('cpChart')); const g = el('g', {}); svg.appendChild(g);
+  const L = 56, W = 480, top = 14, H = 180;
+  const hi = niceMax(Math.max(...y.plcWo) * 1.1), yy = v => top + H - v / hi * H;
+  for (let i = 0; i <= 4; i++){ const v = hi * i / 4; hline(g, L, L + W, yy(v), i ? C.grid : '#AEBBC4'); txt(g, L - 8, yy(v) + 4, num(v, 0), { 'text-anchor': 'end' }); }
+  txt(g, L - 8, top - 2, 'kW', { 'text-anchor': 'end' });
+  const labs = ['Jun', 'Jul', 'Jul', 'Aug', 'Aug'], bw = W / 5;
+  y.plcWo.forEach((v, i) => {
+    const x = L + i * bw;
+    rect(g, x + bw * 0.14, yy(v), bw * 0.32, yy(0) - yy(v), C.load);
+    rect(g, x + bw * 0.52, yy(y.plcW[i]), bw * 0.32, yy(0) - yy(y.plcW[i]), C.teal);
+    txt(g, x + bw / 2, top + H + 18, 'CP ' + (i + 1) + ', ' + labs[i], { 'text-anchor': 'middle' });
+  });
+  // monthly peak chart
+  const svg2 = clear($('peakChart')); const g2 = el('g', {}); svg2.appendChild(g2);
+  const hi2 = niceMax(Math.max(...y.peaks.map(p => p.wo)) * 1.08), y2 = v => top + H - v / hi2 * H, bw2 = W / 12;
+  for (let i = 0; i <= 4; i++){ const v = hi2 * i / 4; hline(g2, L, L + W, y2(v), i ? C.grid : '#AEBBC4'); txt(g2, L - 8, y2(v) + 4, num(v, 0), { 'text-anchor': 'end' }); }
+  txt(g2, L - 8, top - 2, 'kW', { 'text-anchor': 'end' });
+  y.peaks.forEach((p, i) => {
+    const x = L + i * bw2;
+    rect(g2, x + bw2 * 0.12, y2(p.wo), bw2 * 0.36, y2(0) - y2(p.wo), C.load);
+    rect(g2, x + bw2 * 0.52, y2(p.w), bw2 * 0.36, y2(0) - y2(p.w), C.teal);
+    txt(g2, x + bw2 / 2, top + H + 18, MON[i], { 'text-anchor': 'middle' });
+  });
+}
+
+/* ---------- COMPARE ---------- */
+function renderCompare(){
+  const s = state;
+  const variants = [
+    { n: 'Current inputs', o: {} },
+    { n: '2-hour battery', o: { eMWh: s.pMW * 2 } },
+    { n: '6-hour battery', o: { eMWh: s.pMW * 6 } },
+    { n: 'Without RegD', o: { vsReg: false } },
+    { n: 'Without 5CP capacity', o: { vsCap: false } },
+    { n: 'Augment at 85% SOH', o: { augTrig: 85 } }
+  ];
+  const rows = variants.map(v => { const r = v.o && Object.keys(v.o).length ? simulate(Object.assign({}, s, v.o)) : R; return { n: v.n, r }; });
+  $('varTable').innerHTML = '<thead><tr><th>Variant</th><th class="num">Project NPV</th><th class="num">Project IRR</th><th class="num">Equity IRR</th><th class="num">Payback</th><th class="num">Year-1 value</th><th class="num">End SOH</th><th class="num">Augmentations</th></tr></thead><tbody>' +
+    rows.map(x => '<tr><td>' + x.n + '</td><td class="num">' + money(x.r.npv) + '</td><td class="num">' + pct(x.r.irr) + '</td><td class="num">' + pct(x.r.eirr) + '</td><td class="num">' + (x.r.pb === null ? 'none' : x.r.pb.toFixed(1) + ' y') + '</td><td class="num">' + money(x.r.y1Value) + '</td><td class="num">' + Math.round(x.r.endSOH * 100) + '%</td><td class="num">' + (x.r.augYears.length ? 'year ' + x.r.augYears.join(', ') : 'none') + '</td></tr>').join('') + '</tbody>';
+  const sens = [
+    { n: 'CAPEX ±20%', id: 'capexKWh', lo: 1.2, hi: 0.8 },
+    { n: 'Demand charge ±20%', id: 'dcRate', lo: 0.8, hi: 1.2 },
+    { n: 'Capacity price ±30%', id: 'capPrice', lo: 0.7, hi: 1.3 },
+    { n: 'RegD prices ±30%', id: 'rmccp', lo: 0.7, hi: 1.3, also: 'rmpcp' },
+    { n: 'Cycle fade ±30%', id: 'cycFade', lo: 1.3, hi: 0.7 },
+    { n: 'Discount rate ±2 pts', id: 'disc', add: 2 },
+    { n: 'Realization factor 0.70 / 1.00', id: 'rf', set: [0.7, 1.0] }
+  ].map(x => {
+    const mk = which => {
+      const o = Object.assign({}, s);
+      if (x.add) o[x.id] = s[x.id] + (which === 'lo' ? x.add : -x.add);
+      else if (x.set) o[x.id] = which === 'lo' ? x.set[0] : x.set[1];
+      else { o[x.id] = s[x.id] * x[which]; if (x.also) o[x.also] = s[x.also] * x[which]; }
+      return simulate(o).npv - R.npv;
+    };
+    return { n: x.n, lo: mk('lo'), hi: mk('hi') };
+  }).sort((a, b) => (Math.abs(b.hi - b.lo)) - (Math.abs(a.hi - a.lo)));
+  const svg = clear($('tornado')); const g = el('g', {}); svg.appendChild(g);
+  const L = 230, W = 700, top = 20, rh = 40;
+  const mx = niceMax(Math.max(...sens.map(x => Math.max(Math.abs(x.lo), Math.abs(x.hi))), 1));
+  const xx = v => L + W / 2 + v / mx * W / 2;
+  [-mx, -mx / 2, 0, mx / 2, mx].forEach(v => { g.appendChild(el('line', { x1: xx(v), x2: xx(v), y1: top - 6, y2: top + sens.length * rh, stroke: v === 0 ? '#AEBBC4' : C.grid })); txt(g, xx(v), top + sens.length * rh + 16, signed(v, a => money(a)), { 'text-anchor': 'middle' }); });
+  sens.forEach((x, i) => {
+    const yv = top + i * rh + 8;
+    txt(g, L - 12, yv + 15, x.n, { 'text-anchor': 'end', fill: C.ink, 'font-size': 13 });
+    rect(g, Math.min(xx(0), xx(x.lo)), yv, Math.abs(xx(x.lo) - xx(0)), 22, C.amber);
+    rect(g, Math.min(xx(0), xx(x.hi)), yv, Math.abs(xx(x.hi) - xx(0)), 22, C.teal);
+  });
+}
+
+/* ---------- ARCHITECTURE ---------- */
+function renderArch(){
+  const svg = clear($('archDiagram'));
+  const defs = el('defs', {});
+  const mk = el('marker', { id: 'ah', viewBox: '0 0 10 10', refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: 'auto-start-reverse' });
+  mk.appendChild(el('path', { d: 'M0 0L10 5L0 10z', fill: '#4F616D' }));
+  defs.appendChild(mk); svg.appendChild(defs);
+  const H = 58;
+  const B = {
+    data: { x: 200, y: 14, w: 600, cls: '', t: 'Data and validation', s: 'Domain 7: source, ingested, validated, model-ready (B.1)' },
+    bess: { x: 180, y: 104, w: 300, cls: '', t: 'BESS model', s: 'Domain 1: capability, SOC, SOH, auxiliary load' },
+    lm:   { x: 520, y: 104, w: 300, cls: '', t: 'Load and market model', s: 'Domain 2: load, tariff, PJM signals and rules' },
+    ops:  { x: 320, y: 194, w: 360, cls: '', t: 'Operational requirements', s: 'Domain 3: needs of each value stream' },
+    disp: { x: 320, y: 284, w: 360, cls: 'core', t: 'Dispatch engine', s: 'Domain 4: co-optimizes streams on one battery' },
+    deg:  { x: 40,  y: 384, w: 270, cls: '', t: 'Degradation engine', s: 'Domain 5: SOH, augmentation events' },
+    tar:  { x: 365, y: 384, w: 270, cls: 'tar', t: 'Tariff engine', s: 'Domain 2: bill with and without battery' },
+    set:  { x: 690, y: 384, w: 270, cls: 'set', t: 'PJM settlement adapter', s: 'Domain 2: what the market pays' },
+    fin:  { x: 320, y: 474, w: 360, cls: 'fin', t: 'Financial valuation', s: 'Domain 6: cash flow, NPV, IRR, payback' }
+  };
+  const cx = b => b.x + b.w / 2, bot = b => b.y + H;
+  const arrow = (x1, y1, x2, y2, dash) => { const a = { x1, y1, x2, y2, stroke: '#4F616D', 'stroke-width': 1.5, 'marker-end': 'url(#ah)' }; if (dash) a['stroke-dasharray'] = dash; svg.appendChild(el('line', a)); };
+  arrow(cx(B.bess), bot(B.data), cx(B.bess), B.bess.y - 2);
+  arrow(cx(B.lm), bot(B.data), cx(B.lm), B.lm.y - 2);
+  arrow(cx(B.bess), bot(B.bess), cx(B.ops) - 60, B.ops.y - 2);
+  arrow(cx(B.lm), bot(B.lm), cx(B.ops) + 60, B.ops.y - 2);
+  arrow(cx(B.ops), bot(B.ops), cx(B.disp), B.disp.y - 2);
+  arrow(cx(B.disp) - 120, bot(B.disp), cx(B.deg), B.deg.y - 2);
+  arrow(cx(B.disp), bot(B.disp), cx(B.tar), B.tar.y - 2);
+  arrow(cx(B.disp) + 120, bot(B.disp), cx(B.set), B.set.y - 2);
+  arrow(cx(B.deg), bot(B.deg), cx(B.fin) - 140, B.fin.y - 2);
+  arrow(cx(B.tar), bot(B.tar), cx(B.fin), B.fin.y - 2);
+  arrow(cx(B.set), bot(B.set), cx(B.fin) + 140, B.fin.y - 2);
+  // annual feedback: degradation -> BESS
+  svg.appendChild(el('path', { d: 'M' + (B.deg.x + 20) + ' ' + B.deg.y + ' L' + (B.deg.x + 20) + ' ' + (B.bess.y + H / 2) + ' L' + (B.bess.x - 2) + ' ' + (B.bess.y + H / 2), fill: 'none', stroke: '#0B5E7E', 'stroke-width': 1.8, 'stroke-dasharray': '6 4', 'marker-end': 'url(#ah)' }));
+  svg.appendChild(el('text', { x: B.deg.x + 28, y: B.bess.y + H + 40, 'font-size': 12, fill: '#0B5E7E', 'font-weight': 600 }, 'Annual feedback:'));
+  svg.appendChild(el('text', { x: B.deg.x + 28, y: B.bess.y + H + 56, 'font-size': 12, fill: '#0B5E7E' }, 'next year\'s SOH, capacity'));
+  svg.appendChild(el('text', { x: B.deg.x + 28, y: B.bess.y + H + 72, 'font-size': 12, fill: '#0B5E7E' }, 'and degradation signal'));
+  // outputs
+  svg.appendChild(el('text', { x: 500, y: 568, 'font-size': 12.5, fill: '#4F616D', 'text-anchor': 'middle' }, 'Results and governance data to Unity Catalog, read by the Databricks App (dashboards, comparison, PDF and Excel exports)'));
+  for (const k in B){
+    const b = B[k]; const g = el('g', { class: 'arch-box ' + b.cls }); svg.appendChild(g);
+    g.appendChild(el('rect', { x: b.x, y: b.y, width: b.w, height: H, rx: 8 }));
+    g.appendChild(el('text', { x: b.x + 14, y: b.y + 24, class: 't' }, b.t));
+    g.appendChild(el('text', { x: b.x + 14, y: b.y + 43, class: 's' }, b.s));
+  }
+  const map = [
+    ['BESS', 'A.2.1', 'bess_model', 'Python library invoked by the scenario task'],
+    ['Load and market', 'A.2.2', 'load_market.signal_provider', 'Python library; reads model-ready tables'],
+    ['Tariff engine', 'A.2.2 §9', 'tariff', 'Runs after all years of the scenario (ratchets need 12-month history)'],
+    ['PJM settlement', 'A.2.2 §13', 'load_market.settlement_adapter', 'Runs after dispatch, in parallel with the tariff engine'],
+    ['Operational', 'A.2.3', 'operational', 'Python library'],
+    ['Dispatch', 'A.2.4, B.3', 'dispatch', 'One LP per scenario and month, solved with an open-source solver (HiGHS) on serverless compute'],
+    ['Degradation', 'A.2.5', 'degradation', 'Annual update at the end-of-year barrier'],
+    ['Financial', 'A.2.6, B.4', 'financial', 'After tariff engine and settlement'],
+    ['Data and application', 'A.2.7, B.1', 'data_lifecycle, execution_control, application', 'Unity Catalog schemas, scenario-batch job, Databricks App']
+  ];
+  $('archMap').innerHTML = '<thead><tr><th>Domain</th><th>Engineering</th><th>Software unit (B.5)</th><th>Databricks realization (B.6)</th></tr></thead><tbody>' +
+    map.map(r => '<tr><td>' + r[0] + '</td><td><span class="tag">' + r[1] + '</span></td><td><code>' + r[2] + '</code></td><td>' + r[3] + '</td></tr>').join('') + '</tbody>';
+  const yrs = Math.round(state.years), nSc = 1 + 5 + 14;
+  const steps = [
+    ['Read inputs', 'Model-ready load, tariff, PJM prices and scenario parameters from Unity Catalog.'],
+    ['For each project year, fan out', 'Scenario × month problems run in parallel inside one task (Spark grouped execution). Months are independent because each starts and ends at the same state of charge.'],
+    ['End-of-year barrier', 'Wait for all months, write the year\'s results once, then update state of health and the degradation signal for the next year.'],
+    ['After the last year', 'Tariff engine and PJM settlement run independently; then Financial valuation.'],
+    ['Publish', 'Results and validation evidence written to Unity Catalog; the Databricks App reads them.']
+  ];
+  $('archSteps').innerHTML = steps.map(s => '<li><b>' + s[0] + '</b><span>' + s[1] + '</span></li>').join('') +
+    '<li style="list-style:none;margin-left:-22px;padding:10px 12px;background:var(--teal-soft);border-radius:8px;font-size:13.5px">Scale of the Compare screen: ' + nSc + ' scenarios × 12 months × ' + yrs + ' years = <b>' + num(nSc * 12 * yrs, 0) + '</b> dispatch problems. This is the workload PySpark parallelizes.</li>';
+  const pv = [
+    ['Dispatch', 'Priority heuristic', 'LP co-optimization (PH-034)'],
+    ['Time resolution', 'Hourly, 3 day types per month', '15-minute where data allows (PH-054)'],
+    ['Execution', 'In the browser', 'Python engine on Databricks jobs'],
+    ['Data', 'Synthetic, illustrative prices', 'ENGIE data in Unity Catalog (PH-003)'],
+    ['Scenarios', 'Computed one after another', 'Scenario batches in parallel'],
+    ['Validation', 'Checks shown on screen', 'Automated invariant tests and UAT']
+  ];
+  $('protoVsProd').innerHTML = '<thead><tr><th>Aspect</th><th>This prototype</th><th>Delivered system</th></tr></thead><tbody>' +
+    pv.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') + '</tbody>';
+}
+
+/* ---------- METHOD ---------- */
+function renderMethod(){
+  const s = state, y = R.y1;
+  const steps = [
+    ['Data and validation', 'Load profile, BGE-style tariff and PJM prices enter and are checked before any calculation.', 'Prototype: synthetic hourly data for 3 representative day types per month.', ['A.2.7', 'B.1']],
+    ['BESS model', 'Capacity, power, efficiency, SOC window and auxiliary load define what the battery can physically do.', 'Available energy this year: ' + num(s.eMWh * y.sohStart, 2) + ' MWh.', ['A.2.1', 'B.2 §4.1']],
+    ['Load and market model', 'Provides site load, tariff structure, 5CP hours and PJM regulation prices as signals.', 'Market adapter: PJM, BGE zone.', ['A.2.2', 'B.2 §4.2']],
+    ['Operational requirements', 'Each value stream states what it needs: peak target, coincident-peak hours, on-peak window, RegD availability.', 'Streams on: ' + TOGGLES.filter(t => s[t.id]).length + ' of 4.', ['A.2.3']],
+    ['Dispatch', 'Coordinates the streams on one battery; terminal SOC equals initial SOC; net load follows one composition rule.', 'Prototype: priority heuristic. Delivered engine: LP co-optimization.', ['A.2.4', 'B.3']],
+    ['Degradation, annual feedback', 'Converts cycling into state of health, triggers augmentation, and returns next year\'s capacity and marginal degradation signal.', 'Year-1 signal: $' + num(y.degCost, 3) + ' per kWh of throughput (dispatch only, never a cash flow).', ['A.2.5', 'B.2 §4.6']],
+    ['Tariff engine', 'Composes net load (site load + battery + auxiliary) and computes the customer bill with and without the battery. Single source of bill savings.', 'Bill savings year 1: ' + money(y.demSav + y.enSav + y.capSav) + '.', ['A.2.2 §9', 'B.2 §4.3']],
+    ['PJM settlement adapter', 'Applies PJM rules to the dispatch attribution: capability, mileage and performance score. Determines what the market pays; does not value the project.', 'RegD settled year 1: ' + money(y.regRev) + '.', ['A.2.2 §13', 'B.2 v0.5.1', 'B.4 §4.4']],
+    ['Financial valuation', 'Consumes bill savings, settled value and degradation events; applies realization factor to market revenue only; adds costs, augmentation and residual value; computes NPV, IRR and payback.', 'Pre-tax, nominal cash flows. RegD valued at ' + money(y.regReal) + '.', ['A.2.6', 'B.4']]
+  ];
+  $('pipe').innerHTML = steps.map((st, i) =>
+    '<div class="step"><div class="dot">' + (i + 1) + '</div><div><b>' + st[0] + '</b><span>' + st[1] + '</span></div><div><span>' + st[2] + '</span></div><div class="refs">' + st[3].map(r => '<span class="tag">' + r + '</span>').join('') + '</div></div>').join('');
+  const okI = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const warnI = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>';
+  const ok = t => '<span class="ok">' + okI + t + '</span>', warn = t => '<span class="pend">' + warnI + t + '</span>';
+  const rules = [
+    ['Energy balance closes every day', R.chk.residual < 0.01 ? ok('Pass') : warn('Residual ' + num(R.chk.residual, 2) + ' kWh'), 'B.2 §4.1'],
+    ['SOC stays inside the window', (R.chk.minS >= s.socMin / 100 - 1e-6 && R.chk.maxS <= s.socMax / 100 + 1e-6) ? ok('Pass') : warn('Out of window'), 'A.2.1'],
+    ['Power never exceeds rating', R.chk.maxPow <= s.pMW * 1000 + 1e-6 ? ok('Pass') : warn('Exceeded'), 'B.3 §5'],
+    ['Recharge completes, terminal SOC equals initial', R.chk.shortfall < 1 ? ok('Pass') : warn('Shortfall ' + num(R.chk.shortfall, 0) + ' kWh'), 'B.3 §8.5'],
+    ['Net load = site load + battery + auxiliary', ok('Applied'), 'B.2 §4.3'],
+    ['Each value counted once (bill vs. settlement)', ok('Applied'), 'B.4 §11'],
+    ['Tariff escalation applied once, in the tariff engine', ok('Applied'), 'B.4 §7.3'],
+    ['Realization factor on market revenue only', ok('Applied'), 'B.4 §5.3'],
+    ['Degradation cost is a dispatch signal, not a cash flow', ok('Applied'), 'B.4 §6.5']
+  ];
+  $('rules').innerHTML = '<thead><tr><th>Rule</th><th>Status</th><th>Source</th></tr></thead><tbody>' + rules.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td><span class="tag">' + r[2] + '</span></td></tr>').join('') + '</tbody>';
+  const lin = [
+    ['Demand and energy savings', 'Tariff engine', 'Bill with vs. without battery'],
+    ['Capacity savings', 'Tariff engine', 'PLC at 5CP hours × capacity price × hit rate'],
+    ['RegD revenue', 'PJM settlement adapter', 'MW-h × score × (RMCCP + mileage × RMPCP)'],
+    ['Augmentation cost', 'Degradation event, costed in Financial', 'Added kWh × augmentation cost'],
+    ['NPV, IRR, payback', 'Financial engine', 'Annual net cash flows, pre-tax, nominal']
+  ];
+  $('lineage').innerHTML = '<thead><tr><th>Result</th><th>Produced by</th><th>Computed from</th></tr></thead><tbody>' + lin.map(r => '<tr><td>' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td></tr>').join('') + '</tbody>';
+  const defs = [
+    ['Target market', 'PJM, BGE zone', 'PH-001'],
+    ['Configuration', 'Behind-the-meter', 'PH-002'],
+    ['Coincident peak hours', 'Known, with configurable hit rate', 'PH-022'],
+    ['Dispatch foresight', 'Perfect foresight; realization factor in Financial', 'PH-033'],
+    ['Dispatch method', 'LP (this prototype: priority heuristic)', 'PH-034'],
+    ['Realization factor', num(s.rf, 2) + ' on market revenue', 'PH-035'],
+    ['Degradation update', 'Annual state-of-health update', 'PH-036'],
+    ['Representative periods', 'Monthly (this prototype: 3 day types per month)', 'PH-040'],
+    ['Financing', num(s.debtPct, 0) + '% debt at ' + num(s.debtRate, 2) + '% over ' + s.debtYears + ' years', 'PH-042'],
+    ['Tax and conventions', 'Pre-tax, nominal', 'PH-043'],
+    ['Augmentation policy', 'SOH-triggered at ' + s.augTrig + '%', 'PH-044'],
+    ['Time resolution', '15-minute where data allows (this prototype: hourly)', 'PH-054']
+  ];
+  $('defaults').innerHTML = '<thead><tr><th>Decision</th><th>Working assumption used</th><th>Register ID</th><th>Status</th></tr></thead><tbody>' + defs.map(d => '<tr><td>' + d[0] + '</td><td>' + d[1] + '</td><td><span class="tag">' + d[2] + '</span></td><td><span class="tag a">Awaiting ENGIE</span></td></tr>').join('') + '</tbody>';
+}
+
+/* ---------- DATA ---------- */
+function renderData(){
+  const s = state;
+  let kwh = 0, mx = 0; const stats = [];
+  for (let m = 0; m < 12; m++){
+    const c = dayCounts(m); let e = 0, p = 0;
+    [0, 1, 2].forEach(t => { for (let h = 0; h < 24; h++){ const l = loadKW(s.peakKW, m, h, t); e += l * c[t]; p = Math.max(p, l); } });
+    kwh += e; mx = Math.max(mx, p); stats.push({ peak: p, avg: e / (DAYS[m] * 24) });
+  }
+  $('loadSub').textContent = 'Annual consumption ' + num(kwh / 1000, 0) + ' MWh, peak ' + num(mx, 0) + ' kW, load factor ' + num(kwh / (mx * 8760) * 100, 0) + '%. Synthetic profile for demonstration.';
+  const svg = clear($('loadChart')); const g = el('g', {}); svg.appendChild(g);
+  const L = 56, W = 480, top = 14, H = 180, hi = niceMax(mx * 1.05), yy = v => top + H - v / hi * H, bw = W / 12;
+  for (let i = 0; i <= 4; i++){ const v = hi * i / 4; hline(g, L, L + W, yy(v), i ? C.grid : '#AEBBC4'); txt(g, L - 8, yy(v) + 4, num(v, 0), { 'text-anchor': 'end' }); }
+  txt(g, L - 8, top - 2, 'kW', { 'text-anchor': 'end' });
+  stats.forEach((st, i) => {
+    const x = L + i * bw;
+    rect(g, x + bw * 0.12, yy(st.peak), bw * 0.36, yy(0) - yy(st.peak), C.load);
+    rect(g, x + bw * 0.52, yy(st.avg), bw * 0.36, yy(0) - yy(st.avg), C.teal);
+    txt(g, x + bw / 2, top + H + 18, MON[i], { 'text-anchor': 'middle' });
+  });
+  const okI = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  const pI = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+  const ok = t => '<span class="ok">' + okI + t + '</span>', pend = t => '<span class="pend">' + pI + t + '</span>';
+  const checks = [
+    ['Load profile covers 12 months, all hours', ok('Pass')],
+    ['Tariff periods cover every hour of the year', ok('Pass')],
+    ['Prices cover the ' + Math.round(s.years) + '-year horizon', ok('Pass (escalated)')],
+    ['SOC window inside battery limits', (s.socMin < s.socMax) ? ok('Pass') : pend('Check window')],
+    ['No export to grid (no export compensation assumed)', R.chk.minNet >= -1e-6 ? ok('Pass') : pend('Export detected')],
+    ['Bill reconciliation against historical bills', pend('Awaiting data')]
+  ];
+  $('checks').innerHTML = '<thead><tr><th>Check</th><th>Status</th></tr></thead><tbody>' + checks.map(c => '<tr><td>' + c[0] + '</td><td>' + c[1] + '</td></tr>').join('') + '</tbody>';
+  const pending = [
+    ['Interval meter data for reference sites (15-minute)', 'PH-003'],
+    ['Customer tariff details: demand, TOU, ratchets, minimum bill', 'PH-023'],
+    ['Historical customer bills for tariff validation', 'PH-003'],
+    ['PJM price assumptions: capacity, RegD, energy', 'PH-003'],
+    ['Battery vendor degradation curves and warranty terms', 'PH-015'],
+    ['Reference projects and expected results for benchmarking', 'PH-005']
+  ];
+  $('pending').innerHTML = '<thead><tr><th>Data</th><th>Register ID</th><th>Status</th></tr></thead><tbody>' + pending.map(p => '<tr><td>' + p[0] + '</td><td><span class="tag">' + p[1] + '</span></td><td><span class="tag a">Requested</span></td></tr>').join('') + '</tbody>';
+}
+
+/* ---------- orchestration ---------- */
+function renderView(){
+  if (view === 'results') renderResults();
+  else if (view === 'pjm') renderPJM();
+  else if (view === 'compare') renderCompare();
+  else if (view === 'arch') renderArch();
+  else if (view === 'method') renderMethod();
+  else if (view === 'data') renderData();
+}
+let pending = null;
+function update(){
+  if (pending) cancelAnimationFrame(pending);
+  pending = requestAnimationFrame(() => { pending = null; R = simulate(state); renderStrip(true); renderView(); });
+}
+
+buildNav(); buildSegs(); buildForm();
+renderStrip(false);
+const startView = (location.hash || '').slice(1);
+go(VIEWS.some(v => v.id === startView) ? startView : 'results');
+window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v !== view && VIEWS.some(x => x.id === v)) go(v); });
+})();
+</script>
+</body>
+</html>
     </main>
   </div>
 </div>
