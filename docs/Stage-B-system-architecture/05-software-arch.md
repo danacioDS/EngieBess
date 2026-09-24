@@ -1,7 +1,4 @@
-
----
-
-# B.5 Software Architecture v0.4 — Baseline (Frozen)
+# B.5-SW-ARCH-001 — Software Architecture (v0.4.1 — Baseline Frozen)
 
 ---
 
@@ -11,7 +8,7 @@
 
 **Document ID:** B.5-SW-ARCH-001
 
-**Version:** 0.4 — Baseline (Frozen)
+**Version:** 0.4.1 — Baseline (Frozen)
 
 **Section:** §8 — B.5 Software Architecture
 
@@ -33,8 +30,9 @@
 - B.0-INTEGRATED-SYS-ARCH-001 — B.0 Integrated System Architecture (v0.3.3 Baseline Frozen)
 - B.1-DATA-ARCH-001 — B.1 Data Architecture (v0.3 Baseline Frozen)
 - B.2-MODEL-ARCH-001 — B.2 Model Architecture (v0.5.1 Baseline Frozen)
-- B.3-OPT-ARCH-001 — B.3 Optimization Architecture (v0.6 Baseline Frozen)
+- B.3-OPT-ARCH-001 — B.3 Optimization Architecture (v0.6.1 Baseline Frozen)
 - B.4-FIN-ARCH-001 — B.4 Financial Architecture (v0.4 Baseline Frozen)
+- B.6-DBX-ARCH-001 — B.6 Databricks Architecture (v0.4 Baseline Frozen)
 
 **Note on versions.** Parent document versions are not restated here; they are as declared in each document.
 
@@ -805,23 +803,23 @@ The settlement interfaces declared in **B.2 v0.5.1 §7.2** and referenced in **B
 
 | Architectural interface | Source | B.5 exposure |
 |-------------------------|--------|--------------|
-| BESS → Dispatch | B.2 §7.2 | `bess_model` → `dispatch` |
-| BESS → Degradation | B.2 §7.2 | `bess_model` → `degradation` |
-| BESS → Tariff (auxiliary consumption) | B.2 §7.2 | `bess_model` → `tariff` |
-| Load & Market → Dispatch | B.2 §7.2 | `load_market.signal_provider` → `dispatch` |
-| Load & Market → Tariff (reference load) | B.2 §7.2 | `load_market.signal_provider` → `tariff` |
-| Operational → Dispatch | B.2 §7.2 | `operational` → `dispatch` |
-| Operational → Degradation | B.2 §7.2 | `operational` → `degradation` |
-| Dispatch → BESS | B.2 §7.2 | `dispatch` → `bess_model` |
-| Dispatch → Degradation | B.2 §7.2 | `dispatch` → `degradation` |
-| Dispatch → Tariff (battery power trajectory) | B.2 §7.2 | `dispatch` → `tariff` |
-| Dispatch → Financial (attribution basis) | B.2 §7.2 | `dispatch` → `financial` |
+| BESS → Dispatch | B.2 v0.5.1 §7.2 | `bess_model` → `dispatch` |
+| BESS → Degradation | B.2 v0.5.1 §7.2 | `bess_model` → `degradation` |
+| BESS → Tariff (auxiliary consumption) | B.2 v0.5.1 §7.2 | `bess_model` → `tariff` |
+| Load & Market → Dispatch | B.2 v0.5.1 §7.2 | `load_market.signal_provider` → `dispatch` |
+| Load & Market → Tariff (reference load) | B.2 v0.5.1 §7.2 | `load_market.signal_provider` → `tariff` |
+| Operational → Dispatch | B.2 v0.5.1 §7.2 | `operational` → `dispatch` |
+| Operational → Degradation | B.2 v0.5.1 §7.2 | `operational` → `degradation` |
+| Dispatch → BESS | B.2 v0.5.1 §7.2 | `dispatch` → `bess_model` |
+| Dispatch → Degradation | B.2 v0.5.1 §7.2 | `dispatch` → `degradation` |
+| Dispatch → Tariff (battery power trajectory) | B.2 v0.5.1 §7.2 | `dispatch` → `tariff` |
+| Dispatch → Financial (attribution basis) | B.2 v0.5.1 §7.2 | `dispatch` → `financial` |
 | Dispatch → Load & Market (attribution basis, for settlement) | B.2 v0.5.1 §7.2 | `dispatch` → `load_market.settlement_adapter` |
 | Load & Market → Financial (settlement basis) | B.2 v0.5.1 §7.2 | `load_market.settlement_adapter` → `financial` |
-| Degradation → BESS | B.2 §7.2 | `degradation` → `bess_model` |
-| Degradation → Dispatch (marginal signal) | B.2 §7.2 | `degradation` → `dispatch` |
-| Degradation → Financial (physical events) | B.2 §7.2 | `degradation` → `financial` |
-| Tariff → Financial (bill and savings) | B.2 §7.2 | `tariff` → `financial` |
+| Degradation → BESS | B.2 v0.5.1 §7.2 | `degradation` → `bess_model` |
+| Degradation → Dispatch (marginal signal) | B.2 v0.5.1 §7.2 | `degradation` → `dispatch` |
+| Degradation → Financial (physical events) | B.2 v0.5.1 §7.2 | `degradation` → `financial` |
+| Tariff → Financial (bill and savings) | B.2 v0.5.1 §7.2 | `tariff` → `financial` |
 
 ---
 
@@ -936,22 +934,36 @@ Those are Stage C and Stage D responsibilities, with physical topology in B.6.
 | 11 | §7.1: added explicit "Rule on annual sequencing ownership" — B.3 owns semantics, B.5 orchestrates, B.6 realizes; §10.3 and §10.4 and §12.2 aligned with this rule | Prevent B.5 from re-appropriating B.3's annual-sequence semantics |
 | 12 | §10.3: replaced "and of the annual sequence" with "Temporal sequencing and state carry-forward remain governed by the execution contracts defined in B.2 and B.3" | Align with B.3 v0.6 §8.4 and §9.5 |
 
-### 19.4 Version History
+### 19.4 Changes from v0.4 to v0.4.1
+
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | Header: version bumped from v0.4 to **v0.4.1 — Baseline (Frozen)** | Editorial patch; no architectural content changed |
+| 2 | Header: B.3 cited as **v0.6.1 Baseline Frozen** (was v0.6) | Align with the frozen B.3 version |
+| 3 | Header: B.6 added to Parent Documents with **v0.4 Baseline Frozen** | Completeness of the frozen Stage B tree |
+| 4 | §17.4 (Interface Traceability Matrix): all 17 rows updated from `B.2 §7.2` to `B.2 v0.5.1 §7.2` | Consistency with §17.2, which already cited v0.5.1; complete the version traceability |
+| 5 | §19.4: this change log entry added | Traceability of the editorial patch |
+| 6 | §19.5: version history updated to include v0.4.1 | Traceability |
+
+**Nature of the change.** Exclusively editorial. **No architectural content of v0.4 has been altered.** The software unit decomposition of §4, the service boundaries of §5, the state externalization rule of §5.4, the parallelization rule of §10.3, the testing levels of §13.2, and the interface traceability matrix of §17.4 (structural content) remain identical to v0.4. Only the version citations in §17.4 and the parent document list were updated.
+
+### 19.5 Version History
 
 | Version | Date | Changes | Status |
 |---------|------|---------|--------|
 | 0.1 | Stage B start | Initial B.5 draft | Superseded |
 | 0.2 | Stage B review | 11 corrections | Superseded |
 | 0.3 | Stage B review | 9 corrections (consolidation) | Superseded |
-| 0.4 | Stage B review | 12 corrections (state externalization, app boundary, parallel owner, invariant tests, kernel cleanup, adapter description, persistence, B.3 v0.6 citation, annual sequencing ownership) | **Baseline (Frozen)** |
+| 0.4 | Stage B review | 12 corrections (state externalization, app boundary, parallel owner, invariant tests, kernel cleanup, adapter description, persistence, B.3 v0.6 citation, annual sequencing ownership) | Superseded |
+| 0.4.1 | Stage B closure | 6 editorial corrections (parent list completed, B.3 v0.6.1 citation, B.6 v0.4 citation, §17.4 version citations) | **Baseline (Frozen)** |
 
 ---
 
-**End of §8 — B.5 Software Architecture (v0.4 — Baseline Frozen)**
+**End of §8 — B.5 Software Architecture (v0.4.1 — Baseline Frozen)**
 
 **Status:** Baseline (Frozen)
 
-**Next:** B.6 Databricks Architecture
+**Next:** Stage B → Stage C Handoff
 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 
@@ -959,36 +971,4 @@ Those are Stage C and Stage D responsibilities, with physical topology in B.6.
 
 ---
 
-## 📋 Resumen de los 12 cambios consolidados en v0.4
-
-| # | Punto | Cambio aplicado |
-|---|-------|-----------------|
-| 1 | Estado externalizado | §5.2/§5.3/§15.1: "State-carrying service"; §5.4 "Rule — State externalization" |
-| 2 | Databricks App + exports | §9.2: añadidas filas "Web UI (Databricks App)" y "Exports (PDF / Excel)" |
-| 3 | Dueño único del reparto paralelo | §10.2/§10.3/§10.4: `execution_control` como **sole owner**; `scenario_mgmt` → Python solo |
-| 4 | Persistencia como Delta tables | §10.4: "Delta tables (written via Python / PySpark; queried via SQL)" |
-| 5 | Tests de invariantes | §13.2: nuevo nivel "System invariants" |
-| 6 | `config` fuera del kernel | §3.1: kernel solo con contracts, types, errors |
-| 7 | "Adapter" mal descrito | §15.1 y §4.6: "applies external rule sets (market / program) to internal data" |
-| 8 | §9.2 sin App ni exports | §9.2: ahora incluye App y exports |
-| 9 | Cita B.3 → v0.6 Frozen | Cabecera: B.3 → v0.6 Baseline Frozen; nota de reconciliación eliminada |
-| 10 | Annual sequencing ownership | §7.1 regla explícita: B.3 owns semantics, B.5 orchestrates, B.6 realizes |
-| 11 | §10.3 y §10.4 alineados | "Temporal sequencing and state carry-forward remain governed by B.2 and B.3" |
-| 12 | §12.2 alineado | `execution_control` interactúa con B.3 semantics sin redefinirlas |
-
----
-
-## 🚦 Estado de Stage B
-
-| Documento | Versión | Estado |
-|-----------|---------|--------|
-| B.0 Integrated System Architecture | v0.3.3 | ✅ Baseline Frozen |
-| B.1 Data Architecture | v0.3 | ✅ Baseline Frozen |
-| B.2 Model Architecture | v0.5.1 | ✅ Baseline Frozen |
-| B.3 Optimization Architecture | v0.6 | ✅ Baseline Frozen |
-| B.4 Financial Architecture | v0.4 | ✅ Baseline Frozen |
-| **B.5 Software Architecture** | **v0.4** | **✅ Baseline Frozen** |
-| B.6 Databricks Architecture | — | ⏭ Next |
-
----
 
