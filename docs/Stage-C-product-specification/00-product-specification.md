@@ -1,6 +1,6 @@
 # STAGE-C-PLAN-001 — Stage C Product Specification Plan
 
-**Document ID:** STAGE-C-PLAN-001
+**Document ID:** STAGE-C-PLAN-001 
 
 **Version:** 0.1 — Draft for Review
 
@@ -646,56 +646,3 @@ The following risks are tracked for Stage C.
 
 ---
 
-## 📋 Secuencia Git para commitear este documento
-
-Ejecuta:
-
-```bash
-cd ~/repo_lab/EngieBess
-
-# Crear el directorio de Stage C si no existe
-mkdir -p docs/Stage-C-product-specification
-
-# Guardar el documento (pega el contenido completo arriba)
-cat > docs/Stage-C-product-specification/STAGE-C-PLAN-001.md << 'EOF'
-[PEGA AQUÍ EL CONTENIDO COMPLETO DEL STAGE-C-PLAN-001]
-EOF
-
-# Verificar
-head -5 docs/Stage-C-product-specification/STAGE-C-PLAN-001.md
-wc -l docs/Stage-C-product-specification/STAGE-C-PLAN-001.md
-
-# Commit
-git add docs/Stage-C-product-specification/STAGE-C-PLAN-001.md
-
-git commit -m "docs(stage-c): add STAGE-C-PLAN-001 — Stage C Product Specification Plan v0.1
-
-Establishes the master plan for Stage C (Product Specification).
-
-Contents:
-- Document Control
-- Stage C Scope
-- Stage C Deliverables Overview (C.1–C.7 + Handoff)
-- Master Index of Stage C deliverables
-- Consolidation of the 65 deferrals from the Stage B Handoff
-- Dependency Chain (C.1 → C.7)
-- Level of Detail Rule (Stage C vs Stage D)
-- Review and Freeze Process
-- Stage C Closure Criteria
-- Stage C → Stage D Handoff criteria
-- Risk Register
-- Change Control
-- Sign-Off
-
-Stage C entry point. Freeze of this plan authorizes the start of C.1.
-
-Refs: STAGE-C-PLAN-001
-Next: C.1 Physical Data Specification"
-
-git push origin main
-
-git tag -a stage-c-plan-v01 -m "Stage C — Plan v0.1 (Draft for Review)"
-git push origin stage-c-plan-v01
-```
-
----
