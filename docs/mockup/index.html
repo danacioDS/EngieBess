@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BESS Valuation Studio, concept prototype (PJM / BGE)</title>
+<title>BESS Operational &amp; Financial Studio, concept prototype (PJM / BGE)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600&display=swap" rel="stylesheet">
 <style>
@@ -144,13 +144,42 @@ td.num,th.num{text-align:right;font-family:var(--num);font-variant-numeric:tabul
   .step{grid-template-columns:28px minmax(0,1fr)}
   .step > :nth-child(3),.step > :nth-child(4){grid-column:2}
 }
+
+/* patch: footer + about */
+.footer{background:var(--rail);color:#A9B7C0;padding:14px 32px;font-size:12.5px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;border-top:1px solid #1B3342}
+.footer-left{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.footer-right{font-size:12px;flex:1;text-align:right}
+.footer .brand-line{font-weight:600;color:#E6ECEF}
+.footer .credit{color:#7FC2DA;font-weight:600}
+.footer .sep{color:#6B7C87}
+.footer-right b{color:#7FC2DA;font-weight:600}
+@media (max-width:860px){.footer{padding:14px 16px;flex-direction:column;align-items:flex-start;gap:8px}.footer-right{text-align:left}}
+.about p{margin:0;max-width:72ch}
+.about ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.author{display:flex;align-items:center;gap:14px}
+.avatar{width:52px;height:52px;border-radius:10px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px;flex-shrink:0}
+.author b{display:block;font-size:16px}
+.author span{font-size:13px;color:var(--muted)}
+.ref{font-size:13px}
+.ref i{font-style:italic}
+.tour{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.tour .t{border:1px solid var(--line);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px;justify-content:space-between}
+.tour .n{font-family:var(--num);font-size:13px;font-weight:600;color:var(--teal)}
+.tour b{font-size:14.5px}
+.tour p{font-size:13.5px;color:#2B3D49}
+.tour button{align-self:flex-start;min-height:40px}
+.chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13.5px}
+.chain span.k{background:var(--teal-soft);color:#08455D;border-radius:6px;padding:5px 9px;font-weight:600}
+.chain span.a{color:var(--muted)}
+@media (max-width:1180px){.tour{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){.tour{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <div class="app">
   <aside class="rail">
     <div>
-      <div class="brand"><b>BESS Valuation Studio</b><span>Concept prototype for ENGIE</span></div>
+      <div class="brand"><b>BESS Operational &amp; Financial Studio</b><span>Concept prototype for ENGIE</span></div>
       <nav class="nav" aria-label="Screens" id="nav"></nav>
     </div>
     <div class="railfoot">
@@ -322,6 +351,21 @@ td.num,th.num{text-align:right;font-family:var(--num);font-variant-numeric:tabul
           <div class="sub">From the Phase 1 clarification register. Each default can be changed without redesigning the model.</div>
           <div style="overflow-x:auto"><table id="defaults"></table></div>
         </div>
+              <div class="card">
+          <h3>Not modeled in this prototype</h3>
+          <div class="sub">Declared so that no simplification is hidden. Each is covered by the engineering baseline.</div>
+          <div style="overflow-x:auto"><table>
+            <thead><tr><th>Aspect</th><th>Prototype treatment</th><th>Baseline</th></tr></thead>
+            <tbody>
+              <tr><td>Initial state of charge</td><td>Derived so each day ends where it starts; the delivered engine takes it as an explicit input to every independent optimization</td><td><span class="tag">B.3 &sect;8.5</span></td></tr>
+              <tr><td>Thermal effects</td><td>Constant temperature; no thermal derating</td><td><span class="tag">A.2.1</span></td></tr>
+              <tr><td>Inverter apparent power</td><td>Fixed active-power envelope; reactive power not modeled</td><td><span class="tag">PH-041</span></td></tr>
+              <tr><td>Voltage and reactive support</td><td>Not modeled</td><td><span class="tag">A.2.3</span></td></tr>
+              <tr><td>Demand response baseline and performance</td><td>Not modeled; capacity value is represented through 5CP</td><td><span class="tag">A.2.3</span></td></tr>
+              <tr><td>PLC one-year lag</td><td>Capacity savings applied in the same year</td><td><span class="tag">A.2.2</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
       </section>
 
       <!-- DATA -->
@@ -346,9 +390,90 @@ td.num,th.num{text-align:right;font-family:var(--num);font-variant-numeric:tabul
           <table id="pending"></table>
         </div>
       </section>
+    
+      <!-- ABOUT -->
+      <section class="view about" id="v-about" aria-labelledby="h-about" hidden>
+        <div class="vhead">
+          <div><h2 id="h-about">About</h2><p>A concept prototype submitted with the proposal for ENGIE's BESS Operational and Financial Modeling Platform (RFP-264144-1). It answers one question: how much is a behind-the-meter battery in PJM worth, where does that value come from, and which assumptions hold it up? Data and prices are synthetic and dispatch is simplified; the purpose is to make the engineering design visible and testable, not to produce investment-grade numbers.</p></div>
+        </div>
+
+        <div class="card">
+          <h3>A 3-minute tour</h3>
+          <div class="tour">
+            <div class="t"><span class="n">Step 1</span><b>Change an assumption</b><p>Raise the power rating or the capacity price. Everything recalculates, and the strip at the top shows the change from the baseline.</p><button class="btn" type="button" data-go="setup">Open Scenario setup</button></div>
+            <div class="t"><span class="n">Step 2</span><b>See the battery operate</b><p>Pick July and a peak weekday: the peak target, the coincident peak hour, charging at night and RegD in idle hours.</p><button class="btn" type="button" data-go="results">Open Results</button></div>
+            <div class="t"><span class="n">Step 3</span><b>Follow the money</b><p>Bill savings come from the tariff engine; RegD revenue comes from PJM settlement and is then valued in Financial.</p><button class="btn" type="button" data-go="pjm">Open PJM value streams</button></div>
+            <div class="t"><span class="n">Step 4</span><b>Check the reasoning</b><p>Which engineering rules pass on this run, and which working assumptions wait for ENGIE's confirmation.</p><button class="btn" type="button" data-go="method">Open Method and traceability</button></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Engineering foundation</h3>
+          <div class="sub">The prototype follows the engineering baseline in the repository (Stage A definition, Stage B architecture)</div>
+          <div class="chain" aria-label="Causal chain">
+            <span class="k">System context</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">Data</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">BESS and load &amp; market</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">Operational requirements</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">Dispatch</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">Degradation</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">Financial</span><span class="a" aria-hidden="true">&rarr;</span><span class="k">Scenarios and results</span>
+          </div>
+          <div class="grid2">
+            <div><b>Physical-operational cycle</b><p class="hint">Time-dependent and stateful: dispatch drives cycling, cycling drives state of health, and each year's state of health sets next year's capacity and degradation signal.</p></div>
+            <div><b>Economic-financial cycle</b><p class="hint">Consumes the operational results (bill savings, settled market value, degradation events) and discounts them over the project horizon.</p></div>
+          </div>
+          <div style="overflow-x:auto"><table>
+            <thead><tr><th>Domain</th><th>Responsibility</th><th>Documents</th></tr></thead>
+            <tbody>
+              <tr><td>BESS</td><td>Intrinsic capability: power, energy, efficiency, SOC and state of health</td><td><span class="tag">A.2.1</span></td></tr>
+              <tr><td>Load and market</td><td>External context, tariff engine, market adapters</td><td><span class="tag">A.2.2</span></td></tr>
+              <tr><td>Operational</td><td>What each value stream requires from the battery</td><td><span class="tag">A.2.3</span></td></tr>
+              <tr><td>Dispatch</td><td>Coordination of all streams on one battery</td><td><span class="tag">A.2.4</span> <span class="tag">B.3</span></td></tr>
+              <tr><td>Degradation</td><td>State-of-health evolution and marginal degradation signal</td><td><span class="tag">A.2.5</span></td></tr>
+              <tr><td>Financial</td><td>Cash flow, NPV, IRR and payback</td><td><span class="tag">A.2.6</span> <span class="tag">B.4</span></td></tr>
+              <tr><td>Data and application</td><td>Data lifecycle, execution on Databricks, application</td><td><span class="tag">A.2.7</span> <span class="tag">B.1</span> <span class="tag">B.5</span> <span class="tag">B.6</span></td></tr>
+            </tbody>
+          </table></div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <h3>Selected references</h3>
+            <div style="overflow-x:auto"><table>
+              <thead><tr><th>Reference</th><th>Where it is used</th></tr></thead>
+              <tbody>
+                <tr><td class="ref">Xu, Zhao, Zheng, Litvinov and Kirschen (2018). Factoring the cycle aging cost of batteries participating in electricity markets. <i>IEEE Trans. Power Systems</i> 33(2).</td><td>Marginal degradation cost as a dispatch signal</td></tr>
+                <tr><td class="ref">Xu, Oudalov, Ulbig, Andersson and Kirschen (2018). Modeling of lithium-ion battery degradation for cell life assessment. <i>IEEE Trans. Smart Grid</i> 9(2).</td><td>Cycle and calendar degradation</td></tr>
+                <tr><td class="ref">Shi, Xu, Wang and Zhang (2018). Using battery storage for peak shaving and frequency regulation: joint optimization for superlinear gains. <i>IEEE Trans. Power Systems</i> 33(3).</td><td>Stacking peak shaving with regulation</td></tr>
+                <tr><td class="ref">Neubauer and Simpson (2015). Deployment of behind-the-meter energy storage for demand charge reduction. NREL/TP-5400-63162.</td><td>Behind-the-meter demand charge value</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+          <div class="card">
+            <h3>Author and contact</h3>
+            <div class="author"><div class="avatar" aria-hidden="true">DC</div><div><b>Daniel Ignacio Canedo Donoso</b><span>Author of the engineering baseline and of this prototype</span></div></div>
+            <ul>
+              <li>ML Engineer, Anyone AI</li>
+              <li>MSc Economics, Yokohama National University</li>
+              <li>Economist, Universidad Cat&oacute;lica Boliviana</li>
+            </ul>
+            <p class="hint">Repository and engineering documents: <a href="https://github.com/danacioDS/EngieBess">github.com/danacioDS/EngieBess</a></p>
+            
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </div>
+
+<!-- patch:about-footer-v2 -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-left">
+    <span class="brand-line">Blue Trail Software &middot; BessEngie</span>
+    <span class="sep">&middot;</span>
+    <span>&copy; 2026</span>
+    <span class="sep">|</span>
+    <span class="credit">MSc. Daniel Canedo</span>
+  </div>
+  <div class="footer-right">
+    Engineering domains: <b>BESS</b> &middot; <b>Load &amp; Market</b> &middot; <b>Operational</b> &middot; <b>Dispatch</b> &middot; <b>Degradation</b> &middot; <b>Financial</b> &middot; <b>Data &amp; Application</b>
+  </div>
+</footer>
 
 <script>
 /* ============================================================
@@ -631,7 +756,8 @@ const VIEWS = [
   { id:'compare', t:'Compare scenarios', i:'<rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="16" rx="1.5"/>' },
   { id:'arch', t:'Architecture', i:'<path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/><path d="M3 17.5l9 5 9-5"/>' },
   { id:'method', t:'Method and traceability', i:'<circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8M18 8l-5 8"/>' },
-  { id:'data', t:'Data and validation', i:'<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>' }
+  { id:'data', t:'Data and validation', i:'<path d="M12 3l8 3v6c0 4.5-3.4 8-8 9-4.6-1-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/>' },
+  { id:'about', t:'About', i:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/>' }
 ];
 
 /* ---------- formatting ---------- */
@@ -669,6 +795,7 @@ function buildNav(){
 }
 function go(id){
   view = id;
+  try { history.replaceState(null, '', '#' + id); } catch (e) {}
   document.querySelectorAll('.nav button').forEach(b => { if (b.dataset.view === id) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
   VIEWS.forEach(v => { $('v-' + v.id).hidden = v.id !== id; });
   renderView();
@@ -810,7 +937,7 @@ function renderSOH(){
   for (let t = 0; t <= n; t += 5) txt(g, x(t), top + H + 18, String(t), { 'text-anchor': 'middle' });
   txt(g, L + W, top + H + 18, 'years', { 'text-anchor': 'end' });
   const avgEfc = R.Y.reduce((a, r) => a + r.efc, 0) / n;
-  $('sohNote').textContent = num(avgEfc, 0) + ' equivalent full cycles per year on average';
+  $('sohNote').textContent = num(avgEfc, 0) + ' equivalent full cycles per year on average' + '. Marginal degradation signal $' + num(R.y1.degCost, 3) + ' per kWh (dispatch only, not a cash flow)';
 }
 function renderCash(){
   const svg = clear($('cashChart')); const g = el('g', {}); svg.appendChild(g);
@@ -1160,7 +1287,9 @@ function update(){
 
 buildNav(); buildSegs(); buildForm();
 renderStrip(false);
-go('results');
+const startView = (location.hash || '').slice(1);
+go(VIEWS.some(v => v.id === startView) ? startView : 'results');
+window.addEventListener('hashchange', () => { const v = location.hash.slice(1); if (v !== view && VIEWS.some(x => x.id === v)) go(v); });
 })();
 </script>
 </body>
