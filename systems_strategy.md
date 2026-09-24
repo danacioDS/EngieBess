@@ -1,9 +1,8 @@
-# BESS Operational & Financial Modeling Platform
-## System Strategy & Delivery Framework
+# SYS-STR-FRM-001 — System Strategy & Delivery Framework (v1.0.2 — Consolidated Baseline, Mapping Errata Applied)
 
 **Document ID:** SYS-STR-FRM-001
 
-**Version:** 0.9 — Consolidated Baseline
+**Version:** 1.0.2 — Consolidated Baseline (Mapping Errata Applied)
 
 **Status:** System Strategy — Delivery Framework — Baselined
 
@@ -14,7 +13,7 @@
 **Language:** English
 
 **Parent Documents:**
-- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6)
+- `SYS-ENG-DEF-001` — Stage A.1 — System Component Definition (v0.6.1)
 - `A.2.1-BESS-ENG-001` — BESS Engineering (v1.3)
 - `A.2.2-LOAD-MKT-ENG-001` — Load & Market Engineering (v1.3)
 - `A.2.3-OPS-ENG-001` — Operational Engineering (v1.4)
@@ -23,6 +22,19 @@
 - `A.2.6-FIN-ENG-001` — Financial Engineering (v0.3)
 - `A.2.7-DATA-APP-ENG-001` — Data & Application Engineering (v0.3)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
+- `STAGE-A-CONSOL-REPORT-001` — Stage A Consolidation Report (v1.1)
+- `STAGE-B-HLD-INDEX-001` — Stage B HLD Master Index and Scope Definition (v0.2)
+- `STAGE-B-TO-C-HANDOFF-001` — Stage B → Stage C Handoff (v0.2 Baseline Frozen)
+- `B.0-INTEGRATED-SYS-ARCH-001` — B.0 Integrated System Architecture (v0.3.3)
+- `B.1-DATA-ARCH-001` — B.1 Data Architecture (v0.3)
+- `B.2-MODEL-ARCH-001` — B.2 Model Architecture (v0.5.1)
+- `B.3-OPT-ARCH-001` — B.3 Optimization Architecture (v0.6.1)
+- `B.4-FIN-ARCH-001` — B.4 Financial Architecture (v0.4)
+- `B.5-SW-ARCH-001` — B.5 Software Architecture (v0.4.1)
+- `B.6-DBX-ARCH-001` — B.6 Databricks Architecture (v0.4)
+- `STAGE-C-PLAN-001` — Stage C Product Specification Plan (v1.0.2 Baseline)
+
+**Change log.** See §15.
 
 ---
 
@@ -43,7 +55,7 @@ This document defines the **System Strategy** for that platform. It establishes:
 - What the system must produce
 - What principles govern its design
 - What cross-cutting concerns span the domains
-- How it will be delivered across the 12-week engagement
+- How it is delivered across the 12-week engagement
 
 It deliberately does **not** define equations, algorithms, schemas, class structures, or implementation details. Those belong to subsequent stages.
 
@@ -88,25 +100,94 @@ Three parallel workstreams, one contract:
 
 | Workstream | Owner in this strategy | Where it is defined |
 |---|---|---|
-| **Engineering** | System Context + Domains 1–6 | Stage A (Conceptual) → Stage B (Architecture) → Stage C (Specification) |
-| **Software** | Domain 7 | Stage C (Specification) → Stage D (Implementation) |
+| **Engineering** | System Context + Domains 1–6 | Stage A (Engineering Definition) → Stage B (System Architecture) → Stage C (Product Specification) |
+| **Software** | Domain 7 | Stage C (Product Specification) → Stage D (Implementation) |
 | **Delivery** | Cross-cutting (Phase 4) | Stage D (Deployment, Documentation, Training) |
 
 Treating ENGINEERING as the whole engagement is the most common underestimation in analytical software contracts.
 
-### 1.2 Stage A.2 Complete
+### 1.2 Engagement Stage Model — Consolidated
 
-As of this revision, **Stage A.2 is conceptually and formally complete**. All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The next step is the **Stage A Consolidation Audit**, followed by **Stage B — System Architecture (HLD)**.
+The engagement is delivered through **four engineering stages** — A, B, C, D — under the System Strategy.
 
-| Order | Document ID | Domain | Status |
+| Stage | Name | Engineering Equivalent | Purpose |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
-| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
-| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
-| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
-| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
+| **A** | Engineering Definition | Conceptual Engineering | Define what the system must contain, and what the engineering responsibilities are |
+| **B** | System Architecture (HLD) | Basic Engineering | Define how those responsibilities are structurally organized into an executable system |
+| **C** | Product Specification | Detailed Engineering | Specify what exactly must be built, at a level precise enough to be implementable and verifiable |
+| **D** | Implementation | Construction & Commissioning | Implement, test, validate, and deploy **against baselined Stage C specifications** |
+
+**Progression principle:**
+
+```
+Stage A
+Engineering Definition
+        ↓
+Stage B
+System Architecture (HLD)
+        ↓
+Stage C
+Product Specification
+        ↓
+Stage D
+Implementation
+```
+
+**Verb progression (specification language rule):**
+
+```
+Stage A — defines requirements and engineering responsibilities
+Stage B — establishes architectural decisions
+Stage C — specifies detailed technical decisions within the frozen architecture
+Stage D — implements within the frozen specification
+```
+
+**Controlled parallel execution between Stage C and Stage D.**
+
+Stage C and Stage D may execute in **controlled parallel** during the engagement. However, Stage D **cannot implement a specification domain until the corresponding Stage C deliverable is sufficiently baselined**, and implementation is subject to Stage C → Stage D handoff controls.
+
+```
+Stage C — Specification
+        │
+        ├── C.1 Data Specification ──────► D: data implementation
+        ├── C.2 Model Specification ─────► D: model implementation
+        ├── C.3 Optimization Spec. ──────► D: optimization implementation
+        ├── C.4 Financial Spec. ─────────► D: financial implementation
+        ├── C.5 Software Spec. ──────────► D: software implementation
+        ├── C.6 Platform Spec. ──────────► D: platform implementation
+        └── C.7 Testing & Validation ────► D: test implementation
+```
+
+**Current stage status:**
+
+| Stage | Status | Evidence |
+|---|---|---|
+| **A** | ✅ **CLOSED** | Stage A Consolidation Report v1.1; tag `stage-a-closed` |
+| **B** | ✅ **CLOSED** | Stage B HLD Index v0.2; Handoff v0.2 Baseline Frozen; tags `stage-b-closed`, `stage-b-handoff-v02` |
+| **C** | 🔄 **ACTIVE** | Stage C Plan v1.0.2 Baseline Frozen; C.1 Data Specification next |
+| **D** | ⏭ **PENDING** | Begins after Stage C → D Handoff; may run in controlled parallel against baselined Stage C deliverables |
+
+**Traceability chain:**
+
+```
+ENGIE RFP
+      ↓
+Stage A — Requirements / Engineering Definition
+      ↓
+Stage B — Architecture
+      ↓
+Approved Clarifications / Derived Engineering Requirements
+      ↓
+Stage C — Product Specification
+      ↓
+Stage D — Implementation
+      ↓
+Verification & Testing
+      ↓
+UAT Evidence
+```
+
+Every Stage C requirement and specification item is traceable to a Stage A requirement, a frozen Stage B architectural decision, an approved clarification, or a formally derived engineering requirement.
 
 ---
 
@@ -171,12 +252,14 @@ The System Context has **two components**:
 
 **External Context** — what surrounds the BESS:
 
-| Dimension | What it declares |
-|---|---|
-| **Generation** | Renewable generation profiles, curtailment, intermittency *(architecture extension — see §3.1)* |
-| **Grid / Network** | Connection topology, import/export limits, interconnection capacity, congestion |
-| **Load / Demand** | Physical demand profiles, seasonality, growth, electrification |
-| **Market** | Which markets exist, which products are available, participation rules |
+| Dimension | What it declares | Implementation status |
+|---|---|---|
+| **Generation** | Renewable generation profiles, curtailment, intermittency | **Architectural dimension retained; implementation subject to PH-004** |
+| **Grid / Network** | Connection topology, import/export limits, interconnection capacity, congestion | Architecture + implementation |
+| **Load / Demand** | Physical demand profiles, seasonality, growth, electrification | Architecture + implementation |
+| **Market** | Which markets exist, which products are available, participation rules | Architecture + implementation |
+
+**Generation is retained as a System Context dimension at the architectural level.** Its implementation in the initial delivery remains subject to **PH-004** (Project configuration). The architecture accommodates generation; the initial delivery scope does not commit to it.
 
 **Project Configuration** — the project's own topology and coupling:
 
@@ -227,18 +310,18 @@ This distinction matters:
 
 ---
 
-## 4. Delivery Philosophy — Design-Led, Iteratively Delivered
+## 4. Delivery Framework — Four-Stage Progression
 
-The engagement follows a **four-stage engineering progression**.
+The engagement follows the **four-stage engineering progression** declared in §1.2.
 
 | Stage | Name | Engineering Equivalent | Purpose |
 |---|---|---|---|
-| **A** | Engineering Definition | Conceptual Engineering | Define what the system must calculate and under what rules |
-| **B** | System Architecture | Basic Engineering | Define how the engineering model is represented computationally |
-| **C** | Product Specification | Detailed Engineering | Consolidate requirements, models, architecture, interfaces, validation |
-| **D** | Implementation | Construction & Commissioning | Build, test, validate, deploy |
+| **A** | Engineering Definition | Conceptual Engineering | Define what the system must contain, and what the engineering responsibilities are |
+| **B** | System Architecture (HLD) | Basic Engineering | Define how those responsibilities are structurally organized into an executable system |
+| **C** | Product Specification | Detailed Engineering | Specify what exactly must be built, at a level precise enough to be implementable and verifiable |
+| **D** | Implementation | Construction & Commissioning | Implement, test, validate, and deploy against baselined Stage C specifications |
 
-The sequence is deliberate, but **the gates between stages are lightweight**, and Stage D begins in **parallel** with Stage C.
+The sequence is deliberate, but **the gates between stages are lightweight**, and Stage C and Stage D run in **controlled parallel**.
 
 ### 4.1 Stage Progression with a Thin Vertical Slice
 
@@ -265,15 +348,26 @@ STAGE A — ENGINEERING DEFINITION
 STAGE A CONSOLIDATION AUDIT
        │
        ▼
-STAGE B — SYSTEM ARCHITECTURE
+STAGE B — SYSTEM ARCHITECTURE (HLD)
        │
-       ├── High-Level Design (HLD)
-       └── Basic Architecture Definition
+       ├── B.0 Integrated System Architecture
+       ├── B.1 Data Architecture
+       ├── B.2 Model Architecture
+       ├── B.3 Optimization Architecture
+       ├── B.4 Financial Architecture
+       ├── B.5 Software Architecture
+       ├── B.6 Databricks Architecture
+       ├── STAGE-B-HLD-INDEX-001
+       └── STAGE-B-TO-C-HANDOFF-001
        │
        ▼
 STAGE C — PRODUCT SPECIFICATION  ────┐
-       │                            │  Stage C and Stage D run in parallel
-       │                            │  from week 3
+       │                            │  Stage C and Stage D run in
+       │                            │  controlled parallel, with
+       │                            │  implementation proceeding
+       │                            │  against baselined Stage C
+       │                            │  specifications and subject
+       │                            │  to Stage C→D handoff controls
        ▼                            │
 STAGE D — IMPLEMENTATION            │
        │                            │
@@ -302,14 +396,41 @@ The slice serves **two purposes**:
 
 ### 4.3 Consolidated Stage A.2
 
-The seven A.2 documents **may be delivered as one consolidated document with seven chapters** rather than seven standalone files.
+The seven A.2 documents were delivered as a **single consolidated document with seven chapters** rather than seven standalone files.
 
 ### 4.4 Lightweight Gates
 
 - Stage A.2 review is **per-chapter**, not per-document
 - Stage B review is a **single consolidated review**
-- Stage C review is a **single review**
+- **Stage C deliverables are reviewed and frozen individually**, with a consolidated Stage C closure review after C.1–C.7 and the Stage C → D Handoff are complete
 - Stage D acceptance is **continuous**, culminating in UAT
+
+### 4.5 Stage Progression Ownership and Verbs
+
+The four stages are not interchangeable. Each owns a distinct class of decisions:
+
+```
+Stage A
+Engineering Definition
+        ↓
+Stage B
+System Architecture (HLD)
+        ↓
+Stage C
+Product Specification
+        ↓
+Stage D
+Implementation
+```
+
+| Stage | Owns |
+|---|---|
+| **A** | Engineering requirements and conceptual responsibilities |
+| **B** | Architectural decisions and structural organization |
+| **C** | Detailed technical specifications and approved technical decisions within the frozen architecture |
+| **D** | Implementation within the frozen specification |
+
+**Rule.** Stage C specifies technical decisions within the constraints established by Stage A, Stage B, and approved clarifications. Stage D implements within the frozen specification. No stage silently redefines a frozen decision of an upstream stage; any change goes through the applicable change-control process.
 
 ---
 
@@ -335,7 +456,7 @@ Physical system: battery, capacity, power, SOC, SOH, efficiency, C-rate, ramp, l
 
 **Boundary:** BESS Engineering declares **intrinsic capability**. System Context declares **availability and imposed constraints**. These are separate.
 
-**Reference:** `A.2.1-BESS-ENG-001` v1.2.
+**Reference:** `A.2.1-BESS-ENG-001` v1.3.
 
 ### Domain 2 — Load & Market Engineering
 
@@ -349,9 +470,9 @@ Representation of external signals: load, load projection / forecasting, energy 
 
 Value streams: peak shaving, DR, arbitrage, frequency regulation, voltage regulation. **Operational requirements** (per `A.2.3` §4), service metrics, interaction declarations.
 
-**Note.** Operational Engineering defines **operational requirements** — what behavior must occur if the service is provided. Dispatch decides which value streams to activate, when, and how.
+**Note.** Operational Engineering defines **operational requirements** — what behavior must occur if the service is provided. Dispatch selects which value streams to activate, when, and how.
 
-**Reference:** `A.2.3-OPS-ENG-001` v1.3.
+**Reference:** `A.2.3-OPS-ENG-001` v1.4.
 
 ### Domain 4 — Dispatch & Optimization Engineering
 
@@ -359,7 +480,7 @@ Coordination layer. Consumes physical capability, external signals, operational 
 
 **Does not own:** the external context. Consumes context-derived signals from Domain 2. Produces **battery power and SOC trajectories**; **cycling metrics are derived by Domain 5**.
 
-**Reference:** `A.2.4-DISPATCH-ENG-001` v0.9.
+**Reference:** `A.2.4-DISPATCH-ENG-001` v1.0.
 
 ### Domain 5 — Degradation Engineering
 
@@ -370,23 +491,37 @@ Dynamic state evolution: calendar aging, cycle aging, SOH, capacity fade, augmen
 - **Marginal degradation cost** — operational signal (Domain 5)
 - **Replacement cash flow** — monetary flow (Domain 6)
 
-**Reference:** `A.2.5-DEG-ENG-001` v0.3.
+**Reference:** `A.2.5-DEG-ENG-001` v0.4.
 
 ### Domain 6 — Financial Engineering
 
 Economic translation: CAPEX, OPEX, revenue by stream, savings, costs, degradation events, incentives, tax, discount rate, escalation, contract term, NPV, IRR, payback. Applies the realization factor to operational results.
 
-**Two sources of truth for value:**
-- **Behind-the-meter savings** — Domain 2 (tariff engine)
-- **Market revenues** — Domain 4 (attribution) + market adapters (settlement)
+**Market revenue ownership chain (explicit):**
 
-**Reference:** `A.2.6-FIN-ENG-001` v0.2.
+```
+Market revenue:
+  operational attribution basis → Domain 4
+  settlement realization       → Domain 2 / settlement adapters
+  financial valuation          → Domain 6
+```
+
+**Rule.** Domain 4 does not compute final financial revenue. Domain 4 produces the **operational attribution basis**. Domain 2 executes the **settlement adapters** to produce the **settlement basis**. Domain 6 performs the **financial valuation** and produces the **financial revenue** in the project cash flow.
+
+**Two sources of truth for value:**
+
+| Value category | Source of truth |
+|---|---|
+| **Behind-the-meter savings** | Domain 2 — Tariff engine |
+| **Market revenues** | Domain 4 (operational attribution basis) → Domain 2 (settlement basis) → Domain 6 (financial valuation) |
+
+**Reference:** `A.2.6-FIN-ENG-001` v0.3.
 
 ### Domain 7 — Data & Application Engineering
 
 Technological layer: Python, PySpark, SQL, Databricks, Databricks App, data pipelines, scenario configuration, visualization, export, execution and lineage records.
 
-**Reference:** `A.2.7-DATA-APP-ENG-001` v0.2.
+**Reference:** `A.2.7-DATA-APP-ENG-001` v0.3.
 
 ---
 
@@ -398,7 +533,7 @@ Technological layer: Python, PySpark, SQL, Databricks, Databricks App, data pipe
 |---|---|---|
 | **Context** | System Context: external context + project configuration | Domain 2 (external) + Scenario Management (configuration) |
 | **Data Architecture** | Ingestion, validation, transformation, schemas, data quality | Domain 7 |
-| **Model Architecture** | BESS physics, load, degradation as computational objects and state | Domains 1, 2, 5 |
+| **Model Architecture** | BESS physics, external-signal models, degradation, computational state | Domains 1, 2, 5 |
 | **Optimization Architecture** | Dispatch logic, revenue stacking, constraint handling | Domains 3, 4 |
 | **Financial Architecture** | Cash flow, NPV, IRR, scenario valuation, realization factor | Domain 6 |
 | **Software Architecture** | Python engine, Databricks App, PySpark, SQL, APIs | Domain 7 |
@@ -527,6 +662,28 @@ The **realization factor** is applied in **Financial Engineering**, not in Dispa
 
 **Rule:** Dispatch consumes context through explicit interfaces. It is not the owner of the external context. Domain 2 remains the owner of the External Context interface.
 
+### 6.6 From Stage A to Stage B — Architectural Realization
+
+The seven domains declared in Stage A are computationally represented in Stage B through **7 functional components** and **6 cross-cutting capabilities**. Stage B does not redefine the domains; it organizes them into an executable system.
+
+**Cross-cutting capabilities — evolution from Stage A to Stage B:**
+
+- **Stage A** identifies **two conceptual cross-cutting capabilities** — Scenario Management and Validation.
+- **Stage B** realizes these together with **Configuration, Execution Control, Lineage, and Observability** as **six architectural cross-cutting capabilities**.
+
+| Stage A (conceptual) | Stage B (architectural) |
+|---|---|
+| Scenario Management | Scenario Management |
+| Validation | Validation |
+| — | Configuration |
+| — | Execution Control |
+| — | Lineage |
+| — | Observability |
+
+**Rule.** The two Stage A capabilities remain conceptually stable. Stage B adds four additional architectural capabilities required for the executable system. The addition does not redefine the original two.
+
+**Reference:** Stage B views B.0–B.6, Stage B HLD Index v0.2, Stage B → Stage C Handoff v0.2.
+
 ---
 
 ## 7. Two Simultaneous Cycles
@@ -541,7 +698,11 @@ Represents the **economic consequence of the physical-operational cycle**. Deriv
 
 ### 7.3 Coupling Between Cycles
 
-The two cycles are **coupled**: physical-operational runs first within each period; economic-financial consumes the outputs; degradation feeds back; financial results inform scenario comparison.
+The two cycles are **coupled**: physical-operational runs first within each period; economic-financial consumes the outputs; degradation feeds back.
+
+**Rule.** Financial results are used for **scenario evaluation and comparison**, but **do not feed back into operational dispatch** unless explicitly transformed into an approved operational signal.
+
+**Reference:** §6.4 (Operational Signals vs. Investment Assumptions).
 
 ### 7.4 Why This Separation Matters
 
@@ -563,6 +724,12 @@ Four levels: domain, model, system, UAT. Validation must be defined **before** r
 
 KPI list + dashboard wireframe, prepared during Phase 1 and refined continuously.
 
+### 8.4 Cross-Cutting Capabilities — A/B Relationship
+
+Stage A identifies **two conceptual cross-cutting capabilities** — Scenario Management and Validation. Stage B realizes them together with **four additional architectural capabilities** — Configuration, Execution Control, Lineage, and Observability — as **six cross-cutting capabilities**.
+
+**Reference:** §6.6.
+
 ---
 
 ## 9. System Strategy — Scope Definition
@@ -572,12 +739,14 @@ KPI list + dashboard wireframe, prepared during Phase 1 and refined continuously
 - System boundary
 - System purpose
 - The three natures of the RFP
+- **Engagement Stage Model (§1.2)**
 - **System Context (§3.4–3.6)**
 - Major engineering domains
 - Cross-cutting capabilities
 - Operational signals vs. investment assumptions
 - **Dispatch boundary with respect to System Context (§6.5)**
-- Delivery philosophy
+- **From Stage A to Stage B — architectural realization (§6.6)**
+- Delivery philosophy (§4)
 - Validation philosophy
 - Technology strategy (§9.3)
 - Evolution strategy (§9.4)
@@ -617,9 +786,18 @@ KPI list + dashboard wireframe, prepared during Phase 1 and refined continuously
 | Phase | Weeks | Delivery Stage | Focus |
 |---|---|---|---|
 | 1 — Design | 1–2 | Stage A + B | Requirements validation, conceptual engineering, high-level architecture, output mock. **Stage A.2 complete by end of Week 2** |
-| 2 — Development | 3–9 | Stage C + D (parallel) | Thin end-to-end slice by ~week 4, then progressive deepening |
+| 2 — Development | 3–9 | Stage C + D (controlled parallel) | Thin end-to-end slice by ~week 4, then progressive deepening. **Stage D proceeds against baselined Stage C deliverables only.** |
 | 3 — Testing | 10–11 | Stage D | Model validation, UAT |
 | 4 — Deployment | 12 | Stage D | Final delivery, deployment, documentation, training |
+
+**Stage status at the time of this revision:**
+
+| Stage | Status |
+|---|---|
+| **A** | ✅ CLOSED |
+| **B** | ✅ CLOSED |
+| **C** | 🔄 ACTIVE — Plan v1.0.2 Baseline; C.1 Data Specification next |
+| **D** | ⏭ PENDING |
 
 ---
 
@@ -657,21 +835,34 @@ The Phase 1 clarification items are tracked in the **Phase 1 Clarification & Dat
 | **PH-036** | D3 | Degradation feedback time scale | **Annual SOH update** with representative-period simulation |
 | **PH-041** | D4 | Voltage regulation coupling | **Fixed envelope** — no P² + Q² ≤ S² linearization initially |
 | **PH-050** | D5 | Load forecasting method | **ENGIE-provided** if available; otherwise statistical baseline |
-| **PH-051** | D6 | Short-horizon forecast vs. multi-year projection | Both modeled |
-| **PH-052** | D7 | Load forecasting home | **Domain 2 owns it conceptually**; implementation via Domain 7 |
+| **PH-051** | D6 | Load forecasting home | **Domain 2 owns it conceptually**; implementation via Domain 7 |
+| **PH-052** | D7 | Scenario granularity | **3–5 core scenarios** initially, expandable |
 | **PH-042** | D8 | Financing structure | **Project IRR primary; equity IRR computed with default debt parameters, configurable by the user** |
 | **PH-043** | D9 | Tax and incentives treatment | **Pre-tax** initially; ITC / depreciation flagged as extension |
 | **PH-047** | D10 | Reporting format | **Both PDF and Excel** |
-| **PH-053** | D11 | Scenario granularity | **3–5 core scenarios** initially, expandable |
+| **PH-053** | D11 | Market adapter scope | **One adapter at delivery**, architecture supports more |
 | **PH-048** | D12 | Audit / lineage / traceability scope | **Basic execution logs + data lineage** |
-| **PH-054** | D13 | Market adapter scope | **One adapter at delivery**, architecture supports more |
-| **PH-055** | D14 | Time resolution and simulation horizon | **15-minute when input data permits; hourly otherwise**. 15-year contract term |
+| **PH-054** | D13 | Time resolution and simulation horizon | **15-minute when input data permits; hourly otherwise**. 15-year contract term |
+| **PH-055** | D14 | Presentation of value (BTM mapping convention) | **Accepted** (see also PH-009) |
 | **PH-046** | D15 | Databricks workspace access and environment ownership | **ENGIE-owned workspace**; consultant granted developer access |
 | **PH-026** | D16 | BESS sizing vs. evaluation | **Evaluation** of a predefined configuration |
 | **PH-027** | D17 | Primary model purpose / use case | **Evaluation** (project development support) |
 | **PH-028** | D18 | Model output granularity | **All levels** (interval schedules, daily / monthly metrics, annual KPIs) |
 | **PH-040** | D19 | Representative-period scheme | **Monthly representative periods, respecting the billing period.** If demand ratchets apply, all 12 months of the year are simulated — representative-period reduction is not permitted where ratchets are present |
 | **PH-004** | D20 | Initial implementation configuration assumption | **Standalone BESS** unless **PH-004** confirms a co-located or integrated configuration as the primary reference case. This is an **implementation assumption**, not a conceptual limitation — the architecture does not preclude co-located configurations |
+
+**Note on PH-004.** PH-004 (Project configuration) appears both as a blocking item (§12.1) and as a defaultable implementation assumption (§12.2, former D20). The blocking item determines the primary reference case; the defaultable item states the implementation assumption pending resolution. These are consistent, not duplicated.
+
+**Note on PH-050 to PH-055.** The mapping above follows `PH1-REG-001` v1.1 exactly:
+
+| Register ID | Former ID | Topic |
+|---|---|---|
+| PH-050 | D5 | Load forecasting method |
+| PH-051 | D6 | Load forecasting home |
+| PH-052 | D7 | Scenario granularity |
+| PH-053 | D11 | Market adapter scope |
+| PH-054 | D13 | Time resolution |
+| PH-055 | D14 | Presentation of value (BTM mapping convention) |
 
 ### 12.3 Rationale
 
@@ -683,7 +874,7 @@ The two-tier structure allows the project to proceed even if ENGIE is slow to an
 
 **PH-004** (as D20) is an implementation assumption, not a conceptual limitation.
 
-**Note.** The former reference to `A.2.4 §28.3` has been resolved. A.2.4 v0.9 §28.3 no longer includes D19; the representative-period scheme is now declared as a technical consultant decision in `A.2.4` §26 and §28.3.
+**Note.** The former reference to `A.2.4 §28.3` has been resolved. A.2.4 v1.0 §28.3 no longer includes D19; the representative-period scheme is now declared as a technical consultant decision in `A.2.4` §26 and §28.3.
 
 ---
 
@@ -691,23 +882,35 @@ The two-tier structure allows the project to proceed even if ENGIE is slow to an
 
 This System Strategy establishes a disciplined, domain-driven approach to the ENGIE BESS Operational & Financial Modeling Platform engagement.
 
+The engagement is delivered through **four engineering stages** — **A (Engineering Definition), B (System Architecture — HLD), C (Product Specification), D (Implementation)** — under a single System Strategy.
+
+**Current status:**
+
+- **Stage A — CLOSED**
+- **Stage B — CLOSED**
+- **Stage C — ACTIVE** (Plan v1.0.2 Baseline; C.1 Data Specification next)
+- **Stage D — PENDING** (may run in controlled parallel with Stage C, against baselined Stage C deliverables only)
+
 The system is organized into **seven engineering domains**, operating **within a System Context** — composed of **External Context** (generation, grid, load, market) and **Project Configuration** (BESS configuration, topology, coupling).
 
 **Ownership is explicit:**
 - **Domain 2** owns the External Context interface.
 - **Project Configuration** is a scenario parameter, managed by Scenario Management.
+- **Market revenue ownership chain:** Domain 4 (attribution) → Domain 2 (settlement) → Domain 6 (valuation).
 
 The **context → impact → domain → decision → value** chain is the central principle that connects the System Context to the causal backbone.
 
 **Dispatch consumes System Context but does not own it** (§6.5). It receives context-derived signals from Domain 2.
 
-Two simultaneous cycles — physical-operational and economic-financial — are preserved as distinct but coupled. Two **cross-cutting capabilities** — Scenario Management and Validation — span the domains.
+Two simultaneous cycles — physical-operational and economic-financial — are preserved as distinct but coupled. Financial results do not feed back into dispatch except through approved operational signals.
 
-The engagement is understood as **three parallel natures** — Engineering, Software, and Delivery. Delivery is **design-led and iteratively delivered**: a thin end-to-end slice exists by approximately week 4. Stage C and Stage D run in parallel from week 3. Stage gates are lightweight.
+**Cross-cutting capabilities:** Stage A identifies two conceptual capabilities (Scenario Management, Validation); Stage B realizes them together with four additional architectural capabilities (Configuration, Execution Control, Lineage, Observability) as six cross-cutting capabilities.
 
-**Stage A.2 is conceptually and formally complete.** All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The next step is the **Stage A Consolidation Audit**, followed by **Stage B — System Architecture (HLD)**.
+The engagement is understood as **three parallel natures** — Engineering, Software, and Delivery. Delivery is **design-led and iteratively delivered**: a thin end-to-end slice exists by approximately week 4. Stage C and Stage D run in **controlled parallel**, with Stage D proceeding against baselined Stage C deliverables. Stage gates are lightweight.
 
-The platform will connect system context, data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation — and it will be extensible to new markets, value streams, and system configurations without re-architecture.
+**Stage C is specified within the constraints established by Stage A, Stage B, and approved clarifications.** The traceability chain — RFP → A → B → C → D → Verification → UAT — is the backbone of the acceptance argument to ENGIE.
+
+The platform connects system context, data, forecast, physics, dispatch, degradation, revenue, and finance into a single auditable chain, delivering the analytical robustness ENGIE requires for business development and project evaluation — and it is extensible to new markets, value streams, and system configurations without re-architecture.
 
 ---
 
@@ -729,17 +932,88 @@ The following clarification items are relevant to the System Strategy. They are 
 | **PH-046** | **Databricks environment.** Please confirm workspace ownership, access provisioning, Databricks Apps availability, Unity Catalog usage, and compute policies. | Determines the delivery environment |
 | **PH-012** | **Users and handover.** Who are the users and roles, how many, and who will maintain the tool after week 12? | Defines training audience and documentation level |
 | **PH-047** | **Reporting requirements.** Are there ENGIE templates or branding requirements for PDF and Excel exports? | Determines reporting design |
-| **PH-006** | **Point of contact and decision timing.** A single point of contact and access to subject-matter experts. Decisions on blocking items (PH-001 to PH-006) by end of Week 2. | Governance |
 | **PH-033** | **Interim demo.** Is a working end-to-end demo around Week 4 acceptable as a scope-validation checkpoint? | Aligns with §4.2 |
 
-**Note.** Items are assigned IDs in `PH1-REG-001` v1.1. The Register is the authoritative source; this section is a filtered view.
+**Note.** Items are assigned IDs in `PH1-REG-001` v1.1. The Register is the authoritative source; this section is a filtered view. **PH-013 (Point of contact) is reserved in the Register (Appendix C) and is not used here.**
 
 ---
 
-**Prepared by:** BESS Operational & Financial Modeling Consultant
-**Engagement:** RFP-264144-1
-**Duration:** 12 Weeks
-**Language:** English
+## 15. Change Log
+
+### 15.1 Changes from v0.8 to v0.9
+
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | Phase 1 IDs replaced B1–B6 / D1–D20 with PH-XXX (PH-001 to PH-055) | Consolidation with `PH1-REG-001` v1.1 |
+| 2 | §12 consolidated Blocking / Defaultable items under unified PH IDs | Register integration |
+| 3 | §14 replaced [TBD] IDs with real PH-XXX from the Register | Traceability |
+| 4 | Parent Documents updated with `SYS-ENG-DEF-001` v0.6, `PH1-REG-001` v1.1, A.2.x references | Completeness |
+| 5 | Addendum A added Consolidated Register Cross-Reference (PH-001 to PH-055) | Traceability |
+| 6 | Addendum B added Stage A Consolidation Status | Traceability |
+| 7 | §1.2 added Stage A.2 complete declaration | Consistency |
+
+### 15.2 Changes from v0.9 to v1.0
+
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | Header: version promoted from v0.9 Consolidated Baseline to **v1.0 Consolidated Baseline** | Strategy is now the frozen baseline for the engagement |
+| 2 | Header: Parent Documents updated with all frozen Stage A/B/C documents | Completeness; version normalization |
+| 3 | §1.2: replaced "Stage A.2 Complete" section with **"Engagement Stage Model — Consolidated"** | Centralize the methodology in the foundational document |
+| 4 | §1.2: added Stage status table | Reflect real state |
+| 5 | §4: section retitled **"Delivery Framework — Four-Stage Progression"** | Terminology normalization |
+| 6 | §4.1: Stage progression diagram updated | Reflect real state |
+| 7 | §4.3: text updated from future tense to past tense | Reflect real state |
+| 8 | §4.5: **new section — "Stage Progression Ownership and Verbs"** | Centralize the specification language rule |
+| 9 | §5: Domain references updated to real versions | Version normalization |
+| 10 | §5: Domain 6 updated with settlement chain | Align with Stage B |
+| 11 | §6.6: **new section — "From Stage A to Stage B — Architectural Realization"** | Explicit integration with Stage B |
+| 12 | §9.1: added §1.2, §4, §6.6 to the list of what the Strategy defines | Completeness |
+| 13 | §10: added stage status table | Reflect real state |
+| 14 | §12.2: clarified PH-004 dual appearance | Consistency with the Register |
+| 15 | §12.3: A.2.4 §28.3 reference updated | Version normalization |
+| 16 | §13: Conclusion rewritten | Reflect real state |
+| 17 | §14: PH-006 duplication corrected to PH-013 | Errata |
+| 18 | §15: **new Change Log section** | Traceability |
+| 19 | Addendum A: mapping "Former ID → Register ID" retained as historical cross-reference | Traceability |
+| 20 | Addendum B: replaced "Stage A Consolidation Audit will verify..." with "Stage A — CLOSED" | Reflect real state |
+
+### 15.3 Changes from v1.0 to v1.0.2 (Combined Errata + Review Pass + Mapping Errata)
+
+| # | Change | Reason |
+|---|--------|--------|
+| 1 | §1.2, §4.1, §4.4, §10: reconciled the Stage C/D parallelism ambiguity — Stage D runs in **controlled parallel**, proceeding against baselined Stage C specifications only | Remove the contradiction between "begins after Stage C closure" and "run in parallel from week 3" |
+| 2 | §1.2: added explicit specification-domain parallel diagram (C.1–C.7 → corresponding D implementation) | Clarify the controlled-parallel model |
+| 3 | §4.4: "Stage C review is a single review" → **"Stage C deliverables are reviewed and frozen individually, with a consolidated closure review after C.1–C.7 and the Handoff"** | Align with `STAGE-C-PLAN-001` v1.0.2 §7.4 |
+| 4 | §3.4: Generation declared as an **architectural dimension retained at System Context level, with implementation subject to PH-004** | Reconcile architecture extensibility with initial delivery scope |
+| 5 | §5 Domain 6: added explicit **market revenue ownership chain** — Domain 4 (attribution) → Domain 2 (settlement) → Domain 6 (valuation) | Remove ambiguity about who computes final market revenue |
+| 6 | §6.1: "Model Architecture" description neutralized to **"BESS physics, external-signal models, degradation, computational state"** | Domain 2 is not only load — it includes market, tariff, and forecasting logic |
+| 7 | §7.3: "financial results inform scenario comparison" → **"financial results are used for scenario evaluation and comparison, but do not feed back into operational dispatch unless explicitly transformed into an approved operational signal"** | Align with §6.4 (operational signals vs investment assumptions) |
+| 8 | §6.6, §8.4: cross-cutting capabilities declared as **Stage A (2 conceptual) → Stage B (6 architectural)** | Traceability between Stage A and Stage B |
+| 9 | §12.2: PH-050 to PH-055 mapping **corrected to match `PH1-REG-001` v1.1 exactly** | **Mapping errata** — previous mapping was shifted by one position |
+| 10 | §12.2: PH-055 = **Presentation of value (BTM mapping convention)** | **Mapping errata** — corrected |
+| 11 | §14: PH-013 (Point of contact) **removed** — it is reserved in the Register (Appendix C) | **Mapping errata** |
+| 12 | §15: added this change log entry and version history | Traceability |
+| 13 | Header: version updated to **v1.0.2 — Consolidated Baseline (Mapping Errata Applied)** | Reflect the combined review + mapping errata |
+
+**Nature of the change.** The v1.0.2 is a **combined review + errata** update over v1.0. It:
+- Removes the C/D parallelism ambiguity (controlled parallel model).
+- Aligns Stage C review/freeze with `STAGE-C-PLAN-001` v1.0.2.
+- Declares Generation as an architectural dimension subject to PH-004.
+- Explicitly declares the market revenue ownership chain.
+- Neutralizes the Model Architecture description.
+- Clarifies that financial results do not feed back into dispatch.
+- Declares the cross-cutting capabilities A → B evolution.
+- **Corrects the PH-050 to PH-055 mapping to match `PH1-REG-001` v1.1 exactly.**
+- Removes the reserved PH-013 from §14.
+
+### 15.4 Version History
+
+| Version | Date | Changes | Status |
+|---|---|---|---|
+| 0.8 | — | Pre-consolidation baseline | Superseded |
+| 0.9 | Stage A closure | Phase 1 ID consolidation (PH-XXX); Register integration; Stage A.2 completion declaration | Superseded |
+| 1.0 | Stage C activation | Four-stage model centralized; stage status updated; version normalization; Stage A → B realization section; delivery framework normalization; specification language rule | Superseded |
+| 1.0.2 | Stage C validation | 13 corrections (C/D controlled parallel, individual Stage C review, Generation scope, market revenue ownership, Model Architecture neutralization, financial feedback rule, cross-cutting A/B, PH-050 to PH-055 mapping errata, PH-013 removal) | **Baseline** |
 
 ---
 
@@ -747,65 +1021,127 @@ The following clarification items are relevant to the System Strategy. They are 
 
 The following table consolidates all Phase 1 clarification items across the seven domains and the Strategy, by Register ID. The authoritative source is `PH1-REG-001` v1.1.
 
-| Register ID | Topic | Primary domain | Strategy mapping |
+| Register ID | Topic | Primary domain | Historical Strategy mapping |
 |---|---|---|---|
-| **PH-001** | Target market(s) | Strategy, Domain 2 | B1 |
-| **PH-002** | BTM vs. FTM scope | Strategy, Domain 2 | B2 |
-| **PH-003** | Data availability | Domain 1, Domain 2 | B3 |
-| **PH-004** | Project configuration | Strategy, Domain 5 | B6 / D20 |
-| **PH-005** | Benchmark data | Domain 6, Domain 7 | B4 |
-| **PH-006** | Acceptance thresholds | Strategy, all domains | B5 |
-| **PH-007** | Commercial perspective | Domain 6 | — |
-| **PH-012** | Users and handover | Domain 7 | — |
-| **PH-015** | Battery data | Domain 1, Domain 5 | — |
-| **PH-016** | SOC bounds and warranty | Domain 1, Domain 5 | — |
-| **PH-017** | SOC window behavior under degradation | Domain 1, Domain 5 | — |
-| **PH-018** | Multi-cohort aggregation | Domain 5 | — |
-| **PH-021** | Power factor penalties / kVAR charges | Domain 2, Domain 3 | — |
-| **PH-026** | BESS sizing vs. evaluation | Domain 4 | D16 |
-| **PH-027** | Primary model purpose | Domain 4 | D17 |
-| **PH-028** | Model output granularity | Domain 4 | D18 |
-| **PH-032** | Financial objective inside dispatch | Domain 5 | — |
-| **PH-033** | Perfect foresight vs. forecast-based dispatch | Domain 4 | D2 |
-| **PH-034** | Dispatch methodology | Domain 4 | D1 |
-| **PH-035** | Realization factor | Domain 6 | — |
-| **PH-036** | Degradation feedback time scale | Domain 5 | D3 |
-| **PH-038** | Degradation feedback time scale (confirmatory) | Domain 5 | — |
-| **PH-040** | Representative-period scheme and ratchets | Domain 4 | D19 |
-| **PH-041** | Voltage regulation coupling | Domain 3, Domain 4 | D4 |
-| **PH-042** | Financing structure | Domain 6 | D8 |
-| **PH-043** | Degradation model fidelity / tax treatment | Domain 5, Domain 6 | D9 |
-| **PH-044** | Augmentation policy | Domain 5 | — |
-| **PH-045** | Replacement policy | Domain 5 | — |
-| **PH-046** | Databricks environment | Domain 7 | D15 |
-| **PH-047** | Reporting requirements | Domain 7 | D10 |
-| **PH-048** | Audit / lineage / traceability scope | Domain 7 | D12 |
-| **PH-050** | Load forecasting method | Domain 2 | D5 |
-| **PH-051** | Load forecasting home | Domain 2 | D7 |
-| **PH-052** | Scenario granularity | Domain 2 | D11 |
-| **PH-053** | Market adapter scope | Domain 2 | D13 |
-| **PH-054** | Time resolution | Domain 2 | D14 |
-| **PH-055** | Presentation of value (BTM mapping convention) | Domain 3, Domain 6 | — |
+| PH-001 | Target market(s) | Strategy, D2 | B1 |
+| PH-002 | BTM vs. FTM scope | Strategy, D2 | B2 |
+| PH-003 | Data availability | D1, D2 | B3 |
+| PH-004 | Project configuration | Strategy, D5 | B6 / D20 |
+| PH-005 | Benchmark data | D6, D7 | B4 |
+| PH-006 | Acceptance thresholds | Strategy, all | B5 |
+| PH-007 | Commercial perspective | D6 | — |
+| PH-008 | Co-located configurations | Strategy | — |
+| PH-009 | Presentation of value (strategy) | Strategy, D6 | — |
+| PH-010 | Reporting conventions (strategy) | Strategy, D7 | — |
+| PH-011 | (reserved) | — | — |
+| PH-012 | Users and handover | D7 | — |
+| PH-013 | (reserved) | — | — |
+| PH-014 | (reserved) | — | — |
+| PH-015 | Battery data | D1, D5 | — |
+| PH-016 | SOC bounds and warranty | D1, D5 | — |
+| PH-017 | SOC window behavior under degradation | D1, D5 | — |
+| PH-018 | Multi-cohort aggregation | D5 | — |
+| PH-019 | Export and net metering | D2 | — |
+| PH-020 | Minimum bill and fixed charges | D2 | — |
+| PH-021 | Power factor penalties / kVAR charges | D2, D3, D4 | — |
+| PH-022 | Coincident-peak charges | D2 | — |
+| PH-023 | Tariff structure detail | D2 | — |
+| PH-024 | Tariff escalation | D2, D6 | — |
+| PH-025 | Load projection growth | D2 | — |
+| PH-026 | BESS sizing vs. evaluation | D4 | D16 |
+| PH-027 | Primary model purpose | D4 | D17 |
+| PH-028 | Model output granularity | D4 | D18 |
+| PH-029 | Active vs. reactive priority | D4 | — |
+| PH-030 | Dispatch validation benchmark | D4 | — |
+| PH-031 | Revenue attribution under simultaneous services | D4 | — |
+| PH-032 | Financial objective inside dispatch | D5 | — |
+| PH-033 | Perfect foresight vs. forecast-based dispatch | Strategy, D2, D3, D4 | D2 |
+| PH-034 | Dispatch methodology | Strategy, D3, D4 | D1 |
+| PH-035 | Realization factor | Strategy, D6 | — |
+| PH-036 | Degradation feedback time scale | Strategy, D1, D4, D5 | D3 |
+| PH-037 | Degradation model calibration | D5 | — |
+| PH-038 | Degradation feedback time scale (confirmatory) | D5 | — |
+| PH-039 | Financial objective inside dispatch (confirmatory) | D5 | — |
+| PH-040 | Representative-period scheme and ratchets | Strategy, D4 | D19 |
+| PH-041 | Voltage regulation coupling | Strategy, D3, D4 | D4 |
+| PH-042 | Financing structure | Strategy, D6 | D8 |
+| PH-043 | Degradation model fidelity / tax treatment | Strategy, D5, D6 | D9 |
+| PH-044 | Augmentation policy | Strategy, D5 | — |
+| PH-045 | Replacement policy | Strategy, D5 | — |
+| PH-046 | Databricks environment | Strategy, D7 | D15 |
+| PH-047 | Reporting requirements | Strategy, D6, D7 | D10 |
+| PH-048 | Audit / lineage / traceability scope | Strategy, D7 | D12 |
+| PH-049 | Grid constraints | Strategy, D2 | — |
+| PH-050 | Load forecasting method | Strategy, D2 | D5 |
+| PH-051 | Load forecasting home | Strategy, D2 | D6 |
+| PH-052 | Scenario granularity | Strategy, D2 | D7 |
+| PH-053 | Market adapter scope | Strategy, D2 | D11 |
+| PH-054 | Time resolution | Strategy, D2, D4 | D13 |
+| PH-055 | Presentation of value (BTM mapping convention) | Strategy, D3, D6 | D14 |
 
-**Note.** The mapping "Former ID → Register ID" is the authoritative cross-reference for the transition from the Strategy's B/D numbering to the Register's PH numbering. Where a former ID does not appear, the Register item was introduced after the Strategy's B/D list was frozen.
+**Note.** The mapping "Historical Strategy mapping → Register ID" is retained as a historical cross-reference for the transition from the Strategy's B/D numbering to the Register's PH numbering. The authoritative source is `PH1-REG-001` v1.1. Where a former ID does not appear, the Register item was introduced after the Strategy's B/D list was frozen. PH-011, PH-013, PH-014 are reserved (not assigned) per the Register.
 
 ---
 
-## Addendum B: Stage A Consolidation Status
+## Addendum B: Stage Consolidation Status
 
-Stage A.2 is conceptually and formally complete. The Stage A Consolidation Audit will verify:
+### Stage A — CLOSED
 
-- All PH IDs across the seven A.2.x documents are consistent
-- All cross-references between documents are correct
-- All interfaces are coherent
-- All versions are aligned
-- All parent document citations are correct
+Stage A.2 is conceptually and formally complete. The Stage A Consolidation Audit was completed.
 
-**Audit output:** `Stage A Consolidation Report` (to be produced).
+- All seven domain chapters (A.2.1–A.2.7) delivered and baselined.
+- All PH IDs across the seven A.2.x documents verified and consistent.
+- All cross-references between documents verified.
+- All interfaces verified and coherent.
+- All versions aligned.
+- All parent document citations verified.
 
-**After audit:** Stage B — System Architecture (HLD).
+**Audit output:** `STAGE-A-CONSOL-REPORT-001` v1.1.
+
+**Tag:** `stage-a-closed`.
+
+### Stage B — CLOSED
+
+Stage B produced 7 architectural views (B.0–B.6), a master index, and a formal handoff.
+
+- B.0 Integrated System Architecture (v0.3.3 Baseline Frozen)
+- B.1 Data Architecture (v0.3 Baseline Frozen)
+- B.2 Model Architecture (v0.5.1 Baseline Frozen)
+- B.3 Optimization Architecture (v0.6.1 Baseline Frozen)
+- B.4 Financial Architecture (v0.4 Baseline Frozen)
+- B.5 Software Architecture (v0.4.1 Baseline Frozen)
+- B.6 Databricks Architecture (v0.4 Baseline Frozen)
+- `STAGE-B-HLD-INDEX-001` (v0.2 Baseline Frozen)
+- `STAGE-B-TO-C-HANDOFF-001` (v0.2 Baseline Frozen)
+
+**Tags:** `stage-b-closed`, `stage-b-handoff-v02`, plus per-view tags.
+
+### Stage C — ACTIVE
+
+Stage C is active with the Plan frozen at v1.0.2 Baseline.
+
+- `STAGE-C-PLAN-001` (v1.0.2 Baseline)
+- C.1 Data Specification — ⏭ Next
+- C.2 Computational Model Specification — Pending
+- C.3 Optimization Specification — Pending
+- C.4 Financial Specification — Pending
+- C.5 Software Specification — Pending
+- C.6 Platform Specification — Pending
+- C.7 Testing and Validation Specification — Pending
+- `STAGE-C-TO-D-HANDOFF-001` — Pending
+
+**Tags:** `stage-c-plan-v102`.
+
+### Stage D — PENDING
+
+Stage D begins after the Stage C → Stage D Handoff. It may run in controlled parallel with Stage C, proceeding only against baselined Stage C deliverables.
 
 ---
+
+**Prepared by:** BESS Operational & Financial Modeling Consultant
+**Engagement:** RFP-264144-1
+**Duration:** 12 Weeks
+**Language:** English
 
 
 
