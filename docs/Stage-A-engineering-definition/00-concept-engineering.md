@@ -1,26 +1,37 @@
+# SYS-ENG-DEF-001 — Stage A.1 — System Component Definition (v0.6.1 — Errata Applied)
+
+---
+
 # BESS Operational & Financial Modeling System
 ## Stage A — Engineering Definition
 ### Eagle-Eye View of the Seven Engineering Domains
 
 **Document ID:** SYS-ENG-DEF-001
 
-**Version:** 0.6 — Consolidated Baseline
+**Version:** 0.6.1 — Consolidated Baseline (Errata Applied)
 
 **Status:** Stage A — Engineering Definition (Conceptual Level) — Baselined
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
+**Engagement:** RFP-264144-1
+
+**Language:** English
+
 **Parent Documents:**
 - `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
+- `STAGE-A-CONSOL-REPORT-001` — Stage A Consolidation Report (v1.1)
 
 **Purpose:** Provide a system-level, eagle-eye definition of the seven engineering domains that constitute the BESS Operational & Financial Modeling System, establishing their identity, purpose, boundaries, responsibilities, inputs, outputs, and relationships — without entering into detailed conceptual engineering, architecture, or implementation.
+
+**Change log.** See §21.
 
 ---
 
 ## 1. Purpose of This Document
 
-This document constitutes **Stage A — Engineering Definition** of the delivery framework defined in `SYS-STR-FRM-001` v0.8.
+This document constitutes **Stage A — Engineering Definition** of the delivery framework defined in `SYS-STR-FRM-001` v0.9.
 
 Its purpose is to establish the **system-level decomposition** of the BESS Operational & Financial Modeling Solution into **seven major engineering domains**, operating within a **System Context**, and to define each domain at a conceptual, eagle-eye level.
 
@@ -51,7 +62,7 @@ Stage A is delivered in two levels:
 
 **This document covers Level A.1 only.**
 
-**Status note.** As of this revision, **Stage A.2 is conceptually and formally complete**. All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The next step is the **Stage A Consolidation Audit**, followed by **Stage B — System Architecture (HLD)**.
+**Status note.** As of this revision, **Stage A.2 is conceptually and formally complete**. All seven domain chapters (A.2.1–A.2.7) have been developed, consolidated, and integrated. The **Stage A Consolidation Audit** has been completed and Stage A is **CLOSED**. The next step is **Stage B — System Architecture (HLD)**, which is also complete and frozen.
 
 **Packaging note.** Per `SYS-STR-FRM-001` §4.3, the seven A.2 chapters may be delivered as a **single consolidated document with seven chapters** rather than seven standalone files, if that better serves review velocity.
 
@@ -66,6 +77,11 @@ This document does **not** repeat `SYS-STR-FRM-001` §3.4 (System Context defini
 Stage A sits at the beginning of the four-stage delivery philosophy defined in the System Strategy. The stage names, engineering equivalents, and purposes are defined in `SYS-STR-FRM-001` §4 and are not restated here.
 
 Stage A produces the conceptual engineering baseline. Stage B produces the architecture. Stage C produces the specification. Stage D produces the implementation, running in parallel with Stage C from week 3 onward.
+
+**Status at this revision:**
+- Stage A — **CLOSED** (tag: `stage-a-closed`)
+- Stage B — **Frozen** (B.0–B.6 + Index v0.2 + Handoff v0.1)
+- Stage C — **Next**
 
 ---
 
@@ -135,7 +151,7 @@ The solution is decomposed into the following seven domains:
 
 | # | Domain | Primary Question | Context Interface |
 |---|---|---|---|
-| 1 | **BESS Engineering** | What physical system are we modeling? | *(No permanent context interface — Generation is an architecture extension, activated only if PH-003 confirms co-location)* |
+| 1 | **BESS Engineering** | What physical system are we modeling? | *(No permanent context interface — Generation is an architecture extension, activated only if PH-004 confirms co-location)* |
 | 2 | **Load & Market Engineering** | What external signals, tariffs, market mechanisms and constraints affect the system? | **Owns the External Context interface** |
 | 3 | **Operational Engineering** | How do those conditions translate into feasible use cases? | Consumes Context + Market signals |
 | 4 | **Dispatch & Optimization** | How are physical, operational and economic objectives coordinated? | Consumes context signals from Domain 2 |
@@ -163,7 +179,7 @@ The following sections declare, for each System Context dimension, **how it ente
 
 ### 5.1 Generation
 
-**Scope note.** Generation is an **architecture extension**, not part of the initial delivery scope (`SYS-STR-FRM-001` §3.1). It is activated only if Phase 1 clarification **PH-003** confirms a co-located or integrated configuration. The interfaces below describe how Generation **would** propagate when activated; they do not represent a delivery commitment.
+**Scope note.** Generation is an **architecture extension**, not part of the initial delivery scope (`SYS-STR-FRM-001` §3.1). It is activated only if Phase 1 clarification **PH-004** confirms a co-located or integrated configuration. The interfaces below describe how Generation **would** propagate when activated; they do not represent a delivery commitment.
 
 **Context-to-domain impact:**
 
@@ -294,7 +310,7 @@ Define the **physical and technical representation of the battery energy storage
 
 BESS Engineering declares **intrinsic capability**. System Context declares **availability and imposed constraints**. These are separate.
 
-**Reference.** Detailed conceptual engineering: `A.2.1-BESS-ENG-001` v1.2.
+**Reference.** Detailed conceptual engineering: `A.2.1-BESS-ENG-001` v1.3.
 
 ---
 
@@ -332,8 +348,10 @@ Represent the **External Context** — the electricity demand, tariffs, market p
 The tariff engine lives in Domain 2 because **Domain 2 owns the tariff structure**. However, computing the bill *with* BESS requires the **net load**, which is a **result of dispatch** (Domain 4).
 
 ```
-Domain 4 (Dispatch)  ─── net load ───►  Domain 2 (Tariff engine)  ─── bill with BESS ───► Domain 6
+Domain 4 (Dispatch)  ─── battery power trajectory ───►  Domain 2 (Tariff engine)  ─── bill with BESS ───► Domain 6
 ```
+
+**Note.** The net load is **composed by the Tariff Engine** from three components: base load + battery power trajectory + auxiliary consumption. Dispatch delivers the **battery power trajectory**, not the net load. This rule was resolved in Stage B (B.2 v0.5.1 §4.3).
 
 ### 7.5 Inputs and Outputs
 
@@ -346,7 +364,7 @@ Domain 4 (Dispatch)  ─── net load ───►  Domain 2 (Tariff engine)  
 | **Inputs** | Program Data | DR program parameters, event windows, notification rules, penalties |
 | **Inputs** | Grid Data | Interconnection limits, export constraints, eligibility rules |
 | **Inputs** | Regulatory Data | Applicable grid requirements, operating restrictions |
-| **Inputs** | Net Load (post-dispatch) | Net load after BESS dispatch, from Domain 4 |
+| **Inputs** | Battery power trajectory (post-dispatch) | Battery power trajectory from Domain 4; the Tariff Engine composes the net load |
 | **Outputs** | Load Signals | Short-horizon forecast, multi-year projection, baseline consumption, peak projections |
 | **Outputs** | Generation Signals *(extension)* | Available generation, charge opportunity, curtailment envelope |
 | **Outputs** | Price Signals | Electricity price curves, ancillary price curves, capacity revenues |
@@ -355,7 +373,7 @@ Domain 4 (Dispatch)  ─── net load ───►  Domain 2 (Tariff engine)  
 | **Outputs** | Context Signals | Aggregated External Context signals consumed by other domains |
 | **Outputs** | Bill Outputs | Customer bill with and without BESS, per tariff, per scenario |
 
-**Note.** Generation-related inputs and outputs are **architecture extension** per `SYS-STR-FRM-001` §3.1. They are activated only if Phase 1 clarification **PH-003** confirms a co-located or integrated configuration.
+**Note.** Generation-related inputs and outputs are **architecture extension** per `SYS-STR-FRM-001` §3.1. They are activated only if Phase 1 clarification **PH-004** confirms a co-located or integrated configuration.
 
 ### 7.6 Boundary
 
@@ -411,9 +429,9 @@ Define **how the BESS can be used to provide specific services or value streams*
 
 Operational Engineering declares **operational requirements**. Dispatch selects the actual behavior.
 
-**Terminology alignment.** This document uses **operational requirements** in place of the term *candidate actions* used in previous versions. This aligns with `A.2.3-OPS-ENG-001` v1.3 §4, which establishes that Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**.
+**Terminology alignment.** This document uses **operational requirements** in place of the term *candidate actions* used in previous versions. This aligns with `A.2.3-OPS-ENG-001` v1.4 §4, which establishes that Operational Engineering defines **what behavior must occur if the service is provided**, not **what action should be scheduled**.
 
-**Reference.** Detailed conceptual engineering: `A.2.3-OPS-ENG-001` v1.3.
+**Reference.** Detailed conceptual engineering: `A.2.3-OPS-ENG-001` v1.4.
 
 ---
 
@@ -484,11 +502,13 @@ Act as the **coordination layer between competing operational objectives**.
 | **Inputs** | Value Signals | Market prices, TOU tariffs, **demand charge rates**, program payments, reserve prices |
 | **Outputs** | Dispatch | Charge/discharge/rest schedule (time series) |
 | **Outputs** | State | SOC trajectory over optimization horizon |
-| **Outputs** | Net Load | Net load profile after BESS dispatch (to Domain 2 tariff engine) |
+| **Outputs** | Battery power trajectory | Battery power trajectory (to Domain 2 Tariff Engine) |
 | **Outputs** | Attribution | Operational attribution basis per value stream |
 | **Outputs** | Evidence | Constraint compliance evidence |
 
 **Note.** Dispatch **consumes** System Context signals from Domain 2. It does **not** own the external context (`SYS-STR-FRM-001` §6.5). Dispatch produces **battery power and SOC trajectories**; **cycling metrics are derived by Domain 5** (see `A.2.4-DISPATCH-ENG-001` §4.3, §12.1, §14.4).
+
+**Note on Tariff Engine interface.** Dispatch delivers the **battery power trajectory** to the Tariff Engine; the Tariff Engine composes the net load (base load + battery power + auxiliary consumption, per B.2 v0.5.1 §4.3). Dispatch does **not** deliver net load.
 
 ### 9.6 Boundary
 
@@ -496,7 +516,7 @@ Act as the **coordination layer between competing operational objectives**.
 |---|---|
 | Given the available opportunities and constraints, how should the BESS be dispatched? | What is the physical battery? **What is the external context?** What is the complete financial valuation? |
 
-**Reference.** Detailed conceptual engineering: `A.2.4-DISPATCH-ENG-001` v0.9.
+**Reference.** Detailed conceptual engineering: `A.2.4-DISPATCH-ENG-001` v1.0.
 
 ---
 
@@ -570,7 +590,7 @@ Degradation Engineering provides Dispatch with two distinct outputs:
 |---|---|
 | How does operating the battery change the battery over time, and what does one more unit of throughput cost? | What is the total economic value of that degradation over the contract term? |
 
-**Reference.** Detailed conceptual engineering: `A.2.5-DEG-ENG-001` v0.3.
+**Reference.** Detailed conceptual engineering: `A.2.5-DEG-ENG-001` v0.4.
 
 ---
 
@@ -607,7 +627,7 @@ Operational Simulation
         ▼
 Economic Translation
         │
-        ├── Revenue (from D4 attribution + adapters)
+        ├── Revenue (from D4 attribution + Load & Market settlement)
         ├── Savings (from D2 tariff engine)
         ├── Costs
         └── Degradation events (from D5)
@@ -616,12 +636,14 @@ Economic Translation
 Project Cash Flow → Financial KPIs
 ```
 
+**Note.** Market revenue is settled through the Load & Market Model's market/program adapters (per A.2.2 §13.5 and B.4 §4.4). Dispatch produces the **attribution basis**; the Load & Market Model produces the **settlement basis**; Financial Engineering performs the **economic valuation**.
+
 ### 11.4 Two Sources of Truth for Value
 
 | Value category | Source of truth |
 |---|---|
 | **Behind-the-meter savings** | **Domain 2 — Tariff engine** |
-| **Market revenues** | **Domain 4 — Revenue attribution per value stream**, settled through market adapters |
+| **Market revenues** | **Domain 4 — Operational attribution basis**, settled through **Load & Market Model** market/program adapters |
 
 **Peak shaving is a special case.** The economic value of peak reduction is a tariff saving, computed **only** by the tariff engine.
 
@@ -641,6 +663,7 @@ Project Cash Flow → Financial KPIs
 | **Inputs** | Operational | Dispatch results, energy shifted, peak reduction, DR performance, regulation service |
 | **Inputs** | Degradation | Augmentation events, replacement events, physical event information |
 | **Inputs** | Tariff Bill Outputs | Bill with and without BESS (from Domain 2) |
+| **Inputs** | Market Settlement | Settlement basis (from Load & Market Model adapters) |
 | **Inputs** | Financial Assumptions | Discount rate, escalation rates, contract term, incentive schedules |
 | **Inputs** | Financing | Debt parameters for equity IRR |
 | **Inputs** | Tax | Tax and incentive parameters |
@@ -656,7 +679,7 @@ Project Cash Flow → Financial KPIs
 |---|---|
 | What economic value results from the modeled project behavior? | How does the battery physically operate? |
 
-**Reference.** Detailed conceptual engineering: `A.2.6-FIN-ENG-001` v0.2.
+**Reference.** Detailed conceptual engineering: `A.2.6-FIN-ENG-001` v0.3.
 
 ---
 
@@ -697,7 +720,7 @@ Convert the analytical system into an **executable and usable software product**
 |---|---|
 | How does the user provide information, execute models, and consume results? | The underlying BESS, operational, optimization, degradation, or financial logic |
 
-**Reference.** Detailed conceptual engineering: `A.2.7-DATA-APP-ENG-001` v0.2.
+**Reference.** Detailed conceptual engineering: `A.2.7-DATA-APP-ENG-001` v0.3.
 
 ---
 
@@ -716,16 +739,18 @@ Convert the analytical system into an **executable and usable software product**
 | Dispatch | Degradation | Battery power trajectory, SOC trajectory |
 | Degradation | Dispatch | Updated SOH, available capacity, **marginal degradation cost** |
 | Dispatch | Financial | Dispatch schedule, SOC trajectory, operational attribution basis |
-| Dispatch | Load & Market | **Net load (post-dispatch)** for tariff engine |
+| Dispatch | Load & Market | **Battery power trajectory** (Tariff Engine composes the net load) |
 | Degradation | Financial | Augmentation events, replacement events, physical event information |
 | Scenario Management | Degradation | Replacement cost (scenario input) |
 | **Scenario Management** | **All domains** | **Project Configuration (standalone / co-located / BTM / FTM / AC-DC coupling)** |
-| Market Adapters | Financial | Settled market quantities |
+| Market Adapters (Load & Market) | Financial | Settled market quantities (settlement basis) |
 | Financial | Application | Financial KPIs and economic outputs |
 | All domains | Data & Application | Data contracts and execution interfaces |
 | Validation | All domains | Validation criteria and evidence |
 
 **Note.** Per `SYS-STR-FRM-001` §3.5, Domain 2 owns the External Context interface. Project Configuration is a scenario parameter, managed by Scenario Management.
+
+**Note on settlement chain.** Market revenue flows: Dispatch → operational attribution basis → Load & Market (settlement adapter) → settlement basis → Financial. This chain was resolved in Stage B (B.2 v0.5.1 §7.2, B.4 §4.4).
 
 ---
 
@@ -771,11 +796,11 @@ The External Context enters this loop through Domain 2's signals (`SYS-STR-FRM-0
 | # | Domain | Purpose | Key Inputs | Key Outputs | Boundary |
 |---|---|---|---|---|---|
 | 1 | BESS Engineering | Physical representation | Technical parameters, efficiency, limits, temperature profile | State, capability, envelope, losses | What the BESS can do |
-| 2 | Load & Market Engineering | External Context + tariff | Load, generation (ext), tariff, market, program, grid data; net load | Load signals, generation signals (ext), price signals, constraints, bill outputs | What is outside the BESS |
+| 2 | Load & Market Engineering | External Context + tariff | Load, generation (ext), tariff, market, program, grid data; battery power trajectory | Load signals, generation signals (ext), price signals, constraints, bill outputs | What is outside the BESS |
 | 3 | Operational Engineering | Use-case behavior | Physical, external, rules | Operational requirements, service metrics | How each value stream uses BESS |
-| 4 | Dispatch & Optimization | Coordination layer | Physical, external, operational, degradation, value signals, System Context | Dispatch, SOC trajectory, net load, attribution | How to coordinate objectives |
+| 4 | Dispatch & Optimization | Coordination layer | Physical, external, operational, degradation, value signals, System Context | Dispatch, SOC trajectory, battery power trajectory, attribution | How to coordinate objectives |
 | 5 | Degradation Engineering | Capability evolution | Operating history, environmental, physical, replacement cost (scenario) | SOH, capacity, marginal degradation cost, events | How usage changes the battery |
-| 6 | Financial Engineering | Economic translation | Operational outputs, degradation, bill outputs, financial assumptions | Revenue, costs, cash flow, NPV, IRR | What value results |
+| 6 | Financial Engineering | Economic translation | Operational outputs, degradation, bill outputs, settlement basis, financial assumptions | Revenue, costs, cash flow, NPV, IRR | What value results |
 | 7 | Data & Application Engineering | Execution and delivery | All data and models | Dashboards, reports, exports, execution and lineage records | How users interact with the system |
 
 ---
@@ -811,7 +836,7 @@ The External Context enters this loop through Domain 2's signals (`SYS-STR-FRM-0
 ### System Context
 - System Context dimensions are declared in `SYS-STR-FRM-001` §3.4 and are not restated here. Their effects propagate through the seven domains via the interfaces declared in §5 and §13.
 
-These decisions belong to subsequent engineering stages (A.2, B, C, D).
+These decisions belong to subsequent engineering stages (A.2, B, C, D). At this revision, Stage B is frozen and Stage C is next.
 
 ---
 
@@ -834,13 +859,19 @@ Conceptual Engineering per Domain
         ▼
 STAGE A CONSOLIDATION AUDIT
         │
+        │ ✅ CLOSED (tag: stage-a-closed)
+        │
         ▼
 STEP B
 System Architecture (Basic Engineering)
         │
+        │ ✅ FROZEN (B.0–B.6 + Index + Handoff)
+        │
         ▼
 STEP C
 Product Specification (Detailed Engineering)
+        │
+        │ ⏭ Next
         │
         ▼
 STEP D
@@ -891,29 +922,96 @@ This provides the correct **eagle-eye baseline** before entering the detailed co
 
 ## 20. Next Steps
 
-**Stage A.2 status:**
+**Stage status at this revision:**
 
-| Order | Document ID | Domain | Status |
+| Stage | Status |
+|---|---|
+| **Stage A — Engineering Definition** | ✅ CLOSED (tag: `stage-a-closed`) |
+| **Stage B — System Architecture (HLD)** | ✅ FROZEN |
+| **Stage C — Product Specification** | ⏭ Next |
+
+**Stage B frozen baseline:**
+
+| Order | Document ID | View | Status |
 |---|---|---|---|
-| 1 | A.2.1 | BESS Engineering | ✅ Baselined (v1.2) |
-| 2 | A.2.2 | Load & Market Engineering | ✅ Baselined (v1.3) |
-| 3 | A.2.3 | Operational Engineering | ✅ Baselined (v1.3) |
-| 4 | A.2.4 | Dispatch & Optimization Engineering | 🔄 Development Draft (v0.9) |
-| 5 | A.2.5 | Degradation Engineering | 🔄 Development Baseline (v0.3) |
-| 6 | A.2.6 | Financial Engineering | 🔄 Development Draft (v0.2) |
-| 7 | A.2.7 | Data & Application Engineering | 🔄 Development Draft (v0.2) |
+| 1 | B.0 | Integrated System Architecture | ✅ v0.3.3 Frozen |
+| 2 | B.1 | Data Architecture | ✅ v0.3 Frozen |
+| 3 | B.2 | Model Architecture | ✅ v0.5.1 Frozen |
+| 4 | B.3 | Optimization Architecture | ✅ v0.6.1 Frozen |
+| 5 | B.4 | Financial Architecture | ✅ v0.4 Frozen |
+| 6 | B.5 | Software Architecture | ✅ v0.4.1 Frozen |
+| 7 | B.6 | Databricks Architecture | ✅ v0.4 Frozen |
+| 8 | STAGE-B-HLD-INDEX-001 | Master Index | ✅ v0.2 Frozen |
+| 9 | STAGE-B-TO-C-HANDOFF-001 | Stage B → C Handoff | ✅ v0.1 Draft for Review |
 
-**A.2.4 v0.9 status.** A.2.4 remains a **Development Draft** pending ENGIE clarification responses (**PH-001**, **PH-002**, **PH-034**, **PH-036**, **PH-040**). It will be promoted to v1.0 BASELINE once those items are resolved.
+**Immediate next step:** Produce the **Stage C Plan**.
 
-**Stage A.2 is conceptually and formally complete.** All seven domains have been defined at the conceptual engineering level, with consistent versions, unified PH IDs, correct cross-references, updated Next Steps, and PH addenda.
+**After Stage C Plan:** Begin Stage C specification sequence (C.1–C.7).
 
-**Immediate next step:** `Stage A Consolidation Audit`, which verifies:
-- All PH IDs across the seven documents are consistent
-- All cross-references between documents are correct
-- All interfaces are coherent
-- All versions are aligned
+---
 
-**After consolidation audit:** `Stage B — System Architecture (HLD)`.
+## 21. Change Log
+
+### 21.1 Changes from v0.5 to v0.6
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | Terminology | Replaced "candidate actions" with "operational requirements" (aligned with A.2.3 §4) |
+| 2 | Phase 1 IDs | Replaced D1, D4, D8, D9 with PH-034, PH-041, PH-042, PH-043 |
+| 3 | §3.1 | Fixed PH-003 → PH-004 (project configuration) |
+| 4 | §7.5 | Fixed power factor penalties reference (PH-054 → PH-021) |
+| 5 | §9.5 | Added cycling metrics ownership note (aligned with A.2.4) |
+| 6 | §10.4 | Added annual offset for marginal degradation cost |
+| 7 | §10.6 | Added "Three Concepts That Must Not Collapse" |
+| 8 | §11 | Updated to reflect two sources of truth for value |
+| 9 | §12.3 | Aligned with PH-048 (execution and lineage records) |
+| 10 | §17 | Added Stage A Consolidation Audit step |
+| 11 | §20 | Updated Next Steps with real status of A.2.1–A.2.7 |
+| 12 | Addendum | Added consolidated PH Register cross-reference |
+
+### 21.2 Changes from v0.6 to v0.6.1
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | Header: version bumped from v0.6 to **v0.6.1 — Consolidated Baseline (Errata Applied)** | Errata patch; no architectural content changed |
+| 2 | Header: added `STAGE-A-CONSOL-REPORT-001` v1.1 to Parent Documents | Completeness of the Stage A closure documentation |
+| 3 | Header: `SYS-STR-FRM-001` cited as **v0.9** (was unpinned) | Version traceability |
+| 4 | Header: `PH1-REG-001` cited as **v1.1** (was unpinned) | Version traceability |
+| 5 | §1.1 Status note: added "Stage A is **CLOSED**" and "Stage B is also complete and frozen" | Reflect the real state at the time of the errata |
+| 6 | §2: added explicit status table (Stage A CLOSED / Stage B FROZEN / Stage C Next) | Traceability of the stage progression |
+| 7 | §5.1: replaced `PH-003` with `PH-004` in the Generation scope note | **ERRATA:** Generation is activated by PH-004 (Project configuration), not PH-003 (Data availability). This aligns with the Strategy v0.9 §12.1 (PH-004 = B6) and the Consolidation Report §6.2 |
+| 8 | §7.5: replaced `PH-003` with `PH-004` in the Generation note | **ERRATA:** same correction, consistency with §5.1 |
+| 9 | §7.4: updated the tariff engine diagram label from "net load" to "battery power trajectory"; added explicit note that the net load is composed by the Tariff Engine | Align with Stage B resolution (B.2 v0.5.1 §4.3) |
+| 10 | §9.5: replaced the "Net Load" output row with "Battery power trajectory" and added a note on the Tariff Engine interface | Align with Stage B resolution (B.2 v0.5.1 §4.3) |
+| 11 | §11.3: added note that market revenue is settled through the Load & Market Model's adapters; added "Market Settlement" input row | Align with Stage B resolution (B.4 §4.4) |
+| 12 | §11.4: updated "Market revenues" source of truth from "Domain 4 — Revenue attribution" to "Domain 4 — Operational attribution basis, settled through Load & Market Model" | Align with Stage B resolution (B.4 §4.4) |
+| 13 | §13: replaced "Dispatch | Load & Market | Net load (post-dispatch)" with "Dispatch | Load & Market | Battery power trajectory (Tariff Engine composes the net load)" | Align with Stage B resolution (B.2 v0.5.1 §4.3) |
+| 14 | §13: replaced "Market Adapters | Financial | Settled market quantities" with "Market Adapters (Load & Market) | Financial | Settled market quantities (settlement basis)" and added note on settlement chain | Align with Stage B resolution (B.4 §4.4) |
+| 15 | §15: updated Domain 2 inputs to "battery power trajectory" (was "net load"); updated Domain 4 outputs to "battery power trajectory" (was "net load"); updated Domain 6 inputs to include "settlement basis" | Consistency with §7.4, §9.5, §11.3, §13 |
+| 16 | §16: updated "These decisions belong to subsequent engineering stages (A.2, B, C, D)" to "Stage B is frozen and Stage C is next" | Reflect real state |
+| 17 | §17: added stage status annotations to the engineering sequence diagram (Stage A CLOSED, Stage B FROZEN, Stage C Next) | Reflect real state |
+| 18 | §20: **fully rewritten Next Steps** — replaced the A.2.x status table with the Stage B frozen baseline table and declared the next step (Stage C Plan) | Reflect real state |
+| 19 | §21: added this change log | Traceability |
+
+**Nature of the change.** The v0.6.1 patch is a **combination of errata and Stage B alignment**:
+
+- **Errata (items 7, 8):** the `PH-003` → `PH-004` correction in the Generation scope notes. This resolves the collision flagged in the Stage A Consolidation Report §6.2 and confirmed by the Stage B closure audit.
+- **Stage B alignment (items 9–15):** updates to reflect decisions resolved in Stage B (net load composition by Tariff Engine; settlement chain through Load & Market adapters). These do not change Stage A content; they align the Stage A document with the downstream frozen architecture.
+- **Status updates (items 5, 6, 16, 17, 18):** reflect the real state of the engagement (Stage A CLOSED, Stage B FROZEN, Stage C Next).
+
+**No architectural content of v0.6 has been altered** in terms of the seven-domain decomposition, the System Context operationalization, or the domain responsibilities.
+
+### 21.3 Version History
+
+| Version | Date | Changes | Status |
+|---|---|---|---|
+| 0.1 | Stage A start | Initial A.1 draft | Superseded |
+| 0.2 | Stage A review | First consolidation | Superseded |
+| 0.3 | Stage A review | Domain refinements | Superseded |
+| 0.4 | Stage A review | Context operationalization | Superseded |
+| 0.5 | Stage A review | Pre-consolidation baseline | Superseded |
+| 0.6 | Stage A closure | 12 corrections (terminology, PH IDs, cycling metrics ownership, annual offset, three concepts, two sources of truth, execution records, consolidation audit, next steps, PH Addendum) | Superseded |
+| 0.6.1 | Stage B closure | 19 corrections (errata PH-003→PH-004; Stage B alignment on net load composition and settlement chain; status updates to reflect Stage A CLOSED / Stage B FROZEN / Stage C Next) | **Consolidated Baseline (Errata Applied)** |
 
 ---
 
@@ -921,7 +1019,7 @@ This provides the correct **eagle-eye baseline** before entering the detailed co
 
 Clarification requests previously listed in this document are now consolidated in the **Phase 1 Clarification & Data Request Register** (`PH1-REG-001` v1.1), the authoritative source for all Phase 1 clarifications across the seven domains and the Strategy.
 
-The items formerly in this addendum correspond to the following Register IDs:
+### A.1 Items Formerly in This Addendum
 
 | Former item | Register ID | Topic |
 |---|---|---|
@@ -935,14 +1033,14 @@ The items formerly in this addendum correspond to the following Register IDs:
 
 New clarification items (if any) should be added to the Register, not to this document.
 
-**Related Register items across the seven domains:**
+### A.2 Related Register Items Across the Seven Domains
 
 | Register ID | Topic | Primary domain |
 |---|---|---|
 | **PH-001** | Target market(s) | Strategy, Domain 2 |
 | **PH-002** | BTM vs. FTM scope | Strategy, Domain 2 |
 | **PH-003** | Data availability | Domain 1, Domain 2 |
-| **PH-004** | Solver licensing | Domain 7 |
+| **PH-004** | Project configuration | Strategy, Domain 5 |
 | **PH-005** | Benchmark data and tools | Domain 6, Domain 7 |
 | **PH-006** | Acceptance thresholds | Strategy, all domains |
 | **PH-007** | Commercial perspective | Domain 6 |
@@ -979,13 +1077,16 @@ New clarification items (if any) should be added to the Register, not to this do
 
 **Note.** Items are assigned IDs in `PH1-REG-001` v1.1. The Register is the authoritative source; this table is a consolidated view across the seven domains.
 
+**Errata note (v0.6.1).** In v0.6, the Generation scope notes in §5.1 and §7.5 cited `PH-003` (Data availability). The correct citation is `PH-004` (Project configuration), which is the Register item that determines whether a co-located or integrated configuration is the primary reference case. This errata corrects the collision flagged in the Stage A Consolidation Report §6.2 and confirmed by the Stage B closure audit.
+
 ---
 
 **Prepared by:** BESS Operational & Financial Modeling Consultant
 **Engagement:** RFP-264144-1
 **Stage:** A.1 — System Component Definition (Eagle-Eye View)
-**Status:** Stage A — Engineering Definition — **Consolidated Baseline (v0.6)**
+**Status:** Stage A — Engineering Definition — **Consolidated Baseline (v0.6.1 — Errata Applied)**
 **Duration:** 12 Weeks
 **Language:** English
 
 ---
+
