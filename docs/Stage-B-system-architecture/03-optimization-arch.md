@@ -1,9 +1,4 @@
-
----
-
-# B.3 Optimization Architecture v0.6 — Baseline Frozen
-
-Copia todo el contenido y pégalo en `docs/Stage-B-system-architecture/03-optimization-arch.md`.
+# B.3-OPT-ARCH-001 — Optimization Architecture (v0.6.1 — Baseline Frozen)
 
 ---
 
@@ -13,7 +8,7 @@ Copia todo el contenido y pégalo en `docs/Stage-B-system-architecture/03-optimi
 
 **Document ID:** B.3-OPT-ARCH-001
 
-**Version:** 0.6 — Baseline (Frozen)
+**Version:** 0.6.1 — Baseline (Frozen)
 
 **Section:** §6 — B.3 Optimization Architecture
 
@@ -35,6 +30,9 @@ Copia todo el contenido y pégalo en `docs/Stage-B-system-architecture/03-optimi
 - `B.0-INTEGRATED-SYS-ARCH-001` — B.0 Integrated System Architecture (v0.3.3 Baseline Frozen)
 - `B.1-DATA-ARCH-001` — B.1 Data Architecture (v0.3 Baseline Frozen)
 - `B.2-MODEL-ARCH-001` — B.2 Model Architecture (v0.5.1 Baseline Frozen)
+- `B.4-FIN-ARCH-001` — B.4 Financial Architecture (v0.4 Baseline Frozen)
+- `B.5-SW-ARCH-001` — B.5 Software Architecture (v0.4 Baseline Frozen)
+- `B.6-DBX-ARCH-001` — B.6 Databricks Architecture (v0.4 Baseline Frozen)
 
 **Note on versions.** Parent document versions are not restated here; they are as declared in each document.
 
@@ -787,7 +785,18 @@ B.3 recognizes the following **logical optimization formulation types**:
 | 18 | §9.3: changed "Net load → Tariff Engine" to "Battery power trajectory → Tariff Engine (net load composed there, per B.2 §4.3)" | Align with B.2 v0.5.1 §4.3 |
 | 19 | §8.1: "Full contract term" → "Full project / modeling horizon" | Avoid contractual ambiguity (contract is 12 weeks, project is 15 years) |
 
-#### 15.6 Version History
+#### 15.6 Changes from v0.6 to v0.6.1
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | Header: added `B.4`, `B.5`, `B.6` to Parent Documents with their frozen versions | Completeness of the frozen Stage B tree |
+| 2 | §16 Next Steps: **B.5 status corrected** — from "🔄 Baseline Candidate (v0.4) — pending update to cite B.3 Frozen" to "✅ Baseline (Frozen) (v0.4)" | Editorial correction: B.5 v0.4 already cites B.3 v0.6 Frozen. No architectural content changed |
+| 3 | §16 Next Steps: **B.4 status confirmed** as "✅ Baseline (Frozen) (v0.4)" | Consistency with the frozen tree |
+| 4 | §16 Next Steps: **B.6 status corrected** — from "⏭ Next" to "✅ Baseline (Frozen) (v0.4)" | B.6 was frozen in the same closure pass |
+| 5 | §16 Next Steps: **Stage B → Stage C Handoff** status corrected to "⏭ Pending" (unchanged), immediate action updated to "Proceed to Stage B → Stage C Handoff" | Reflect real closure state |
+| 6 | Header: version bumped to **v0.6.1 — Baseline (Frozen)** | Editorial patch; the architecture content of v0.6 remains frozen |
+
+#### 15.7 Version History
 
 | Version | Date | Changes | Status |
 |---|---|---|---|
@@ -796,9 +805,10 @@ B.3 recognizes the following **logical optimization formulation types**:
 | 0.3 | Stage B final | 6 corrections | Superseded |
 | 0.4 | Stage B closure | 10 corrections | Superseded |
 | 0.5 | Stage B closure | 4 corrections | Superseded |
-| 0.6 | Stage B freeze audit | 19 corrections (mapping, annual sequencing ownership, initial SOC, degradation boundary, single objective, solver terminology, parent version, net-load composition) | **Baseline (Frozen)** |
+| 0.6 | Stage B freeze audit | 19 corrections (mapping, annual sequencing ownership, initial SOC, degradation boundary, single objective, solver terminology, parent version, net-load composition) | Superseded |
+| 0.6.1 | Stage B closure | 6 editorial corrections (parent list completed; B.4/B.5/B.6 statuses corrected to Frozen) | **Baseline (Frozen)** |
 
-#### 15.7 PH Traceability
+#### 15.8 PH Traceability
 
 **PH IDs cited in B.3:** PH-033, PH-034, PH-036, PH-040, PH-054.
 
@@ -824,42 +834,24 @@ B.3 recognizes the following **logical optimization formulation types**:
 
 | Aspect | Status |
 |---|---|
-| B.3 Optimization Architecture | ✅ Baseline (Frozen) (v0.6) |
-| B.2 Model Architecture | ✅ Baseline Frozen (v0.5.1) |
-| B.4 Financial Architecture | ✅ Baseline Frozen (v0.4) |
-| B.5 Software Architecture | 🔄 Baseline Candidate (v0.4) — pending update to cite B.3 Frozen |
-| B.6 Databricks Architecture | ⏭ Next |
+| B.0 Integrated System Architecture | ✅ Baseline (Frozen) (v0.3.3) |
+| B.1 Data Architecture | ✅ Baseline (Frozen) (v0.3) |
+| B.2 Model Architecture | ✅ Baseline (Frozen) (v0.5.1) |
+| **B.3 Optimization Architecture** | **✅ Baseline (Frozen) (v0.6.1)** |
+| B.4 Financial Architecture | ✅ Baseline (Frozen) (v0.4) |
+| B.5 Software Architecture | ✅ Baseline (Frozen) (v0.4) |
+| B.6 Databricks Architecture | ✅ Baseline (Frozen) (v0.4) |
+| STAGE-B-HLD-INDEX-001 | ⏭ Pending (v0.2 production) |
 | Stage B → Stage C Handoff | ⏭ Pending |
 
 **Immediate next action.**
 
-1. Update B.5 to cite B.3 v0.6 Frozen and to reflect B.3's semantic ownership of the annual sequence (minimal revision).
-2. Freeze B.5.
-3. Proceed to B.6 Databricks Architecture.
+1. Produce `STAGE-B-HLD-INDEX-001` v0.2 (Baseline Frozen).
+2. Produce `STAGE-B-TO-C-HANDOFF-001` v0.1.
+3. Execute the Stage B closure sequence.
 
 ---
 
-**End of §6 — B.3 Optimization Architecture (v0.6 — Baseline Frozen)**
 
-**Status:** Baseline (Frozen)
 
-**Next:** B.5 update → B.6 Databricks Architecture
-
-**Prepared by:** BESS Operational & Financial Modeling Consultant
-
-**Engagement:** RFP-264144-1
-
----
-
-## 📋 Resumen de los 5 cambios aplicados en este cierre de v0.6
-
-| # | Punto | Cambio aplicado |
-|---|-------|-----------------|
-| 1 | Net load en §9.3 | "Net load → Tariff Engine" → "Battery power trajectory → Tariff Engine (net load composed there, per B.2 §4.3)" |
-| 2 | Diagrama §3.1 | "Net Load / Results" → "Battery power / Results" |
-| 3 | Diagrama §4.1 | "dispatch / net load" → "battery power trajectory" |
-| 4 | Regla de composición de carga neta en §5.1 | Añadida "Net-load composition rule within optimization" |
-| 5 | "Full contract term" en §8.1 | "Full contract term" → "Full project / modeling horizon" |
-
----
 
