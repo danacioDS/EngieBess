@@ -2,13 +2,15 @@
 
 **Document ID:** STAGE-B-HLD-INDEX-001
 
-**Version:** 0.1 — Draft for Review
+**Version:** 0.2 — Baseline (Frozen)
 
-**Status:** Stage B — Index and Scope Definition
+**Status:** Stage B — Baseline (Frozen)
 
 **Project:** ENGIE — BESS Operational & Financial Modeling
 
 **Engagement:** RFP-264144-1
+
+**Language:** English
 
 **Parent Documents:**
 - `SYS-STR-FRM-001` — System Strategy & Delivery Framework (v0.9)
@@ -23,7 +25,9 @@
 - `PH1-REG-001` — Phase 1 Clarification & Data Request Register (v1.1)
 - `STAGE-A-CONSOL-REPORT-001` — Stage A Consolidation Report (v1.1)
 
-**Purpose:** Establish the master index, scope, and production sequence for `STAGE-B-HLD-001` (System Architecture — High-Level Design), defining what each section produces, at what level of detail, and in what order.
+**Purpose:** Establish the master index, scope, and production status for `STAGE-B-HLD-001` (System Architecture — High-Level Design), declaring the architectural views produced, their frozen versions, the dependency chain between them, and the closure status of Stage B.
+
+**Change log.** See §11.
 
 ---
 
@@ -34,8 +38,8 @@
 | Aspect | Value |
 |---|---|
 | **Document ID** | `STAGE-B-HLD-INDEX-001` |
-| **Version** | 0.1 — Draft for Review |
-| **Status** | Stage B — Index and Scope Definition |
+| **Version** | 0.2 — Baseline (Frozen) |
+| **Status** | Stage B — Baseline (Frozen) |
 | **Project** | ENGIE — BESS Operational & Financial Modeling |
 | **Engagement** | RFP-264144-1 |
 | **Language** | English |
@@ -45,25 +49,28 @@
 This document establishes:
 
 - The **master index** of `STAGE-B-HLD-001`
-- The **scope** of each section (what it produces, at what level of detail)
-- The **production sequence** for B.0–B.6
+- The **scope** of each architectural view
+- The **frozen versions** of B.0–B.6
+- The **dependency chain** between views
 - The **level-of-detail rule** distinguishing Stage B from Stage C
-- The **review criteria** for accepting the HLD
+- The **closure criteria** for Stage B
+- The **closure status** of Stage B
 
-It is a **contract document** between the consultant and ENGIE: it defines what Stage B will produce before production begins.
+It is a **contract document** between the consultant and ENGIE: it declares what Stage B has produced and under what rules.
 
 ### 0.3 Scope
 
 **In scope:**
 - Master index of `STAGE-B-HLD-001`
-- Scope definition per section
+- Scope definition per view
+- Frozen versions of B.0–B.6
+- Dependency chain
 - Level-of-detail classification (Stage B / Stage C / Stage D)
-- Production sequence
-- Review criteria
+- Closure criteria and status
 - Change control
 
 **Out of scope:**
-- The actual content of `STAGE-B-HLD-001` (produced after this index is frozen)
+- The actual content of each view (produced in B.0–B.6)
 - Any Stage A content (already closed)
 - Any Stage C or Stage D content
 
@@ -80,7 +87,7 @@ Before producing `STAGE-B-HLD-001`, the **structure and scope** must be frozen. 
 - **Premature specification** — HLD becoming Stage C
 - **Inconsistency** — different views contradicting each other
 
-The index document **constrains** the HLD before production.
+The index document **constrains** the HLD before production and **certifies** it after production.
 
 ### 1.2 How This Document Is Used
 
@@ -88,7 +95,7 @@ The index document **constrains** the HLD before production.
 |---|---|
 | **Before HLD production** | Freeze the structure and scope |
 | **During HLD production** | Reference for section scope and level of detail |
-| **After HLD production** | Checklist for HLD review |
+| **After HLD production** | Checklist for HLD review and closure |
 | **Stage C start** | Confirm handoff criteria |
 
 ### 1.3 Relationship to Stage A
@@ -101,7 +108,7 @@ Stage B answers:
 
 > **How are those responsibilities structurally organized into an executable system?**
 
-This index defines **how** Stage B answers that question.
+This index declares **how** Stage B has answered that question.
 
 ---
 
@@ -109,17 +116,17 @@ This index defines **how** Stage B answers that question.
 
 ### 2.1 What Stage B Produces
 
-| Product | Description |
-|---|---|
-| **B.0 Integrated System Architecture** | The architectural contract: components, flows, state, feedback, boundaries, interfaces |
-| **B.1 Data Architecture** | Logical data layers, ownership, contracts, quality, lineage, isolation, persistence |
-| **B.2 Model Architecture** | Computational objects, state, temporal behavior, interfaces, lifecycle, parallelization |
-| **B.3 Optimization Architecture** | Dispatch engine, objective structure, constraints, revenue stacking, solver boundary |
-| **B.4 Financial Architecture** | Cash-flow engine, revenue attribution, realization factor, KPIs, scenario economics |
-| **B.5 Software Architecture** | Package boundaries, service boundaries, API boundaries, execution interfaces |
-| **B.6 Databricks Architecture** | Workspace, app layer, compute, data layer, orchestration, storage, governance |
-| **ADR Log** | Consolidated architectural decision records |
-| **Stage B → Stage C Handoff** | Formal handoff |
+| Product | Description | Status |
+|---|---|---|
+| **B.0 Integrated System Architecture** | The architectural contract: components, flows, state, feedback, boundaries, interfaces | ✅ Frozen |
+| **B.1 Data Architecture** | Logical data categories, ownership, contracts, quality, lineage, isolation | ✅ Frozen |
+| **B.2 Model Architecture** | Computational objects, state, temporal behavior, interfaces, lifecycle, parallelization | ✅ Frozen |
+| **B.3 Optimization Architecture** | Dispatch engine, objective structure, constraints, revenue stacking, solver boundary | ✅ Frozen |
+| **B.4 Financial Architecture** | Cash-flow engine, revenue attribution, realization factor, KPIs, scenario economics | ✅ Frozen |
+| **B.5 Software Architecture** | Software units, service boundaries, API boundaries, execution interfaces | ✅ Frozen |
+| **B.6 Databricks Architecture** | Workspace, app layer, compute, data layer, orchestration, storage, governance | ✅ Frozen |
+| **Stage B → Stage C Handoff** | Formal handoff | ⏭ Pending |
+| **Stage B Closure** | Formal closure of Stage B | ⏭ Pending |
 
 ### 2.2 What Stage B Does Not Produce
 
@@ -155,29 +162,78 @@ Stage B does **not** decide the class name or method signatures. It decides **th
 ```
 STAGE B — SYSTEM ARCHITECTURE (HLD)
 │
-├── B.0 Integrated System Architecture  ← architectural contract
-│   │
-│   ├── 3.1 Logical Architecture
-│   ├── 3.2 Domain-to-Component Mapping
-│   ├── 3.3 Cross-Cutting Components
-│   ├── 3.4 System Data Flow
-│   ├── 3.5 System Execution Flow
-│   ├── 3.6 State and Feedback Architecture
-│   ├── 3.7 Architectural Boundaries
-│   ├── 3.8 System Context Propagation
-│   ├── 3.9 Component Interfaces
-│   └── 3.10 Architectural Decisions (ADR Log)  ← transversal
+├── B.0 Integrated System Architecture      ← architectural contract
+│   ├── Logical Architecture
+│   ├── Functional Components (7)
+│   ├── Cross-Cutting Capabilities (6)
+│   ├── Component Interfaces
+│   ├── State and Feedback Architecture
+│   ├── System Context Propagation
+│   └── Architectural Sequence
 │
-├── B.1 Data Architecture
-├── B.2 Model Architecture
-├── B.3 Optimization Architecture
-├── B.4 Financial Architecture
-├── B.5 Software Architecture
-├── B.6 Databricks Architecture
+├── B.1 Data Architecture                   ← data view
+│   ├── Data Architectural Categories (3)
+│   ├── Data Lifecycle
+│   ├── Execution Data
+│   ├── Governance Data
+│   ├── Data Ownership
+│   ├── Data Flows
+│   ├── Data Interfaces
+│   └── Data Quality, Lineage, Scenario Isolation
 │
-├── ADR Log (consolidated)
+├── B.2 Model Architecture                  ← computational view
+│   ├── Computational Objects (7)
+│   ├── State Model
+│   ├── Temporal Behavior
+│   ├── Inter-Model Interfaces
+│   ├── Lifecycle
+│   └── Parallelization Boundaries
 │
-└── Stage B → Stage C Handoff
+├── B.3 Optimization Architecture           ← optimization view
+│   ├── Objective Structure
+│   ├── Constraint Families
+│   ├── Revenue Stacking
+│   ├── Service Coordination
+│   ├── Horizon Framework
+│   ├── State Transitions
+│   ├── Degradation Signal Integration
+│   ├── Solver Boundary
+│   └── Feasibility Handling
+│
+├── B.4 Financial Architecture              ← financial view
+│   ├── Financial Inputs
+│   ├── Value Categories
+│   ├── Cost Categories
+│   ├── Cash-Flow Architecture
+│   ├── Financial KPIs
+│   ├── Financing
+│   ├── Perspective
+│   └── Double-Counting Prevention
+│
+├── B.5 Software Architecture               ← software view
+│   ├── Package Architecture
+│   ├── Service Boundaries
+│   ├── API / Interface Boundaries
+│   ├── Execution Interfaces
+│   ├── Configuration Interfaces
+│   ├── Application Boundary
+│   ├── Technology Placement
+│   └── Testing Boundaries
+│
+├── B.6 Databricks Architecture             ← platform view
+│   ├── Workspace, Environment, Compute
+│   ├── Data Layout
+│   ├── Delta Table Design
+│   ├── Execution Placement
+│   ├── Parallelization & Synchronization
+│   ├── Application Boundary Realization
+│   ├── Governance, Identity, Secrets
+│   ├── Observability & Lineage
+│   └── Scheduling & Orchestration
+│
+├── STAGE-B-TO-C-HANDOFF-001                ← formal handoff
+│
+└── Stage B Closure
 ```
 
 ### 3.2 Why B.0 First
@@ -192,8 +248,6 @@ B.0 is the **architectural contract**. It defines:
 - How domains map to components
 
 **B.1–B.6 are views** of the architecture defined in B.0. Without B.0, B.1–B.6 would be orphan views.
-
-**Production sequence:** B.0 first, then B.1–B.6.
 
 ### 3.3 Relationship Between B.0 and B.1–B.6
 
@@ -210,368 +264,135 @@ B.0 is the **architectural contract**. It defines:
 **ADRs are not an architecture.** They are the **mechanism** by which decisions across B.0–B.6 are recorded.
 
 - **Within each view:** decisions are identified
-- **In the consolidated ADR Log (§10):** decisions are recorded formally
+- **In the consolidated ADR Log:** decisions are recorded formally
 
 This avoids the impression that ADR is a parallel "Architecture #7".
 
 ---
 
-## 4. Master Index
+## 4. Master Index — Frozen Views
 
-The following is the **complete master index** of `STAGE-B-HLD-001`. Each section is marked with its **level of detail**:
+### 4.1 Frozen Versions
 
-- **Stage B** — produced in Stage B
-- **Stage C** — detailed in Stage C
-- **Stage D** — implemented in Stage D
+| Order | View | Document ID | Version | Status |
+|---|---|---|---|---|
+| 1 | **B.0 Integrated System Architecture** | `B.0-INTEGRATED-SYS-ARCH-001` | **v0.3.3** | ✅ Baseline (Frozen) |
+| 2 | **B.1 Data Architecture** | `B.1-DATA-ARCH-001` | **v0.3** | ✅ Baseline (Frozen) |
+| 3 | **B.2 Model Architecture** | `B.2-MODEL-ARCH-001` | **v0.5.1** | ✅ Baseline (Frozen) |
+| 4 | **B.3 Optimization Architecture** | `B.3-OPT-ARCH-001` | **v0.6.1** | ✅ Baseline (Frozen) |
+| 5 | **B.4 Financial Architecture** | `B.4-FIN-ARCH-001` | **v0.4** | ✅ Baseline (Frozen) |
+| 6 | **B.5 Software Architecture** | `B.5-SW-ARCH-001` | **v0.4** | ✅ Baseline (Frozen) |
+| 7 | **B.6 Databricks Architecture** | `B.6-DBX-ARCH-001` | **v0.4** | ✅ Baseline (Frozen) |
+| 8 | **Stage B → Stage C Handoff** | `STAGE-B-TO-C-HANDOFF-001` | v0.1 | ⏭ Pending |
 
----
+### 4.2 View Scope Summary
 
-### 0. Document Control
+Each view is scoped at **Stage B level of detail** (see §6). The detailed change logs and non-scope sections are in each view.
 
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 0.1 Document ID | `STAGE-B-HLD-001` | Stage B |
-| 0.2 Version | Versión y estado | Stage B |
-| 0.3 Parent Documents | Stage A referenciado | Stage B |
-| 0.4 Scope | Qué cubre / qué no cubre | Stage B |
-| 0.5 Architectural Decision Status | ADRs (aceptados / propuestos / diferidos) | Stage B |
-| 0.6 Glossary | Términos arquitectónicos | Stage B |
-
----
-
-### 1. Purpose and Architectural Objectives
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 1.1 Purpose of Stage B | Qué resuelve Stage B | Stage B |
-| 1.2 Architectural Objectives | Qué busca lograr la arquitectura | Stage B |
-| 1.3 What Stage B Does Not Do | Qué queda para Stage C | Stage B |
-| 1.4 Architectural Quality Criteria | Criterios de calidad arquitectónica | Stage B |
-| 1.5 Scope Boundary | Qué está dentro / fuera | Stage B |
-
----
-
-### 2. Architectural Principles
-
-Consolidación de los principios de Stage A como **restricciones arquitectónicas**.
-
-| # | Principio | Origen | Implicación |
-|---|---|---|---|
-| 2.1 | Domain separation | Stage A §2.4 | Componentes separados por dominio |
-| 2.2 | Single source of truth | Stage A §11.4 | Fuentes únicas por tipo de valor |
-| 2.3 | Explicit interfaces | Stage A §13 | Contratos explícitos |
-| 2.4 | Physical capability vs operational availability | Stage A §6.4 | Distinción BESS vs System Context |
-| 2.5 | Dispatch–degradation feedback | Stage A §14 | Loop explícito |
-| 2.6 | Financial valuation downstream | Stage A §11 | Financial consume operational |
-| 2.7 | Scenario isolation | `SYS-STR-FRM-001` §8.1 | Escenarios no se contaminan |
-| 2.8 | Reproducibility | `SYS-STR-FRM-001` §8.2 | Misma entrada → misma salida |
-| 2.9 | Validation as cross-cutting | `SYS-STR-FRM-001` §8.2 | Validación no es un componente único |
-| 2.10 | Technology does not own engineering logic | `SYS-STR-FRM-001` §9.3 | Python/PySpark/SQL no contienen lógica de dominio |
-
-**Nivel:** Stage B (principios). Implementación → Stage C.
-
----
-
-### 3. B.0 Integrated System Architecture
-
-**Sección central del HLD.**
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 3.1 Logical Architecture | Componentes principales y relaciones | Stage B |
-| 3.2 Domain-to-Component Mapping | Mapeo de los 7 dominios a componentes | Stage B |
-| 3.3 Cross-Cutting Components | Scenario Mgmt, Validation, Configuration, Execution Control, Lineage | Stage B |
-| 3.4 System Data Flow | Flujo de datos end-to-end | Stage B |
-| 3.5 System Execution Flow | Causal chain de ejecución | Stage B |
-| 3.6 State and Feedback Architecture | Stateful vs stateless; Dispatch–Degradation loop | Stage B |
-| 3.7 Architectural Boundaries | Componente vs servicio vs vista | Stage B |
-| 3.8 System Context Propagation | Cómo entra el System Context en los componentes | Stage B |
-| 3.9 Component Interfaces | Contratos lógicos entre componentes | Stage B |
-| 3.10 Architectural Decisions (ADR Log) | Registro inicial de decisiones | Stage B |
-
-**Nivel:** Stage B. Detalles de implementación → Stage C.
-
----
-
-### 4. B.1 Data Architecture
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 4.1 Purpose | Qué resuelve la Data Architecture | Stage B |
-| 4.2 Data Layers | Sources → Ingestion → Raw → Validated → Model-ready → Execution State → Results | Stage B |
-| 4.3 Data Ownership | Qué dominio es dueño de qué dato | Stage B |
-| 4.4 Data Contracts | Contratos lógicos entre capas | Stage B |
-| 4.5 Temporal Representation | Series temporales (lógico) | Stage B |
-| 4.6 Data Quality | Reglas de calidad (lógico) | Stage B |
-| 4.7 Lineage and Versioning | Linaje y versionado (lógico) | Stage B |
-| 4.8 Scenario Isolation | Aislamiento de escenarios en datos | Stage B |
-| 4.9 Persistence Requirements | Requisitos de persistencia | Stage B |
-| 4.10 Physical Schemas | Esquemas físicos, tablas, particiones | **Stage C** |
-| 4.11 Pipeline Implementation | Implementación de pipelines | **Stage C** |
-
----
-
-### 5. B.2 Model Architecture
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 5.1 Purpose | Qué resuelve la Model Architecture | Stage B |
-| 5.2 Computational Objects | BESS, Load/Market, Operational, Dispatch, Degradation, Financial | Stage B |
-| 5.3 State Model | Estado por objeto | Stage B |
-| 5.4 Stateful vs Stateless | Secuencial vs paralelizable | Stage B |
-| 5.5 Temporal Behavior | Evolución del estado en el tiempo | Stage B |
-| 5.6 Inter-Model Interfaces | Contratos computacionales | Stage B |
-| 5.7 Lifecycle | Inicialización, ejecución, actualización | Stage B |
-| 5.8 Persistence of State | Persistencia del estado | Stage B |
-| 5.9 Parallelization Boundaries | Qué se puede paralelizar (PySpark) | Stage B |
-| 5.10 Class Structures | Clases concretas, métodos, firmas | **Stage C** |
-| 5.11 Exact State Implementation | Implementación exacta del estado | **Stage C** |
-
----
-
-### 6. B.3 Optimization Architecture
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 6.1 Purpose | Qué resuelve la Optimization Architecture | Stage B |
-| 6.2 Dispatch Engine | Componente de dispatch | Stage B |
-| 6.3 Objective Structure | Estructura del objetivo | Stage B |
-| 6.4 Constraint Families | Familias de constraints | Stage B |
-| 6.5 Revenue Stacking | Coordinación de value streams | Stage B |
-| 6.6 Service Coordination | Coordinación de servicios | Stage B |
-| 6.7 Optimization Horizon | Estructura del horizonte | Stage B |
-| 6.8 State Transitions | Cambio de estado durante dispatch | Stage B |
-| 6.9 Degradation Signal Integration | Marginal degradation cost | Stage B |
-| 6.10 Solver Boundary | Frontera con el solver | Stage B |
-| 6.11 Solver Strategy | Estrategia de solver | **Stage C** |
-| 6.12 Solver Formulation | Formulación matemática exacta | **Stage C** |
-| 6.13 Exact Orchestration | Orquestación exacta | **Stage C** |
-
----
-
-### 7. B.4 Financial Architecture
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 7.1 Purpose | Qué resuelve la Financial Architecture | Stage B |
-| 7.2 Cash-Flow Engine | Componente de cash flow | Stage B |
-| 7.3 Revenue Attribution | Atribución de revenue por stream | Stage B |
-| 7.4 Tariff Output Consumption | Consumo de bill outputs | Stage B |
-| 7.5 Realization Factor | Dónde y cómo se aplica | Stage B |
-| 7.6 Project vs Equity Perspective | Distinción de perspectivas | Stage B |
-| 7.7 Scenario Economics | Comparación de escenarios | Stage B |
-| 7.8 KPI Computation | NPV, IRR, payback (lógico) | Stage B |
-| 7.9 Cash-Flow Equations | Ecuaciones exactas | **Stage C** |
-| 7.10 Tax and Depreciation | Tratamiento exacto | **Stage C** |
-| 7.11 Financing Details | Detalles de deuda, waterfall | **Stage C** |
-
----
-
-### 8. B.5 Software Architecture
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 8.1 Purpose | Qué resuelve la Software Architecture | Stage B |
-| 8.2 Package Boundaries | Fronteras entre paquetes Python | Stage B |
-| 8.3 Service Boundaries | Fronteras entre servicios | Stage B |
-| 8.4 API / Interface Boundaries | Fronteras de APIs | Stage B |
-| 8.5 Execution Interfaces | Cómo se ejecuta el sistema | Stage B |
-| 8.6 Configuration Interfaces | Cómo se configura | Stage B |
-| 8.7 Application Boundary | Frontera con Databricks App | Stage B |
-| 8.8 Technology Placement | Dónde va Python, PySpark, SQL | Stage B |
-| 8.9 Class Structures | Clases concretas | **Stage C** |
-| 8.10 API Schemas | Esquemas de API | **Stage C** |
-| 8.11 Code | Código | **Stage D** |
-
----
-
-### 9. B.6 Databricks Architecture
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 9.1 Purpose | Qué resuelve la Databricks Architecture | Stage B |
-| 9.2 Workspace Structure | Estructura lógica del workspace | Stage B |
-| 9.3 App Layer | Capa de aplicación (lógico) | Stage B |
-| 9.4 Compute / Execution | Cómputo y ejecución (lógico) | Stage B |
-| 9.5 Data Layer | Capa de datos (lógico) | Stage B |
-| 9.6 Orchestration | Orquestación (Jobs/Workflows, lógico) | Stage B |
-| 9.7 Storage | Storage (Delta vs otros, lógico) | Stage B |
-| 9.8 Governance / Access | Gobernanza (Unity Catalog, lógico) | Stage B |
-| 9.9 Secrets Management | Gestión de secretos | Stage B |
-| 9.10 Environments | Dev, staging, prod | Stage B |
-| 9.11 Deployment | Estrategia de deployment | Stage B |
-| 9.12 Cluster Configuration | Configuración exacta | **Stage C** |
-| 9.13 CI/CD Pipelines | Pipelines | **Stage D** |
-
----
-
-### 10. ADR Log
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 10.1 ADR Template | Plantilla | Stage B |
-| 10.2 ADR Log | Lista completa con estado | Stage B |
-| 10.3 Accepted ADRs | Decisiones aceptadas | Stage B |
-| 10.4 Proposed ADRs | Decisiones propuestas | Stage B |
-| 10.5 Deferred ADRs | Diferidas a Stage C | Stage B |
-
-**ADRs iniciales propuestos:**
-
-| ADR ID | Título | Estado |
-|---|---|---|
-| ADR-001 | B.0 Integrated Architecture as foundation | Proposed |
-| ADR-002 | Domain separation as component boundary | Proposed |
-| ADR-003 | Stateful vs stateless separation | Proposed |
-| ADR-004 | Single source of truth enforcement | Proposed |
-| ADR-005 | Scenario isolation mechanism | Proposed |
-| ADR-006 | Dispatch–Degradation feedback loop | Proposed |
-| ADR-007 | Technology placement (Python/PySpark/SQL) | Proposed |
-| ADR-008 | Databricks as execution platform | Proposed |
-| ADR-009 | Data layer structure | Proposed |
-| ADR-010 | Persistence strategy | Proposed |
-
----
-
-### 11. Stage B → Stage C Handoff
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 11.1 What Stage B Produces | Resumen de decisiones | Stage B |
-| 11.2 What Stage C Consumes | Qué necesita Stage C | Stage B |
-| 11.3 Interface to Stage C | Contratos de handoff | Stage B |
-| 11.4 Open Questions | Preguntas abiertas | Stage B |
-| 11.5 Review Criteria | Criterios de aceptación | Stage B |
-
----
-
-### 12. Appendices
-
-| Sección | Propósito | Nivel |
-|---|---|---|
-| 12.1 Glossary | Términos arquitectónicos | Stage B |
-| 12.2 References | Documentos referenciados | Stage B |
-| 12.3 Traceability Matrix | Stage A → Stage B → Stage C | Stage B |
-| 12.4 Diagram Index | Lista de diagramas | Stage B |
-
----
-
-## 5. ADRs — Correction
-
-### 5.1 ADRs Are Transversal, Not a "View #7"
-
-**ADRs are not an architecture.** They are the **mechanism** for recording decisions.
-
-**Structure:**
-
-```
-B.0 Integrated System Architecture
- ├── 3.1 Logical Architecture
- ├── 3.2 Domain-to-Component Mapping
- ├── 3.3 Cross-Cutting Components
- ├── 3.4 System Data Flow
- ├── 3.5 System Execution Flow
- ├── 3.6 State and Feedback Architecture
- ├── 3.7 Architectural Boundaries
- ├── 3.8 System Context Propagation
- ├── 3.9 Component Interfaces
- └── 3.10 Architectural Decisions (ADR Log)  ← transversal
-```
-
-### 5.2 How ADRs Are Used
-
-| Phase | Use |
+| View | Question Answered |
 |---|---|
-| **Within each view** | Decisions are identified and informally described |
-| **In §10 (ADR Log)** | Decisions are recorded formally with context, decision, consequences |
-| **Across views** | ADRs are referenced by ID |
+| B.0 | What system are we building? |
+| B.1 | How is information organized? |
+| B.2 | How is the model structured? |
+| B.3 | How is optimization structured? |
+| B.4 | How is financial valuation structured? |
+| B.5 | How is the software organized? |
+| B.6 | How is it realized on Databricks? |
 
-### 5.3 ADR Template
+### 4.3 Deferrals to Stage C
 
-| Field | Content |
+Each view declares its own deferrals. The consolidated list is in the **Stage B → Stage C Handoff** (`STAGE-B-TO-C-HANDOFF-001`). The deferrals fall into six categories:
+
+| Category | Source Views |
 |---|---|
-| **ADR ID** | ADR-NNN |
-| **Title** | Short title |
-| **Status** | Proposed / Accepted / Superseded / Deferred |
-| **Context** | Why this decision is needed |
-| **Decision** | What was decided |
-| **Consequences** | What follows from the decision |
-| **Related** | Related ADRs, Stage A refs |
+| **Physical data specification** | B.1, B.6 |
+| **Physical model specification** | B.2, B.3 |
+| **Physical financial specification** | B.4 |
+| **Physical software specification** | B.5 |
+| **Physical platform specification** | B.6 |
+| **Testing and validation specification** | B.5 |
 
 ---
 
-## 6. Production Sequence
+## 5. Dependency Chain
 
-### 6.1 Sequence
+### 5.1 Dependencies
+
+| View | Depends on | Reason |
+|---|---|---|
+| **B.0** | Stage A | Contract from Stage A |
+| **B.1** | B.0 | Data flows and ownership defined in B.0 |
+| **B.2** | B.0, B.1 | Components and data structures from B.0, B.1 |
+| **B.3** | B.0, B.2 | Dispatch engine and model interfaces |
+| **B.4** | B.0, B.2, B.3 | Cash-flow engine and operational outputs |
+| **B.5** | B.0–B.4 | Software units based on all views |
+| **B.6** | B.0–B.5 | Platform based on all views |
+| **Handoff** | B.0–B.6 | Consolidated handoff |
+
+**Rule:** No view cites a Candidate parent. Every parent is Frozen.
+
+### 5.2 Verified Parent Citations
+
+| View | Cites B.0 | Cites B.1 | Cites B.2 | Cites B.3 | Cites B.4 | Cites B.5 |
+|---|---|---|---|---|---|---|
+| B.1 | v0.3.3 ✅ | — | — | — | — | — |
+| B.2 | v0.3.3 ✅ | v0.3 ✅ | — | — | — | — |
+| B.3 | v0.3.3 ✅ | v0.3 ✅ | v0.5.1 ✅ | — | — | — |
+| B.4 | v0.3.3 ✅ | v0.3 ✅ | v0.5.1 ✅ | v0.6 ✅ | — | — |
+| B.5 | v0.3.3 ✅ | v0.3 ✅ | v0.5.1 ✅ | v0.6 ✅ | v0.4 ✅ | — |
+| B.6 | v0.3.3 ✅ | v0.3 ✅ | v0.5.1 ✅ | v0.6 ✅ | v0.4 ✅ | v0.4 ✅ |
+
+**Result:** ✅ All parent citations are correct. No view cites a Candidate parent.
+
+### 5.3 Production Sequence
 
 ```
 STAGE A — ENGINEERING DEFINITION
    │
-   │ ✅ CERRADO (tag: stage-a-closed)
+   │ ✅ CLOSED (tag: stage-a-closed)
    │
    ▼
 STAGE B — SYSTEM ARCHITECTURE (HLD)
    │
-   ├── STAGE-B-HLD-INDEX-001 (this document)
+   ├── B.0 Integrated System Architecture          ✅ v0.3.3 Frozen
+   ├── B.1 Data Architecture                       ✅ v0.3 Frozen
+   ├── B.2 Model Architecture                      ✅ v0.5.1 Frozen
+   ├── B.3 Optimization Architecture               ✅ v0.6.1 Frozen
+   ├── B.4 Financial Architecture                  ✅ v0.4 Frozen
+   ├── B.5 Software Architecture                   ✅ v0.4 Frozen
+   ├── B.6 Databricks Architecture                 ✅ v0.4 Frozen
    │
-   ├── B.0 Integrated System Architecture
+   ├── STAGE-B-HLD-INDEX-001 (this document)       ✅ v0.2 Frozen
    │
-   ├── B.1 Data Architecture
+   ├── STAGE-B-TO-C-HANDOFF-001                    ⏭ Next
    │
-   ├── B.2 Model Architecture
-   │
-   ├── B.3 Optimization Architecture
-   │
-   ├── B.4 Financial Architecture
-   │
-   ├── B.5 Software Architecture
-   │
-   ├── B.6 Databricks Architecture
-   │
-   ├── ADR Log (consolidated)
-   │
-   ├── Stage B → Stage C Handoff
-   │
-   └── Integrated HLD Review
+   └── Stage B Closure                             ⏭ Pending
         │
         ▼
 STAGE C — PRODUCT SPECIFICATION
 ```
 
-### 6.2 Dependencies
+### 5.4 Milestones
 
-| View | Depends on | Reason |
+| Milestone | Content | Status |
 |---|---|---|
-| **B.0** | Stage A | Contract from Stage A |
-| **B.1 Data** | B.0 | Data flows and ownership defined in B.0 |
-| **B.2 Model** | B.0, B.1 | Components and data structures from B.0, B.1 |
-| **B.3 Optimization** | B.0, B.2 | Dispatch engine and model interfaces |
-| **B.4 Financial** | B.0, B.2, B.3 | Cash-flow engine and operational outputs |
-| **B.5 Software** | B.0–B.4 | Packages and services based on all views |
-| **B.6 Databricks** | B.0–B.5 | Platform based on all views |
-
-**Rule:** No view is produced before its dependencies.
-
-### 6.3 Milestones
-
-| Milestone | Content |
-|---|---|
-| **M1** | B.0 complete |
-| **M2** | B.1 + B.2 complete |
-| **M3** | B.3 + B.4 complete |
-| **M4** | B.5 + B.6 complete |
-| **M5** | ADR Log consolidated |
-| **M6** | Stage B → Stage C Handoff |
-| **M7** | Integrated HLD Review |
+| **M1** | B.0 complete | ✅ |
+| **M2** | B.1 + B.2 complete | ✅ |
+| **M3** | B.3 + B.4 complete | ✅ |
+| **M4** | B.5 + B.6 complete | ✅ |
+| **M5** | Index v0.2 complete | ✅ |
+| **M6** | Stage B → Stage C Handoff | ⏭ Next |
+| **M7** | Stage B Closure | ⏭ Pending |
 
 ---
 
-## 7. Level of Detail Rule
+## 6. Level of Detail Rule
 
-### 7.1 The Rule
+### 6.1 The Rule
 
 > **HLD must be sufficiently concrete to constrain Stage C, but insufficiently detailed to become Stage C.**
 
-### 7.2 Comparison
+### 6.2 Comparison
 
 | Stage B (HLD) | Stage C (Specification) |
 |---|---|
@@ -585,7 +406,7 @@ STAGE C — PRODUCT SPECIFICATION
 | Execution architecture | Exact orchestration code |
 | Technology selection | Configuration details |
 
-### 7.3 Examples
+### 6.3 Examples
 
 | ✅ Stage B | ❌ Stage C (too detailed) |
 |---|---|
@@ -597,54 +418,96 @@ STAGE C — PRODUCT SPECIFICATION
 
 ---
 
-## 8. Review Criteria
+## 7. Stage B Closure Criteria
 
-### 8.1 HLD Acceptance Criteria
+### 7.1 Closure Criteria
 
-| # | Criterion | Verification |
+| # | Criterion | Verification | Status |
+|---|---|---|---|
+| 1 | All views B.0–B.6 are present | Section presence | ✅ |
+| 2 | All domains of Stage A are mapped to components | Domain-to-Component Mapping in B.0 | ✅ |
+| 3 | All Stage A interfaces are declared | Component Interfaces in B.0, expanded in B.1–B.5 | ✅ |
+| 4 | Data flow is complete and consistent | B.0 System Data Flow + B.1 Data Flows | ✅ |
+| 5 | Execution flow is complete and consistent | B.0 System Execution Flow + B.2 Temporal Behavior + B.3 State Transitions | ✅ |
+| 6 | State and feedback are correctly modeled | B.0 State Architecture + B.2 State Model + B.3 State Transitions | ✅ |
+| 7 | All architectural decisions are recorded | ADRs across B.0–B.6 | ✅ |
+| 8 | No premature specification (no Stage C content) | Level of detail check | ✅ |
+| 9 | No missing content (no Stage B gaps) | Section completeness | ✅ |
+| 10 | Traceability to Stage A is complete | Traceability across B.0–B.6 | ✅ |
+| 11 | All parents are Frozen (no Candidate citations) | Parent citation verification (§5.2) | ✅ |
+| 12 | All cross-view interfaces are coherent | Interface consistency check | ✅ |
+| 13 | Stage B → Stage C Handoff produced | Document presence | ⏭ Pending |
+| 14 | Stage B formal closure | Closure declaration | ⏭ Pending |
+
+### 7.2 Consistency Checks
+
+| Check | Description | Status |
 |---|---|---|
-| 1 | All views B.0–B.6 are present | Section presence |
-| 2 | All domains of Stage A are mapped to components | Domain-to-Component Mapping |
-| 3 | All Stage A interfaces are declared | Component Interfaces |
-| 4 | Data flow is complete and consistent | System Data Flow |
-| 5 | Execution flow is complete and consistent | System Execution Flow |
-| 6 | State and feedback are correctly modeled | State and Feedback Architecture |
-| 7 | All architectural decisions are recorded | ADR Log |
-| 8 | No premature specification (no Stage C content) | Level of detail check |
-| 9 | No missing content (no Stage B gaps) | Section completeness |
-| 10 | Traceability to Stage A is complete | Traceability Matrix |
+| **Cross-view consistency** | No contradictions between B.0–B.6 | ✅ |
+| **Interface consistency** | All declared interfaces are consistent | ✅ |
+| **State consistency** | State model is consistent across views | ✅ |
+| **Data flow consistency** | Data flows match interfaces | ✅ |
+| **ADR consistency** | ADRs do not contradict each other | ✅ |
+| **Traceability** | Every Stage A interface is addressed | ✅ |
+| **Version consistency** | No view cites a Candidate parent | ✅ |
+| **Ownership consistency** | Domain 2 owns External Context; annual sequencing tripartite (B.3 semantics, B.5 orchestration, B.6 realization) | ✅ |
+| **Settlement chain** | Dispatch → Load & Market (settlement_adapter) → Financial | ✅ |
+| **Double-counting prevention** | B.3 §10.4 and B.4 §11 consistent | ✅ |
 
-### 8.2 Consistency Checks
+---
 
-| Check | Description |
+## 8. Stage B Closure Status
+
+### 8.1 Current Status
+
+| Aspect | Status |
 |---|---|
-| **Cross-view consistency** | No contradictions between B.0–B.6 |
-| **Interface consistency** | All declared interfaces are consistent |
-| **State consistency** | State model is consistent across views |
-| **Data flow consistency** | Data flows match interfaces |
-| **ADR consistency** | ADRs do not contradict each other |
-| **Traceability** | Every Stage A interface is addressed |
+| **All 7 architectural views (B.0–B.6)** | ✅ Baseline (Frozen) |
+| **Master Index (this document)** | ✅ Baseline (Frozen) |
+| **Stage B → Stage C Handoff** | ⏭ Pending |
+| **Stage B Closure Declaration** | ⏭ Pending |
+
+### 8.2 What Remains
+
+The remaining items are **administrative closure**, not architectural work:
+
+| Item | Nature |
+|---|---|
+| Produce `STAGE-B-TO-C-HANDOFF-001` v0.1 | Consolidation of Stage B outputs |
+| Declare Stage B closed | Formal declaration |
+
+### 8.3 Frozen Baseline
+
+All Stage B views are **frozen** at their current versions:
+
+| Document | Frozen Version |
+|---|---|
+| `B.0-INTEGRATED-SYS-ARCH-001` | v0.3.3 |
+| `B.1-DATA-ARCH-001` | v0.3 |
+| `B.2-MODEL-ARCH-001` | v0.5.1 |
+| `B.3-OPT-ARCH-001` | v0.6.1 |
+| `B.4-FIN-ARCH-001` | v0.4 |
+| `B.5-SW-ARCH-001` | v0.4 |
+| `B.6-DBX-ARCH-001` | v0.4 |
+| `STAGE-B-HLD-INDEX-001` | v0.2 |
+
+Any subsequent change to a frozen view requires an explicit change request and re-baselining.
 
 ---
 
 ## 9. Change Control
 
-### 9.1 Version History
+### 9.1 Change Procedure
 
-| Version | Date | Changes | Author |
-|---|---|---|---|
-| 0.1 | Stage B start | Initial index created | Consultant |
-
-### 9.2 Change Procedure
-
-- **Adding a section:** must be justified; requires index version bump
-- **Removing a section:** must be justified; requires index version bump
-- **Changing scope of a section:** must be justified; requires index version bump
+- **Adding a view:** must be justified; requires index version bump
+- **Removing a view:** must be justified; requires index version bump
+- **Changing scope of a view:** must be justified; requires index version bump
 - **Changing level of detail:** requires review and index version bump
+- **Changing a frozen view:** requires formal change request and re-baselining
 
-### 9.3 Freeze
+### 9.2 Freeze
 
-Once this index is **accepted**, it is **frozen** for the duration of Stage B. Changes require a formal index version bump.
+This index is **frozen** for the duration of Stage B. Changes require a formal index version bump.
 
 ---
 
@@ -658,67 +521,56 @@ Once this index is **accepted**, it is **frozen** for the duration of Stage B. C
 
 **Document:** `STAGE-B-HLD-INDEX-001`
 
-**Version:** 0.1 — Draft for Review
+**Version:** 0.2 — Baseline (Frozen)
 
-**Status:** Awaiting Review
+**Status:** Baseline (Frozen)
 
-**Next Step:** Freeze index → begin B.0
+**Next Step:** Produce `STAGE-B-TO-C-HANDOFF-001` v0.1
 
 **Language:** English
 
 ---
 
-*End of Stage B HLD Master Index and Scope Definition*
+## 11. Change Log
+
+### 11.1 Changes from v0.1 to v0.2
+
+| # | Change | Reason |
+|---|---|---|
+| 1 | Header: version promoted from v0.1 Draft for Review to **v0.2 Baseline (Frozen)** | Content accepted; Stage B closure preparation |
+| 2 | §2.1: added **Status** column to the product table; all B.0–B.6 marked ✅ Frozen | Reflect the frozen tree |
+| 3 | §3.1: restructured the architectural views diagram to show each view's sub-sections | Improve readability; remove duplication present in v0.1 |
+| 4 | §4: **new Master Index — Frozen Views** section, replacing the duplicated draft index of v0.1 | v0.1 had the index repeated in §3.1 and §4; consolidated here |
+| 5 | §4.1: added the frozen version table with all 7 views + Handoff | Single source of truth for versions |
+| 6 | §4.2: added view scope summary (question answered per view) | Quick reference |
+| 7 | §4.3: added deferral categories summary (consolidated handoff refers here) | Avoid duplicating deferrals in the index |
+| 8 | §5: **new Dependency Chain** section with dependency table, verified parent citations matrix, production sequence, and milestones | v0.1 mentioned production sequence but did not verify parent citations |
+| 9 | §5.2: added **Verified Parent Citations** matrix | Certify the frozen dependency chain |
+| 10 | §5.4: added **Milestones** table with status | Track Stage B closure progress |
+| 11 | §6: retained Level of Detail Rule; simplified references | No content change |
+| 12 | §7: **expanded Stage B Closure Criteria** from 10 to 14 criteria, adding parent-citation, cross-view-interface, handoff, and closure criteria | Complete the closure checklist |
+| 13 | §7.2: added **Consistency Checks** table (cross-view, interface, state, data flow, ADR, traceability, version, ownership, settlement chain, double-counting prevention) | Certify the consistency of the frozen tree |
+| 14 | §8: **new Stage B Closure Status** section, declaring what remains | Make the closure state explicit |
+| 15 | §8.3: added **Frozen Baseline** table | Single source of truth for frozen versions |
+| 16 | §9: retained Change Control; refined to cover frozen-view changes | Consistency with the frozen baseline |
+| 17 | §10: updated Sign-Off — version, status, next step | Reflect the frozen state |
+| 18 | §11: added this change log | Traceability |
+
+### 11.2 Version History
+
+| Version | Date | Changes | Status |
+|---|---|---|---|
+| 0.1 | Stage B start | Initial index created (Draft for Review) | Superseded |
+| 0.2 | Stage B closure | Full rewrite: frozen versions declared, dependency chain verified, closure criteria expanded, closure status added, duplicate content removed | **Baseline (Frozen)** |
 
 ---
 
-## 11. Siguiente paso
+**End of STAGE-B-HLD-INDEX-001 — Stage B HLD Master Index and Scope Definition (v0.2 — Baseline Frozen)**
 
-**Guarda este documento** como:
+**Status:** Baseline (Frozen)
 
-```
-docs/Stage-B-system-architecture/STAGE-B-HLD-INDEX-001.md
-```
+**Next:** `STAGE-B-TO-C-HANDOFF-001` v0.1
 
-O el path que prefieras. Asegúrate de crear el directorio:
+**Prepared by:** BESS Operational & Financial Modeling Consultant
 
-```bash
-mkdir -p docs/Stage-B-system-architecture
-```
-
-**Luego:**
-
-```bash
-# Ver el diff
-git status
-
-# Añadir
-git add docs/Stage-B-system-architecture/STAGE-B-HLD-INDEX-001.md
-
-# Commit
-git commit -m "docs(stage-b): add STAGE-B-HLD-INDEX-001 — HLD Master Index and Scope Definition
-
-Establishes the master index, scope, and production sequence for
-STAGE-B-HLD-001 (System Architecture — HLD).
-
-Contents:
-- Document Control
-- Purpose of the Index
-- Stage B Scope
-- Architectural Views Overview (B.0 + B.1–B.6)
-- Master Index (12 sections, marked Stage B/C/D)
-- ADR Log structure (transversal, not a view)
-- Production Sequence (B.0 → B.1 → ... → B.6)
-- Level of Detail Rule (HLD vs Specification)
-- Review Criteria
-- Change Control
-
-Refs: SYS-STR-FRM-001 v0.9, SYS-ENG-DEF-001 v0.6, PH1-REG-001 v1.1
-Closes: Stage B scope definition
-Next: B.0 Integrated System Architecture"
-
-# Push
-git push origin main
-```
-
----
+**Engagement:** RFP-264144-1
