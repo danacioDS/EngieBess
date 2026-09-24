@@ -383,14 +383,14 @@ The system distinguishes **four concepts**:
 
 | Concept | Description | Working default |
 |---|---|---|
-| **Project horizon** | Full project / modeling horizon | 15 years (Strategy D14) |
+| **Project horizon** | Full project / modeling horizon | 15 years (Strategy D13) |
 | **Simulation / representative-period framework** | How the project horizon is represented computationally | Monthly representative periods (PH-040) |
 | **Optimization horizon** | Horizon covered by a single optimization run | See §8.4 |
 | **Time resolution** | Interval-level temporal resolution | 15-min or 1-h (PH-054) |
 
 **Rule:** These are **different concepts**. B.3 does not collapse them. The simulation / representative-period framework is a **simulation structure**, not a horizon.
 
-**Note on the 15-year project term.** The 15-year project term is declared in `SYS-STR-FRM-001` §12.2 D14. PH-054 is the Register item for time resolution, not for the project term. B.3 cites the Strategy for the project term.
+**Note on the 15-year project term.** The 15-year project term is declared in `SYS-STR-FRM-001` §12.2 D13. PH-054 is the Register item for time resolution, not for the project term. B.3 cites the Strategy for the project term.
 
 **Mapping between project years and representative periods.** The simulation framework shall define the **mapping between the project horizon (15 years) and the representative periods** so that annual state transitions, degradation updates, and financial aggregation remain **traceable across the project horizon**. The exact representative-period weighting, replication, and calendar mapping (e.g., whether a representative period is a specific month of a specific year, or a statistical representative repeated across years) are **deferred to Stage C**. B.3 declares that the mapping must exist and be traceable; it does not prescribe the mapping mechanism.
 
@@ -742,7 +742,7 @@ B.3 recognizes the following **logical optimization formulation types**:
 | # | Change | Reason |
 |---|---|---|
 | 1 | Header: removed "Frozen"; status set to **Baseline Candidate (pending B.2 freeze)** | B.2 is still a Draft; B.3 cannot be frozen before B.2 |
-| 2 | §8.1: 15-year project term cites **Strategy D14**, not PH-054 | PH-054 is time resolution, not project term |
+| 2 | §8.1: 15-year project term cites **Strategy D13**, not PH-054 | PH-054 is time resolution, not project term |
 | 3 | §11.3: removed "HiGHS pending verification against PH1-REG-001"; added note that solver licensing is not a Phase 1 clarification item | No PH item for solver licensing exists |
 | 4 | §5.1: added **Tariff / billing coupling** constraint family | Preserves A.2.4 §16.1 (peak as coupled variable, coincident peak, ratchet, regulation charging into peak) |
 | 5 | §5.1: added **Simultaneous charge/discharge** constraint family | Preserves A.2.4 §16.1 trap (negative prices) |
@@ -822,7 +822,7 @@ B.3 recognizes the following **logical optimization formulation types**:
 | PH-040 | Representative periods / ratchets | Representative-period scheme and ratchets | ✅ Match |
 | PH-054 | Time resolution | Time resolution | ✅ Match |
 
-**Note on project term.** The 15-year project term is declared in `SYS-STR-FRM-001` §12.2 D14 and is cited as **Strategy D14**, not as PH-054.
+**Note on project term.** The 15-year project term is declared in `SYS-STR-FRM-001` §12.2 D13 and is cited as **Strategy D13**, not as PH-054.
 
 **No PH IDs are created or reinterpreted in B.3.**
 
